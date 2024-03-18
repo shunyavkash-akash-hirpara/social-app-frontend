@@ -5,7 +5,7 @@ import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 
 type Props = {
   label: string;
-  items: { name: string; avatar: string; id: number }[];
+  items: { name: string; avatar?: string; id: number }[];
 };
 
 function classNames(...classes: string[]): string {
@@ -71,11 +71,14 @@ export default function SelectComponent({
                     }) => (
                       <>
                         <div className="flex items-center">
-                          <img
-                            src={item.avatar}
-                            alt=""
-                            className="h-5 w-5 flex-shrink-0 rounded-full"
-                          />
+                          {item.avatar && (
+                            <img
+                              src={item.avatar}
+                              alt=""
+                              className="h-5 w-5 flex-shrink-0 rounded-full"
+                            />
+                          )}
+
                           <span
                             className={classNames(
                               selected ? "font-semibold" : "font-normal",
