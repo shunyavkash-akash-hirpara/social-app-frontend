@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useFormik } from "formik";
+import * as yup from "yup";
 import InputComponent from "../Component/InputComponent";
 
 type Props = {};
@@ -10,26 +11,34 @@ interface MyFormValues {
 }
 
 export default function SignIn({}: Props) {
+  // schema for yup validation
+  const schema = yup.object().shape({
+    email: yup.string().email().required(),
+    password: yup.string().required().min(6),
+  });
+
+  // method to trigger validation and return the error message
+  const validateFormData = async (formData: any) => {
+    console.log(formData);
+    const errors = await schema.validate(formData);
+
+    if (errors) {
+      console.log(errors);
+      return errors;
+    } else {
+      return undefined;
+    }
+  };
+
   const formik = useFormik({
+    validationSchema: schema,
     initialValues: { email: "", password: "" },
     onSubmit: (values) => {
+      validateFormData(values);
       alert(JSON.stringify(values, null, 2));
       console.log(values);
     },
   });
-  // const handleOnSubmit = (evt: any) => {
-  //   evt.preventDefault();
-
-  //   const { email, password } = state;
-  //   alert(`You are login with email: ${email} and password: ${password}`);
-
-  //   for (const key in state) {
-  //     setState({
-  //       ...state,
-  //       [key]: "",
-  //     });
-  //   }
-  // };
   return (
     <div className="absolute top-0 h-full transition-all duration-600 ease-in-out absolute left-0 w-1/2 z-2">
       <form
@@ -61,44 +70,37 @@ export default function SignIn({}: Props) {
         </div>
         <span className="text-xs">or use your account</span>
         <InputComponent
-          id="email"
           name="email"
           type="email"
           placeholder="Email"
           formik={formik}
         />
         <InputComponent
-          id="password"
           name="password"
           type="password"
           placeholder="Password"
           formik={formik}
         />
-        {/* <input
-          className="bg-gray-200 border-0 py-3 px-4 my-2 w-full"
-          type="email"
-          placeholder="Email"
-          name="email"
-          value={state.email}
-          onChange={handleChange}
-        />
-        <input
-          className="bg-gray-200 border-0 py-3 px-4 my-2 w-full"
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={state.password}
-          onChange={handleChange}
-        /> */}
         <a href="#" className="text-gray-700 text-base no-underline my-4">
           Forgot your password?
         </a>
-        <button
-          type="submit"
-          className="rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-12 py-3 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none"
-        >
-          Sign In
-        </button>
+        <div className="flex relative">
+          <button
+            type="submit"
+            className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-12 py-3 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none"
+          >
+            Sign In
+          </button>
+          {/* <a href="#" className="flex p-2 absolute left-[115%]">
+            skip
+            <img
+              height={30}
+              width={30}
+              src="/public/icons/right-arrow-svgrepo-com.svg"
+              className="px-2"
+            />
+          </a> */}
+        </div>
       </form>
     </div>
   );

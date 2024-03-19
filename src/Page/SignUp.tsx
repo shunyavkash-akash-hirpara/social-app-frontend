@@ -1,32 +1,26 @@
 import React, { useState } from "react";
+import * as yup from "yup";
 import { useFormik } from "formik";
 import InputComponent from "../Component/InputComponent";
 
 type Props = {};
 
 export default function SignUp({}: Props) {
+  // schema for yup validation
+  const schema = yup.object().shape({
+    name: yup.string().required(),
+    email: yup.string().email().required(),
+    password: yup.string().required().min(6),
+  });
+
   const formik = useFormik({
-    initialValues: { email: "", password: "" },
+    validationSchema: schema,
+    initialValues: { name: "", email: "", password: "" },
     onSubmit: (values) => {
       alert(JSON.stringify(values, null, 2));
       console.log(values);
     },
   });
-  // const handleOnSubmit = (evt: any) => {
-  //   evt.preventDefault();
-
-  //   const { name, email, password } = state;
-  //   alert(
-  //     `You are sign up with name: ${name} email: ${email} and password: ${password}`
-  //   );
-
-  //   for (const key in state) {
-  //     setState({
-  //       ...state,
-  //       [key]: "",
-  //     });
-  //   }
-  // };
   return (
     <div className="absolute top-0 h-full transition-all duration-600 ease-in-out absolute left-0 w-1/2 opacity-0 transform translate-x-full opacity-100 z-5 animate-show">
       <form
@@ -58,53 +52,37 @@ export default function SignUp({}: Props) {
         </div>
         <span className="text-xs">or use your email for registration</span>
         <InputComponent
-          id="name"
           name="name"
           type="text"
           placeholder="Name"
           formik={formik}
         />
         <InputComponent
-          id="email"
           name="email"
           type="email"
           placeholder="Email"
           formik={formik}
         />
         <InputComponent
-          id="password"
           name="password"
           type="password"
           placeholder="Password"
           formik={formik}
         />
-        {/* <input
-          className="bg-gray-200 border-0 py-3 px-4 my-2 w-full"
-          type="text"
-          name="name"
-          value={state.name}
-          onChange={handleChange}
-          placeholder="Name"
-        />
-        <input
-          className="bg-gray-200 border-0 py-3 px-4 my-2 w-full"
-          type="email"
-          name="email"
-          value={state.email}
-          onChange={handleChange}
-          placeholder="Email"
-        />
-        <input
-          className="bg-gray-200 border-0 py-3 px-4 my-2 w-full"
-          type="password"
-          name="password"
-          value={state.password}
-          onChange={handleChange}
-          placeholder="Password"
-        /> */}
-        <button className="rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-12 py-3 mt-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
-          Sign Up
-        </button>
+        <div className="flex relative mt-2">
+          <button className="rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-12 py-3 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
+            Sign Up
+          </button>
+          {/* <a href="#" className="flex p-2 absolute left-[115%]">
+            skip
+            <img
+              height={30}
+              width={30}
+              src="/public/icons/right-arrow-svgrepo-com.svg"
+              className="px-2"
+            />
+          </a> */}
+        </div>
       </form>
     </div>
   );

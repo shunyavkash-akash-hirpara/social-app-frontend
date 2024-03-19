@@ -1,9 +1,9 @@
+import { ErrorMessage } from "formik";
 import React, { useState } from "react";
 
 type Props = {};
 
 export default function InputComponent({
-  id,
   name,
   label,
   type,
@@ -12,7 +12,6 @@ export default function InputComponent({
   inputStyle,
   formik,
 }: {
-  id: any;
   name: string;
   label?: string;
   type: string;
@@ -21,10 +20,6 @@ export default function InputComponent({
   currency?: boolean;
   formik: any;
 }): React.JSX.Element {
-  const [state, setState] = useState();
-  const handleChange = (evt: any) => {
-    setState(evt.target.value);
-  };
   return (
     <div>
       {/* <label
@@ -40,14 +35,20 @@ export default function InputComponent({
         <input
           type={type}
           name={name}
-          id={id}
-          className={`bg-white border-solid border-gray border rounded-lg py-3 px-4 my-2 w-full ${
-            currency ? "pr-20" : "pr-3"
-          } + ${inputStyle}`}
+          className={
+            `bg-white border-solid border-gray border rounded-lg py-3 px-4 my-2 w-full ${
+              currency ? "pr-20" : "pr-3"
+            }` + inputStyle
+          }
           placeholder={placeholder}
           onChange={formik.handleChange}
-          value={formik.values.firstName}
+          value={formik.values[name]}
         />
+        {formik.touched[name] && Boolean(formik.errors[name]) && (
+          <div className="text-red-500">
+            {formik.touched[name] && formik.errors[name]}
+          </div>
+        )}
         {/* {currency && (
           <div className="absolute inset-y-0 right-0 flex items-center">
             <label htmlFor="currency" className="sr-only">
