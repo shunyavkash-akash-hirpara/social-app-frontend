@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import InputComponent from "../Component/InputComponent";
-import SelectComponent from "../Component/SelectComponent";
 import SignInForm from "./SignIn";
 import SignUpForm from "./SignUp";
 import classNames from "classnames";
@@ -87,7 +85,7 @@ export default function Home({}: Props) {
       <div className="grid place-items-center">
         <div
           className={
-            "bg-white rounded-2xl shadow-lg relative overflow-hidden w-full max-w-screen-md min-h-screen md:min-h-[480px]"
+            "bg-white rounded-2xl shadow-lg relative overflow-hidden w-full max-w-screen-md min-h-screen min-h-[528px] max-w-[820px]"
           }
           id="container"
         >

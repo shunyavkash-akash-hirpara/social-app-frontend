@@ -36,7 +36,7 @@ export default function InputComponent({
           type={type}
           name={name}
           className={
-            `bg-white border-solid border-gray border rounded-lg py-3 px-4 my-2 w-full ${
+            `bg-white border-solid border-gray border rounded-lg py-3 px-4 my-2 w-[280px] ${
               currency ? "pr-20" : "pr-3"
             }` + inputStyle
           }

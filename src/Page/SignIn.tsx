@@ -2,6 +2,11 @@ import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import InputComponent from "../Component/InputComponent";
+import useApi from "../hooks/useApi";
+import { useSnack } from "../hooks/store/useSnack";
+import { useNavigate } from "react-router-dom";
+import { APIS } from "../api/apiList";
+import { useAuth } from "../hooks/store/useAuth";
 
 type Props = {};
 
@@ -11,32 +16,49 @@ interface MyFormValues {
 }
 
 export default function SignIn({}: Props) {
+  const { apiCall } = useApi();
+  const { setSnack } = useSnack();
+  const navigate = useNavigate();
+  const { login } = useAuth();
   // schema for yup validation
   const schema = yup.object().shape({
     email: yup.string().email().required(),
     password: yup.string().required().min(6),
   });
 
-  // method to trigger validation and return the error message
-  const validateFormData = async (formData: any) => {
-    console.log(formData);
-    const errors = await schema.validate(formData);
-
-    if (errors) {
-      console.log(errors);
-      return errors;
-    } else {
-      return undefined;
-    }
-  };
-
   const formik = useFormik({
     validationSchema: schema,
     initialValues: { email: "", password: "" },
-    onSubmit: (values) => {
-      validateFormData(values);
-      alert(JSON.stringify(values, null, 2));
-      console.log(values);
+    onSubmit: async (values) => {
+      try {
+        const res = await apiCall({
+          url: APIS.AUTHENTICATION.SIGNIN,
+          method: "post",
+          data: JSON.stringify(values, null, 2),
+        });
+        if (res.status === 200) {
+          let {
+            username,
+            name,
+            email,
+            role,
+            profile_img,
+            mobileNumber,
+            accessToken,
+            _id,
+          } = res.data.data;
+          login({
+            user: { username, name, email, role, mobileNumber, profile_img },
+            accessToken: accessToken,
+            userId: _id,
+          });
+          setSnack(res.data.message);
+          navigate("/feed");
+        }
+      } catch (error: any) {
+        let errorMessage = error.response.data.message;
+        setSnack(errorMessage, "warning");
+      }
     },
   });
   return (

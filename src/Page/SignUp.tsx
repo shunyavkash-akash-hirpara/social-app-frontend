@@ -2,23 +2,43 @@ import React, { useState } from "react";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import InputComponent from "../Component/InputComponent";
+import useApi from "../hooks/useApi";
+import { APIS } from "../api/apiList";
+import { useSnack } from "../hooks/store/useSnack";
+import { useNavigate } from "react-router-dom";
 
 type Props = {};
 
 export default function SignUp({}: Props) {
+  const { apiCall } = useApi();
+  const { setSnack } = useSnack();
+  const navigate = useNavigate();
   // schema for yup validation
   const schema = yup.object().shape({
     name: yup.string().required(),
+    username: yup.string().required(),
     email: yup.string().email().required(),
     password: yup.string().required().min(6),
   });
 
   const formik = useFormik({
     validationSchema: schema,
-    initialValues: { name: "", email: "", password: "" },
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
-      console.log(values);
+    initialValues: { name: "", username: "", email: "", password: "" },
+    onSubmit: async (values) => {
+      try {
+        const res = await apiCall({
+          url: APIS.AUTHENTICATION.SIGNUP,
+          method: "post",
+          data: JSON.stringify(values, null, 2),
+        });
+        if (res.status === 200) {
+          setSnack(res.data.message);
+          navigate("/feed");
+        }
+      } catch (error: any) {
+        let errorMessage = error.response.data.message;
+        setSnack(errorMessage, "warning");
+      }
     },
   });
   return (
@@ -55,6 +75,12 @@ export default function SignUp({}: Props) {
           name="name"
           type="text"
           placeholder="Name"
+          formik={formik}
+        />
+        <InputComponent
+          name="username"
+          type="text"
+          placeholder="username"
           formik={formik}
         />
         <InputComponent
