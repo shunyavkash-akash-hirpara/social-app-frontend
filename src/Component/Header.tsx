@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Header() {
+export default function Header(): React.JSX.Element {
   return (
     <nav className="bg-white border-gray-200 fixed top-0 w-full">
       <div className="max-w-screen-xl flex flex-wrap items-center mx-auto p-2">
