@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { useFormik } from "formik";
+import { FormikProps, useFormik } from "formik";
 import * as yup from "yup";
 import InputComponent from "../Component/InputComponent";
 import useApi from "../hooks/useApi";
@@ -8,15 +7,13 @@ import { useNavigate } from "react-router-dom";
 import { APIS } from "../api/apiList";
 import { useAuth } from "../hooks/store/useAuth";
 
-type Props = {};
-
-interface MyFormValues {
+interface MyFormikValues {
   email: string;
   password: string;
 }
 
-export default function SignIn({}: Props) {
-  const { apiCall } = useApi();
+export default function SignIn() {
+  const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -26,7 +23,7 @@ export default function SignIn({}: Props) {
     password: yup.string().required().min(6),
   });
 
-  const formik = useFormik({
+  const formik: FormikProps<MyFormikValues> = useFormik<MyFormikValues>({
     validationSchema: schema,
     initialValues: { email: "", password: "" },
     onSubmit: async (values) => {
@@ -37,7 +34,7 @@ export default function SignIn({}: Props) {
           data: JSON.stringify(values, null, 2),
         });
         if (res.status === 200) {
-          let {
+          const {
             username,
             name,
             email,
@@ -55,14 +52,16 @@ export default function SignIn({}: Props) {
           setSnack(res.data.message);
           navigate("/feed");
         }
-      } catch (error: any) {
-        let errorMessage = error.response.data.message;
-        setSnack(errorMessage, "warning");
+      } catch (error) {
+        if (checkAxiosError(error)) {
+          const errorMessage = error?.response?.data.message;
+          setSnack(errorMessage, "warning");
+        }
       }
     },
   });
   return (
-    <div className="absolute top-0 h-full transition-all duration-600 ease-in-out absolute left-0 w-1/2 z-2">
+    <div className="absolute top-0 h-full transition-all duration-600 ease-in-out left-0 w-1/2 z-2">
       <form
         onSubmit={formik.handleSubmit}
         className="bg-white flex items-center justify-center flex-col px-10 h-full text-center"
@@ -91,13 +90,13 @@ export default function SignIn({}: Props) {
           </a>
         </div>
         <span className="text-xs">or use your account</span>
-        <InputComponent
+        <InputComponent<MyFormikValues>
           name="email"
           type="email"
           placeholder="Email"
           formik={formik}
         />
-        <InputComponent
+        <InputComponent<MyFormikValues>
           name="password"
           type="password"
           placeholder="Password"

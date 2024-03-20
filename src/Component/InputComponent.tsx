@@ -1,24 +1,21 @@
-import { ErrorMessage } from "formik";
-import React, { useState } from "react";
+import { FormikProps } from "formik";
+import React from "react";
 
-type Props = {};
-
-export default function InputComponent({
+export default function InputComponent<MyFormikValues>({
   name,
-  label,
   type,
   currency,
   placeholder,
   inputStyle,
   formik,
 }: {
-  name: string;
+  name: keyof MyFormikValues;
   label?: string;
-  type: string;
+  type: React.HTMLInputTypeAttribute;
   placeholder: string;
   inputStyle?: string;
   currency?: boolean;
-  formik: any;
+  formik: FormikProps<MyFormikValues>;
 }): React.JSX.Element {
   return (
     <div>
@@ -34,7 +31,7 @@ export default function InputComponent({
         </div> */}
         <input
           type={type}
-          name={name}
+          name={name as string}
           className={
             `bg-white border-solid border-gray border rounded-lg py-3 px-4 my-2 w-[280px] ${
               currency ? "pr-20" : "pr-3"
@@ -42,11 +39,11 @@ export default function InputComponent({
           }
           placeholder={placeholder}
           onChange={formik.handleChange}
-          value={formik.values[name]}
+          value={formik.values[name] as string}
         />
         {formik.touched[name] && Boolean(formik.errors[name]) && (
           <div className="text-red-500">
-            {formik.touched[name] && formik.errors[name]}
+            {(formik.touched[name] && formik.errors[name]) as string}
           </div>
         )}
         {/* {currency && (

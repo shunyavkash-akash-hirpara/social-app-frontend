@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import SignInForm from "./SignIn";
 import SignUpForm from "./SignUp";
 import classNames from "classnames";
 
-type Props = {};
-
-export default function Auth({}: Props) {
+export default function Auth() {
   const [type, setType] = useState<"signIn" | "signUp">("signIn");
 
   return (
@@ -22,7 +20,7 @@ export default function Auth({}: Props) {
       <div className="grid place-items-center">
         <div
           className={
-            "bg-white rounded-2xl shadow-lg relative overflow-hidden w-full max-w-screen-md min-h-[528px] max-w-[820px]"
+            "bg-white rounded-2xl shadow-lg relative overflow-hidden w-full max-w-screen-md min-h-[528px]"
           }
           id="container"
         >
@@ -37,7 +35,7 @@ export default function Auth({}: Props) {
               }
             )}
           >
-            <div className="bg-gradient-to-r grid place-items-center from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white relative left-full h-full w-full transform transition duration-600 ease-in-out transform -translate-x-full">
+            <div className="bg-gradient-to-r grid place-items-center from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white relative left-full h-full w-full transform transition duration-600 ease-in-out -translate-x-full">
               {type === "signIn" ? (
                 <div className="absolute top-0 h-full w-full flex flex-col items-center justify-center px-10 text-center transition-transform duration-600 ease-in-out">
                   <h1 className="font-bold m-0">Welcome Back!</h1>

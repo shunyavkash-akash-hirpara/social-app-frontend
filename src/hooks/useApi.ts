@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { instance } from "../api/instance";
 import { useAuth } from "./store/useAuth";
 import { useSnack } from "./store/useSnack";
-import { AxiosRequestConfig } from "axios";
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
 
 export default function useApi() {
   const [isLoading, setIsLoading] = useState(false);
@@ -62,10 +62,15 @@ export default function useApi() {
       throw error;
     }
   },
-  []);
+  [accessToken, logout, setSnack]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function checkAxiosError(payload: any): payload is AxiosError<any, any> {
+    return axios.isAxiosError(payload);
+  }
   return {
     isLoading,
     setIsLoading,
     apiCall,
+    checkAxiosError
   };
 }
