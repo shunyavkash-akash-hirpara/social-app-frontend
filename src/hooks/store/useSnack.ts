@@ -1,13 +1,13 @@
 import { create } from "zustand";
 
-interface AuthState {
+interface SnackState {
   message: string,
   type: string,
   open: boolean,
   setSnack: (message?:string, type?:string, open?:boolean) => void
 }
 
-export const useSnack = create<AuthState>((set) => ({
+export const useSnack = create<SnackState>((set) => ({
   message: "",
   type: "",
   open: false,
