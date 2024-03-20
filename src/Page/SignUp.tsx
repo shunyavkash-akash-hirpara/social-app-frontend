@@ -1,16 +1,20 @@
-import React, { useState } from "react";
 import * as yup from "yup";
-import { useFormik } from "formik";
+import { FormikProps, useFormik } from "formik";
 import InputComponent from "../Component/InputComponent";
 import useApi from "../hooks/useApi";
 import { APIS } from "../api/apiList";
 import { useSnack } from "../hooks/store/useSnack";
 import { useNavigate } from "react-router-dom";
 
-type Props = {};
+interface MyFormikValue {
+  name: string;
+  username: string;
+  email: string;
+  password: string;
+}
 
-export default function SignUp({}: Props) {
-  const { apiCall } = useApi();
+export default function SignUp() {
+  const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
   const navigate = useNavigate();
   // schema for yup validation
@@ -21,7 +25,7 @@ export default function SignUp({}: Props) {
     password: yup.string().required().min(6),
   });
 
-  const formik = useFormik({
+  const formik: FormikProps<MyFormikValue> = useFormik<MyFormikValue>({
     validationSchema: schema,
     initialValues: { name: "", username: "", email: "", password: "" },
     onSubmit: async (values) => {
@@ -35,14 +39,16 @@ export default function SignUp({}: Props) {
           setSnack(res.data.message);
           navigate("/feed");
         }
-      } catch (error: any) {
-        let errorMessage = error.response.data.message;
-        setSnack(errorMessage, "warning");
+      } catch (error) {
+        if (checkAxiosError(error)) {
+          const errorMessage = error?.response?.data.message;
+          setSnack(errorMessage, "warning");
+        }
       }
     },
   });
   return (
-    <div className="absolute top-0 h-full transition-all duration-600 ease-in-out absolute left-0 w-1/2 opacity-0 transform translate-x-full opacity-100 z-5 animate-show">
+    <div className="absolute top-0 h-full transition-all duration-600 ease-in-out left-0 w-1/2 transform translate-x-full opacity-100 z-5 animate-show">
       <form
         onSubmit={formik.handleSubmit}
         className="bg-white flex items-center justify-center flex-col px-10 h-full text-center"

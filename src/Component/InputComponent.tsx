@@ -1,11 +1,7 @@
-import { ErrorMessage } from "formik";
-import React, { useState } from "react";
-
-type Props = {};
+import React from "react";
 
 export default function InputComponent({
   name,
-  label,
   type,
   currency,
   placeholder,
