@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { APIS } from "../api/apiList";
 import { useAuth } from "../hooks/store/useAuth";
 
-interface MyFormValues {
+interface MyFormikValues {
   email: string;
   password: string;
 }
@@ -23,7 +23,7 @@ export default function SignIn() {
     password: yup.string().required().min(6),
   });
 
-  const formik: FormikProps<MyFormValues> = useFormik<MyFormValues>({
+  const formik: FormikProps<MyFormikValues> = useFormik<MyFormikValues>({
     validationSchema: schema,
     initialValues: { email: "", password: "" },
     onSubmit: async (values) => {
@@ -90,13 +90,13 @@ export default function SignIn() {
           </a>
         </div>
         <span className="text-xs">or use your account</span>
-        <InputComponent
+        <InputComponent<MyFormikValues>
           name="email"
           type="email"
           placeholder="Email"
           formik={formik}
         />
-        <InputComponent
+        <InputComponent<MyFormikValues>
           name="password"
           type="password"
           placeholder="Password"

@@ -77,25 +77,25 @@ export default function SignUp() {
           </a>
         </div>
         <span className="text-xs">or use your email for registration</span>
-        <InputComponent
+        <InputComponent<MyFormikValue>
           name="name"
           type="text"
           placeholder="Name"
           formik={formik}
         />
-        <InputComponent
+        <InputComponent<MyFormikValue>
           name="username"
           type="text"
           placeholder="username"
           formik={formik}
         />
-        <InputComponent
+        <InputComponent<MyFormikValue>
           name="email"
           type="email"
           placeholder="Email"
           formik={formik}
         />
-        <InputComponent
+        <InputComponent<MyFormikValue>
           name="password"
           type="password"
           placeholder="Password"
