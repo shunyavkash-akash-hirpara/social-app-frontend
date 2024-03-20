@@ -1,44 +1,52 @@
+import { FormikProps } from "formik";
 import React from "react";
 
-type Props = {};
-
-export default function InputComponent({
+export default function InputComponent<MyFormikValues>({
   name,
-  label,
   type,
   currency,
   placeholder,
   inputStyle,
+  formik,
 }: {
-  name: string;
-  label: string;
-  type: string;
+  name: keyof MyFormikValues;
+  label?: string;
+  type: React.HTMLInputTypeAttribute;
   placeholder: string;
   inputStyle?: string;
   currency?: boolean;
+  formik: FormikProps<MyFormikValues>;
 }): React.JSX.Element {
   return (
     <div>
-      <label
+      {/* <label
         htmlFor={name}
         className="block text-sm font-medium leading-6 text-gray-900"
       >
         {label}
-      </label>
-      <div className="relative mt-2 rounded-md shadow-sm">
+      </label> */}
+      <div className="relative mt-2 rounded-md">
         {/* <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
           <span className="text-gray-500 sm:text-sm">$</span>
         </div> */}
         <input
           type={type}
-          name={name}
-          id={name}
-          className={`block w-full rounded-md border-0 py-1.5 pl-3 ${
-            currency ? "pr-20" : "pr-3"
-          } text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 + ${inputStyle}`}
+          name={name as string}
+          className={
+            `bg-white border-solid border-gray border rounded-lg py-3 px-4 my-2 w-[280px] ${
+              currency ? "pr-20" : "pr-3"
+            }` + inputStyle
+          }
           placeholder={placeholder}
+          onChange={formik.handleChange}
+          value={formik.values[name] as string}
         />
-        {currency && (
+        {formik.touched[name] && Boolean(formik.errors[name]) && (
+          <div className="text-red-500">
+            {(formik.touched[name] && formik.errors[name]) as string}
+          </div>
+        )}
+        {/* {currency && (
           <div className="absolute inset-y-0 right-0 flex items-center">
             <label htmlFor="currency" className="sr-only">
               Currency
@@ -53,7 +61,7 @@ export default function InputComponent({
               <option>EUR</option>
             </select>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

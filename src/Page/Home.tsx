@@ -1,6 +1,4 @@
-import React from "react";
-import InputComponent from "../Component/InputComponent";
-import SelectComponent from "../Component/SelectComponent";
+import React, { useState } from "react";
 
 type Props = {};
 
@@ -68,17 +66,5 @@ const items = [
 ];
 
 export default function Home({}: Props) {
-  return (
-    <>
-      {/* <InputComponent
-        name="price"
-        label="Price"
-        type="text"
-        placeholder="0.00"
-        currency
-      /> */}
-      <SelectComponent label="assign to" items={items} />
-      <div className="text-3xl font-bold underline text-red-600">Home</div>
-    </>
-  );
+  return <h2>Home</h2>;
 }
