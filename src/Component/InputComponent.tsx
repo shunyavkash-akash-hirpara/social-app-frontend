@@ -25,7 +25,7 @@ export default function InputComponent<MyFormikValues>({
       >
         {label}
       </label> */}
-      <div className="relative mt-2 rounded-md">
+      <div className="relative rounded-md">
         {/* <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
           <span className="text-gray-500 sm:text-sm">$</span>
         </div> */}
@@ -33,8 +33,8 @@ export default function InputComponent<MyFormikValues>({
           type={type}
           name={name as string}
           className={
-            `bg-white border-solid border-gray border rounded-lg py-3 px-4 my-2 w-[280px] ${
-              currency ? "pr-20" : "pr-3"
+            `bg-white border-solid border-gray border rounded-xl py-3 px-4 w-[280px] ${
+              currency ? "pr-20" : "pr-3 "
             }` + inputStyle
           }
           placeholder={placeholder}

@@ -1,3 +1,4 @@
+import React from "react";
 import * as yup from "yup";
 import { FormikProps, useFormik } from "formik";
 import InputComponent from "../Component/InputComponent";
@@ -13,7 +14,7 @@ interface MyFormikValue {
   password: string;
 }
 
-export default function SignUp() {
+export default function SignUp(): React.JSX.Element {
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
   const navigate = useNavigate();
@@ -82,24 +83,28 @@ export default function SignUp() {
           type="text"
           placeholder="Name"
           formik={formik}
+          inputStyle="my-2"
         />
         <InputComponent<MyFormikValue>
           name="username"
           type="text"
           placeholder="username"
           formik={formik}
+          inputStyle="my-2"
         />
         <InputComponent<MyFormikValue>
           name="email"
           type="email"
           placeholder="Email"
           formik={formik}
+          inputStyle="my-2"
         />
         <InputComponent<MyFormikValue>
           name="password"
           type="password"
           placeholder="Password"
           formik={formik}
+          inputStyle="my-2"
         />
         <div className="flex relative mt-2">
           <button className="rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-12 py-3 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">

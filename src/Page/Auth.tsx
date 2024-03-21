@@ -3,7 +3,7 @@ import SignInForm from "./SignIn";
 import SignUpForm from "./SignUp";
 import classNames from "classnames";
 
-export default function Auth() {
+export default function Auth(): React.JSX.Element {
   const [type, setType] = useState<"signIn" | "signUp">("signIn");
 
   return (

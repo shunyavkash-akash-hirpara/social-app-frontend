@@ -3,7 +3,7 @@ import React from "react";
 export default function Header(): React.JSX.Element {
   return (
     <nav className="bg-white border-gray-200 fixed top-0 w-full">
-      <div className="max-w-screen-xl flex flex-wrap items-center mx-auto p-2">
+      <div className="flex flex-wrap items-center mx-10 p-2">
         <a
           href="https://flowbite.com/"
           className="flex items-center space-x-3 rtl:space-x-reverse"
@@ -14,7 +14,7 @@ export default function Header(): React.JSX.Element {
             alt="Flowbite Logo"
           />
           <span className="self-center text-2xl font-semibold whitespace-nowrap">
-            Flowbite
+            SocialApp
           </span>
         </a>
 
