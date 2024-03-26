@@ -96,14 +96,14 @@ export default function SignIn(): React.JSX.Element {
           type="email"
           placeholder="Email"
           formik={formik}
-          inputStyle="my-2"
+          inputStyle="bg-white my-2"
         />
         <InputComponent<MyFormikValues>
           name="password"
           type="password"
           placeholder="Password"
           formik={formik}
-          inputStyle="my-2"
+          inputStyle="bg-white my-2"
         />
         <a href="#" className="text-gray-700 text-base no-underline my-4">
           Forgot your password?

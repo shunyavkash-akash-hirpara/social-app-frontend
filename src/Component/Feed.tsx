@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import * as yup from "yup";
 import { FormikProps, useFormik } from "formik";
+import InputEmoji from "react-input-emoji";
 import InputComponent from "../Component/InputComponent";
 import useApi from "../hooks/useApi";
 import { APIS } from "../api/apiList";
@@ -66,6 +67,7 @@ export default function Feed(): React.JSX.Element {
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
   const navigate = useNavigate();
+  const [comment, setComment] = useState({ id: "", text: "" });
   // schema for yup validation
   const schema = yup.object().shape({
     description: yup.string(),
@@ -95,10 +97,14 @@ export default function Feed(): React.JSX.Element {
       }
     },
   });
+  function handleOnEnter(text: string) {
+    formik.setFieldValue("description", text);
+  }
+
   return (
     <>
       {/* post create input */}
-      <div className="w-full bg-white rounded-xl mb-5 p-4">
+      <div className="w-full bg-white rounded-xl mb-6 p-4">
         <div className="flex items-center pb-3">
           <img
             className="w-10 h-10 rounded-full mr-3"
@@ -122,20 +128,30 @@ export default function Feed(): React.JSX.Element {
             />
             <span className="text-gray-500 ml-1 text-sm">Live video</span>
           </button>
-          <button className="flex flex-row items-center">
+          <label
+            htmlFor="post-input-file"
+            className="flex flex-row items-center cursor-pointer"
+          >
+            <input type="file" id="post-input-file" className="hidden" />
             <img
               width={25}
               src="/public/icons/photo-svgrepo-com.svg"
               alt="photos"
             />
             <span className="text-gray-500 ml-1 text-sm">Photos</span>
-          </button>
+          </label>
           <button className="flex flex-row items-center">
-            <img
+            <InputEmoji
+              value={formik.values.description}
+              onChange={handleOnEnter}
+              cleanOnEnter
+              keepOpened
+            />
+            {/* <img
               width={25}
               src="/public/icons/emoji-smile-svgrepo-com.svg"
               alt="feeling"
-            />
+            /> */}
             <span className="text-gray-500 ml-1 text-sm">Feeling</span>
           </button>
           <button className="rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-sm font-bold px-7 py-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
@@ -186,7 +202,7 @@ export default function Feed(): React.JSX.Element {
               ))}
 
               <a
-                className="flex items-center justify-center w-8 h-8 text-xs font-medium text-white bg-pink-700 border-2 border-white rounded-full hover:bg-pink-600"
+                className="flex items-center justify-center w-8 h-8 text-xs font-medium text-white bg-primary border-2 border-white rounded-full hover:bg-pink-600"
                 href="#"
               >
                 +{peoples.length - 3}
@@ -233,21 +249,26 @@ export default function Feed(): React.JSX.Element {
               src="https://plm-staging.s3.amazonaws.com/profiles/65264e33d2ac619310e6687a?v=27"
               alt="Rounded avatar"
             />
-            <InputComponent
-              name="description"
+            <input
               type="text"
               placeholder="Write a comment..."
-              formik={formik}
-              inputStyle="w-[432px] bg-input-primary border-none my-0 text-sm"
+              className="border-gray border rounded-xl py-3 px-4 pr-3 w-[432px] bg-input-primary border-none my-0 text-sm"
+              onChange={(e) =>
+                setComment({ id: item.id.toString(), text: e.target.value })
+              }
+              value={comment.id === item.id.toString() ? comment.text : ""}
             />
-            <div className="bg-[#f48bb34c] py-1 pl-1 pr-2 rounded-xl">
+            <button
+              className="bg-[#f48bb34c] py-1 pl-1 pr-2 rounded-xl"
+              onClick={() => console.log(comment.text)}
+            >
               <img
                 className="transform rotate-[30deg]"
                 width={35}
                 src="/public/icons/share-1-svgrepo-com.svg"
                 alt="enter"
               />
-            </div>
+            </button>
           </div>
         </div>
       ))}

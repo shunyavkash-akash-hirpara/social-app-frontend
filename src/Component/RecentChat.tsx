@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
+import ChatBox from "./ChatBox";
+import StoryModel from "./StoryModel";
 
 const peoples = [
   {
@@ -48,6 +50,10 @@ const peoples = [
 ];
 
 export default function RecentChat(): React.JSX.Element {
+  const [openChat, setOpenChat] = useState(false);
+  const [openStory, setOpenStory] = useState(false);
+  const [chatUser, setChatUser] = useState({ avatar: "", name: "" });
+  const [activeSlide, setActiveSlide] = useState<number>(0);
   return (
     <>
       <aside
@@ -56,21 +62,17 @@ export default function RecentChat(): React.JSX.Element {
         aria-label="Sidebar"
       >
         <div className="h-full px-3 py-4 overflow-y-auto bg-white">
-          <Swiper
-            className="swiper"
-            spaceBetween={5}
-            slidesPerView={4}
-            onSlideChange={() => console.log("slide change")}
-            onSwiper={(swiper) => console.log(swiper)}
-          >
+          <Swiper className="swiper" spaceBetween={5} slidesPerView={4}>
             <SwiperSlide className="relative flex items-center justify-center flex-col">
-              <img
-                className="w-14 h-14 rounded-full ring-2 ring-red-500"
-                src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                alt="Bordered avatar"
-              />
-              <label htmlFor="file_upload">
-                <input id="file_upload" type="file" className="hidden" />
+              <button>
+                <img
+                  className="w-14 h-14 rounded-full ring-2 ring-primary"
+                  src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  alt="Bordered avatar"
+                />
+              </button>
+              <label htmlFor="story-add">
+                <input id="story-add" type="file" className="hidden" />
                 <img
                   className="border-2 rounded-full bg-white absolute bottom-5 left-6 cursor-pointer"
                   width={18}
@@ -82,11 +84,13 @@ export default function RecentChat(): React.JSX.Element {
             </SwiperSlide>
             {peoples.map((item) => (
               <SwiperSlide className="flex items-center justify-center flex-col">
-                <img
-                  className="w-14 h-14 rounded-full ring-2 ring-red-500"
-                  src={item.avatar}
-                  alt="Bordered avatar"
-                />
+                <button onClick={() => setOpenStory(true)}>
+                  <img
+                    className="w-14 h-14 rounded-full ring-2 ring-primary"
+                    src={item.avatar}
+                    alt="Bordered avatar"
+                  />
+                </button>
                 <span className="text-sm mt-2">{item.name.split(" ")[0]}</span>
               </SwiperSlide>
             ))}
@@ -112,18 +116,39 @@ export default function RecentChat(): React.JSX.Element {
                     {people.location}
                   </span>
                 </div>
-                <button className="block ml-[auto]">
+                <button
+                  className="block ml-[auto]"
+                  onClick={() => {
+                    setOpenChat(true);
+                    setChatUser(people);
+                  }}
+                >
                   <img
-                    width={30}
+                    width={25}
                     src="/public/icons/chat-svgrepo-com.svg"
                     alt="chat-icon"
                   />
                 </button>
               </li>
             ))}
+            <div
+              className={`modal-popup-chat ${openChat ? "block" : "hidden"}`}
+            >
+              <ChatBox setOpenChat={setOpenChat} chatUser={chatUser} />
+            </div>
           </ul>
         </div>
       </aside>
+      {openStory && (
+        <div className={`modal-popup-story ${openStory ? "block" : "hidden"}`}>
+          <StoryModel
+            activeSlide={activeSlide}
+            setActiveSlide={setActiveSlide}
+            setOpenStory={setOpenStory}
+            openStory={openStory}
+          />
+        </div>
+      )}
     </>
   );
 }

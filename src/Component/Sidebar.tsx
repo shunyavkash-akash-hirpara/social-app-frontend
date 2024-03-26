@@ -1,8 +1,10 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 
 const siderbarItems = [
   {
     name: "Feed",
+    href: "/",
     svg: (
       <svg
         className="w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900"
@@ -18,6 +20,7 @@ const siderbarItems = [
   },
   {
     name: "My favorites",
+    href: "/my-favorites",
     svg: (
       <svg
         className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900"
@@ -32,6 +35,7 @@ const siderbarItems = [
   },
   {
     name: "Messages",
+    href: "/messages",
     svg: (
       <svg
         className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900"
@@ -46,6 +50,7 @@ const siderbarItems = [
   },
   {
     name: "Settings",
+    href: "/settings",
     svg: (
       <svg
         className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900"
@@ -106,6 +111,7 @@ const peoples = [
 ];
 
 export default function Sidebar(): React.JSX.Element {
+  const location = useLocation();
   return (
     <>
       <aside
@@ -118,11 +124,17 @@ export default function Sidebar(): React.JSX.Element {
             {siderbarItems.map((item) => (
               <li>
                 <a
-                  href="#"
-                  className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
+                  href={item.href}
+                  className={`flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group ${
+                    location.pathname === item.href && "text-[#FCDEE9]"
+                  }`}
                 >
                   {item.svg}
-                  <span className="ms-3 text-gray-500 text-sm transition duration-75 group-hover:text-gray-900">
+                  <span
+                    className={`ms-3 text-gray-500 text-sm transition duration-75 group-hover:text-gray-900 ${
+                      location.pathname === item.href && "text-primary"
+                    }`}
+                  >
                     {item.name}
                   </span>
                 </a>

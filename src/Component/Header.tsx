@@ -4,10 +4,7 @@ export default function Header(): React.JSX.Element {
   return (
     <nav className="bg-white border-gray-200 fixed top-0 w-full">
       <div className="flex flex-wrap items-center mx-10 p-2">
-        <a
-          href="https://flowbite.com/"
-          className="flex items-center space-x-3 rtl:space-x-reverse"
-        >
+        <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
           <img
             src="https://flowbite.com/docs/images/logo.svg"
             className="h-8"
@@ -57,11 +54,13 @@ export default function Header(): React.JSX.Element {
           <label className="mr-2 text-sm text-gray-700 font-bold">
             John Alex
           </label>
-          <img
-            className="w-10 h-10 rounded-full"
-            src="https://plm-staging.s3.amazonaws.com/profiles/65264e33d2ac619310e6687a?v=27"
-            alt="Rounded avatar"
-          />
+          <a href="/">
+            <img
+              className="w-10 h-10 rounded-full"
+              src="https://plm-staging.s3.amazonaws.com/profiles/65264e33d2ac619310e6687a?v=27"
+              alt="Rounded avatar"
+            />
+          </a>
         </div>
       </div>
     </nav>

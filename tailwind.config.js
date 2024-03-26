@@ -9,6 +9,9 @@ export default {
       backgroundColor: {
         "input-primary": "#F6F5F7",
       },
+      colors: {
+        "primary": "#DE2C70",
+      },
     },
   },
   plugins: [],

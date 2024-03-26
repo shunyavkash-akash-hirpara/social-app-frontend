@@ -32,7 +32,7 @@ export default function RecentLikeUser(): React.JSX.Element {
       <div className="bg-white rounded-t-xl p-4 pb-3">
         <div className="flex items-center justify-between">
           <label className="text-sm text-gray-600 font-bold">
-            You might like
+            You Might Like
           </label>
           <a href="#" className="text-sm text-blue-600">
             See all

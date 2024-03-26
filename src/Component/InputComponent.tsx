@@ -33,7 +33,7 @@ export default function InputComponent<MyFormikValues>({
           type={type}
           name={name as string}
           className={
-            `bg-white border-solid border-gray border rounded-xl py-3 px-4 w-[280px] ${
+            `border-solid border-gray border rounded-xl py-3 px-4 w-[280px] ${
               currency ? "pr-20" : "pr-3 "
             }` + inputStyle
           }
