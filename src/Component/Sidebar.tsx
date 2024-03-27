@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const siderbarItems = [
   {
@@ -50,7 +50,7 @@ const siderbarItems = [
   },
   {
     name: "Settings",
-    href: "/settings",
+    href: "/setting",
     svg: (
       <svg
         className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900"
@@ -123,8 +123,8 @@ export default function Sidebar(): React.JSX.Element {
           <ul className="space-y-2 font-medium">
             {siderbarItems.map((item) => (
               <li>
-                <a
-                  href={item.href}
+                <Link
+                  to={item.href}
                   className={`flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group ${
                     location.pathname === item.href && "text-[#FCDEE9]"
                   }`}
@@ -137,7 +137,7 @@ export default function Sidebar(): React.JSX.Element {
                   >
                     {item.name}
                   </span>
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -149,8 +149,8 @@ export default function Sidebar(): React.JSX.Element {
             </li>
             {peoples.map((people) => (
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="#"
                   className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group"
                 >
                   <img
@@ -166,7 +166,7 @@ export default function Sidebar(): React.JSX.Element {
                       {people.location}
                     </span>
                   </div>
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

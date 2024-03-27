@@ -38,7 +38,7 @@ export default function SignUp(): React.JSX.Element {
         });
         if (res.status === 200) {
           setSnack(res.data.message);
-          navigate("/feed");
+          navigate("/");
         }
       } catch (error) {
         if (checkAxiosError(error)) {

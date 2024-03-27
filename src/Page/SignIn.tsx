@@ -51,7 +51,7 @@ export default function SignIn(): React.JSX.Element {
             userId: _id,
           });
           setSnack(res.data.message);
-          navigate("/feed");
+          navigate("/");
         }
       } catch (error) {
         if (checkAxiosError(error)) {
