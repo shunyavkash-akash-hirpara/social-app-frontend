@@ -4,7 +4,7 @@ import SignUpForm from "./SignUp";
 import classNames from "classnames";
 
 export default function Auth(): React.JSX.Element {
-  const [type, setType] = useState<"signIn" | "signUp">("signIn");
+  const [type, setType] = useState<"signIn" | "signUp">("signUp");
 
   return (
     <>

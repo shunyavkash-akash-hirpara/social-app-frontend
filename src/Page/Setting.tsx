@@ -3,9 +3,11 @@ import Header from "../Component/Header";
 import Sidebar from "../Component/Sidebar";
 import RecentChat from "../Component/RecentChat";
 import { useAuth } from "../hooks/store/useAuth";
+import { Link } from "react-router-dom";
 
 export default function Setting(): React.JSX.Element {
-  const { accessToken } = useAuth();
+  const { accessToken, logout } = useAuth();
+
   return (
     <>
       <Header accessToken={accessToken} />
@@ -21,8 +23,8 @@ export default function Setting(): React.JSX.Element {
             </div>
             <ul className="mb-4">
               <li className="d-block border-b-2 border-[#F6F5F7] me-0">
-                <a
-                  href="account-information.html"
+                <Link
+                  to="/account-information"
                   className="pt-2 pb-2 flex items-center"
                 >
                   <div className="bg-blue-500 w-10 h-10 rounded-full flex items-center justify-center mr-2">
@@ -40,11 +42,11 @@ export default function Setting(): React.JSX.Element {
                     src="/public/icons/right-arrow-svgrepo-com(1).svg"
                     alt="right arrow"
                   />
-                </a>
+                </Link>
               </li>
               <li className="d-block border-b-2 border-[#F6F5F7] me-0">
-                <a
-                  href="contact-information.html"
+                <Link
+                  to="/contact-information"
                   className="pt-2 pb-2 flex items-center"
                 >
                   <div className="bg-[#F29F4A] w-10 h-10 rounded-full flex items-center justify-center mr-2">
@@ -62,10 +64,10 @@ export default function Setting(): React.JSX.Element {
                     src="/public/icons/right-arrow-svgrepo-com(1).svg"
                     alt="right arrow"
                   />
-                </a>
+                </Link>
               </li>
               <li className="d-block border-b-2 border-[#F6F5F7] me-0">
-                <a href="social.html" className="pt-2 pb-2 flex items-center">
+                <Link to="/social" className="pt-2 pb-2 flex items-center">
                   <div className="bg-[#E65026] w-10 h-10 rounded-full flex items-center justify-center mr-2">
                     <img
                       className="w-7 rounded-full"
@@ -81,10 +83,13 @@ export default function Setting(): React.JSX.Element {
                     src="/public/icons/right-arrow-svgrepo-com(1).svg"
                     alt="right arrow"
                   />
-                </a>
+                </Link>
               </li>
               <li className="d-block me-0">
-                <a href="password.html" className="pt-2 pb-2 flex items-center">
+                <Link
+                  to="/change-password"
+                  className="pt-2 pb-2 flex items-center"
+                >
                   <div className="bg-[#033799] w-10 h-10 rounded-full flex items-center justify-center mr-2">
                     <img
                       className="w-7 rounded-full"
@@ -100,7 +105,7 @@ export default function Setting(): React.JSX.Element {
                     src="/public/icons/right-arrow-svgrepo-com(1).svg"
                     alt="right arrow"
                   />
-                </a>
+                </Link>
               </li>
             </ul>
 
@@ -109,8 +114,8 @@ export default function Setting(): React.JSX.Element {
             </div>
             <ul className="list-inline">
               <li className="d-block border-b-2 border-[#F6F5F7] me-0">
-                <a
-                  href="default-notification.html"
+                <Link
+                  to="/notification"
                   className="pt-2 pb-2 flex items-center"
                 >
                   <div className="bg-[#F29F4A] w-10 h-10 rounded-full flex items-center justify-center mr-2">
@@ -128,29 +133,35 @@ export default function Setting(): React.JSX.Element {
                     src="/public/icons/right-arrow-svgrepo-com(1).svg"
                     alt="right arrow"
                   />
-                </a>
+                </Link>
               </li>
               <li className="d-block border-b-2 border-[#F6F5F7] me-0">
-                <a href="help-box.html" className="pt-2 pb-2 flex items-center">
+                <Link
+                  to="/delete-my-account"
+                  className="pt-2 pb-2 flex items-center"
+                >
                   <div className="bg-blue-500 w-10 h-10 rounded-full flex items-center justify-center mr-2">
                     <img
                       className="w-7 rounded-full"
-                      src="/public/icons/help-circle-svgrepo-com.svg"
+                      src="/public/icons/delete-profile-svgrepo-com.svg"
                       alt="home"
                     />
                   </div>
                   <h4 className="font-bold text-base text-gray-600 mb-0 mt-0">
-                    Help
+                    Delete My Account
                   </h4>
                   <img
                     className="w-7 ms-[auto]"
                     src="/public/icons/right-arrow-svgrepo-com(1).svg"
                     alt="right arrow"
                   />
-                </a>
+                </Link>
               </li>
               <li className="d-block me-0">
-                <a href="#" className="pt-2 pb-2 flex items-center">
+                <button
+                  className="pt-2 pb-2 flex items-center w-full"
+                  onClick={() => logout()}
+                >
                   <div className="bg-[#E65026] w-10 h-10 rounded-full flex items-center justify-center mr-2">
                     <img
                       className="w-7 rounded-full"
@@ -166,7 +177,7 @@ export default function Setting(): React.JSX.Element {
                     src="/public/icons/right-arrow-svgrepo-com(1).svg"
                     alt="right arrow"
                   />
-                </a>
+                </button>
               </li>
             </ul>
           </div>

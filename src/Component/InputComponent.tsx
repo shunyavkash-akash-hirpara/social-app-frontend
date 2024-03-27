@@ -2,11 +2,13 @@ import { FormikProps } from "formik";
 import React from "react";
 
 export default function InputComponent<MyFormikValues>({
+  label,
   name,
   type,
   currency,
   placeholder,
   inputStyle,
+  labelStyle,
   formik,
 }: {
   name: keyof MyFormikValues;
@@ -14,17 +16,22 @@ export default function InputComponent<MyFormikValues>({
   type: React.HTMLInputTypeAttribute;
   placeholder: string;
   inputStyle?: string;
+  labelStyle?: string;
   currency?: boolean;
   formik: FormikProps<MyFormikValues>;
 }): React.JSX.Element {
   return (
     <div>
-      {/* <label
-        htmlFor={name}
-        className="block text-sm font-medium leading-6 text-gray-900"
-      >
-        {label}
-      </label> */}
+      {label && (
+        <label
+          className={
+            `inline-flex text-sm font-bold leading-6 px-4 w-[280px] text-gray-500 ` +
+            labelStyle
+          }
+        >
+          {label}
+        </label>
+      )}
       <div className="relative rounded-md">
         {/* <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
           <span className="text-gray-500 sm:text-sm">$</span>
@@ -33,7 +40,7 @@ export default function InputComponent<MyFormikValues>({
           type={type}
           name={name as string}
           className={
-            `border-solid border-gray border rounded-xl py-3 px-4 w-[280px] ${
+            `border-solid border-gray border text-gray-700 rounded-xl py-3 px-4 w-[280px] ${
               currency ? "pr-20" : "pr-3 "
             }` + inputStyle
           }
@@ -46,6 +53,15 @@ export default function InputComponent<MyFormikValues>({
             {(formik.touched[name] && formik.errors[name]) as string}
           </div>
         )}
+        {/* {type === "date" && (
+          <button className="absolute top-4 right-14 flex items-center w-8 h-8">
+            <img
+              className="w-7"
+              src="/public/icons/calander-interface-icon-svgrepo-com.svg"
+              alt="calander"
+            />
+          </button>
+        )} */}
         {/* {currency && (
           <div className="absolute inset-y-0 right-0 flex items-center">
             <label htmlFor="currency" className="sr-only">
