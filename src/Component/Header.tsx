@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Header({
   accessToken,
@@ -70,13 +70,13 @@ export default function Header({
             <label className="mr-2 text-sm text-gray-700 font-bold">
               John Alex
             </label>
-            <a href="/">
+            <Link to="/profile">
               <img
                 className="w-10 h-10 rounded-full"
                 src="https://plm-staging.s3.amazonaws.com/profiles/65264e33d2ac619310e6687a?v=27"
                 alt="Rounded avatar"
               />
-            </a>
+            </Link>
           </div>
         </div>
       </nav>

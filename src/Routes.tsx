@@ -10,6 +10,7 @@ import SocialDetail from "./Page/SocialDetail";
 import ChangePassword from "./Page/ChangePassword";
 import Notifications from "./Page/Notifications";
 import DeleteMyAccount from "./Page/DeleteMyAccount";
+import Profile from "./Page/Profile";
 
 const routes = createBrowserRouter([
   { path: "/", Component: Home },
@@ -21,6 +22,7 @@ const routes = createBrowserRouter([
   { path: "/change-password", Component: ChangePassword },
   { path: "/notification", Component: Notifications },
   { path: "/delete-my-account", Component: DeleteMyAccount },
+  { path: "/profile", Component: Profile },
 ]);
 
 export default function Routes(): React.JSX.Element {
