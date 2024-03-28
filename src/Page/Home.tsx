@@ -1,70 +1,28 @@
-import React, { useState } from "react";
+import React from "react";
+import Header from "../Component/Header";
+import Sidebar from "../Component/Sidebar";
+import RecentChat from "../Component/RecentChat";
+import Feed from "../Component/Feed";
+import RecentLikeUser from "../Component/RecentLikeUser";
+import SuggestedUser from "../Component/SuggestedUser";
+import { useAuth } from "../hooks/store/useAuth";
 
-type Props = {};
-
-const items = [
-  {
-    id: 1,
-    name: "Wade Cooper",
-    avatar:
-      "https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-  },
-  {
-    id: 2,
-    name: "Arlene Mccoy",
-    avatar:
-      "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-  },
-  {
-    id: 3,
-    name: "Devon Webb",
-    avatar:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80",
-  },
-  {
-    id: 4,
-    name: "Tom Cook",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-  },
-  {
-    id: 5,
-    name: "Tanya Fox",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-  },
-  {
-    id: 6,
-    name: "Hellen Schmidt",
-    avatar:
-      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-  },
-  {
-    id: 7,
-    name: "Caroline Schultz",
-    avatar:
-      "https://images.unsplash.com/photo-1568409938619-12e139227838?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-  },
-  {
-    id: 8,
-    name: "Mason Heaney",
-    avatar:
-      "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-  },
-  {
-    id: 9,
-    name: "Claudie Smitham",
-    avatar:
-      "https://images.unsplash.com/photo-1584486520270-19eca1efcce5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-  },
-  {
-    id: 10,
-    name: "Emil Schaefer",
-    avatar:
-      "https://images.unsplash.com/photo-1561505457-3bcad021f8ee?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-  },
-];
-
-export default function Home({}: Props) {
-  return <h2>Home</h2>;
+export default function Home(): React.JSX.Element {
+  const { accessToken } = useAuth();
+  return (
+    <>
+      <Header accessToken={accessToken} />
+      <Sidebar />
+      <main className="fixed w-[900px] top-[80px] left-[280px] right-[344px] mx-[auto] flex h-calc-screen-minus-nav">
+        <div className="feed-scroll w-[580px] mr-6 overflow-y-auto">
+          <Feed />
+        </div>
+        <div className="w-[300px]">
+          <RecentLikeUser />
+          <SuggestedUser />
+        </div>
+      </main>
+      <RecentChat />
+    </>
+  );
 }

@@ -1,7 +1,6 @@
 #root {
-  min-width: 1280px;
+  min-width: 100%;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
   color: black;
 }
@@ -26,4 +25,68 @@ input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 30px white inset !important;
   -webkit-text-fill-color: black;
+}
+
+.swiper.swiper-backface-hidden.swiper-horizontal.swiper-initialized {
+  overflow: unset;
+}
+
+.feed-scroll {
+  scrollbar-width: none;
+}
+
+.react-input-emoji--container,
+.react-input-emoji--input {
+  @apply !opacity-0 !w-0 !p-0 !m-0 !h-0;
+}
+
+button.react-input-emoji--button {
+  padding: 2px;
+}
+.modal-popup-chat {
+  padding: 20px;
+  position: fixed;
+  bottom: 56px;
+  right: 312px;
+  z-index: 100;
+}
+.modal-popup-story {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: #000000b8;
+  z-index: 101;
+  width: 100vw;
+  height: 100vh;
+}
+.autoplay-progress {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 10;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: var(--swiper-theme-color);
+}
+
+.autoplay-progress svg {
+  --progress: 0;
+  position: absolute;
+  left: 0;
+  top: 0px;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  stroke-width: 4px;
+  stroke: var(--swiper-theme-color);
+  fill: none;
+  stroke-dashoffset: calc(125.6 * (1 - var(--progress)));
+  stroke-dasharray: 125.6;
+  transform: rotate(-90deg);
 }

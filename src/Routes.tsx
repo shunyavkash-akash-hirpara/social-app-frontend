@@ -1,16 +1,28 @@
 import React from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Home from "./Page/Home";
-import SignIn from "./Page/SignIn";
-import SignUp from "./Page/SignUp";
 import ErrorBoundary from "./Component/ErrorBoundary";
 import Auth from "./Page/Auth";
+import Setting from "./Page/Setting";
+import AccountDetail from "./Page/AccountDetail";
+import ContactDetail from "./Page/ContactDetail";
+import SocialDetail from "./Page/SocialDetail";
+import ChangePassword from "./Page/ChangePassword";
+import Notifications from "./Page/Notifications";
+import DeleteMyAccount from "./Page/DeleteMyAccount";
+import Profile from "./Page/Profile";
 
 const routes = createBrowserRouter([
   { path: "/", Component: Home },
   { path: "/auth", Component: Auth },
-  { path: "/signin", Component: SignIn },
-  { path: "/signup", Component: SignUp },
+  { path: "/setting", Component: Setting },
+  { path: "/account-information", Component: AccountDetail },
+  { path: "/contact-information", Component: ContactDetail },
+  { path: "/social", Component: SocialDetail },
+  { path: "/change-password", Component: ChangePassword },
+  { path: "/notification", Component: Notifications },
+  { path: "/delete-my-account", Component: DeleteMyAccount },
+  { path: "/profile", Component: Profile },
 ]);
 
 export default function Routes(): React.JSX.Element {

@@ -1,3 +1,4 @@
+import React from "react";
 import { FormikProps, useFormik } from "formik";
 import * as yup from "yup";
 import InputComponent from "../Component/InputComponent";
@@ -12,7 +13,7 @@ interface MyFormikValues {
   password: string;
 }
 
-export default function SignIn() {
+export default function SignIn(): React.JSX.Element {
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ export default function SignIn() {
             userId: _id,
           });
           setSnack(res.data.message);
-          navigate("/feed");
+          navigate("/");
         }
       } catch (error) {
         if (checkAxiosError(error)) {
@@ -95,12 +96,14 @@ export default function SignIn() {
           type="email"
           placeholder="Email"
           formik={formik}
+          inputStyle="bg-white my-2"
         />
         <InputComponent<MyFormikValues>
           name="password"
           type="password"
           placeholder="Password"
           formik={formik}
+          inputStyle="bg-white my-2"
         />
         <a href="#" className="text-gray-700 text-base no-underline my-4">
           Forgot your password?

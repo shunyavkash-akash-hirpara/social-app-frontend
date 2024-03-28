@@ -1,3 +1,4 @@
+import React from "react";
 import * as yup from "yup";
 import { FormikProps, useFormik } from "formik";
 import InputComponent from "../Component/InputComponent";
@@ -5,6 +6,7 @@ import useApi from "../hooks/useApi";
 import { APIS } from "../api/apiList";
 import { useSnack } from "../hooks/store/useSnack";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/store/useAuth";
 
 interface MyFormikValue {
   name: string;
@@ -13,9 +15,10 @@ interface MyFormikValue {
   password: string;
 }
 
-export default function SignUp() {
+export default function SignUp(): React.JSX.Element {
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
+  const { login } = useAuth();
   const navigate = useNavigate();
   // schema for yup validation
   const schema = yup.object().shape({
@@ -36,8 +39,23 @@ export default function SignUp() {
           data: JSON.stringify(values, null, 2),
         });
         if (res.status === 200) {
+          const {
+            username,
+            name,
+            email,
+            role,
+            profile_img,
+            mobileNumber,
+            accessToken,
+            _id,
+          } = res.data.data;
+          login({
+            user: { username, name, email, role, mobileNumber, profile_img },
+            accessToken: accessToken,
+            userId: _id,
+          });
           setSnack(res.data.message);
-          navigate("/feed");
+          navigate("/");
         }
       } catch (error) {
         if (checkAxiosError(error)) {
@@ -82,24 +100,28 @@ export default function SignUp() {
           type="text"
           placeholder="Name"
           formik={formik}
+          inputStyle="bg-white my-2"
         />
         <InputComponent<MyFormikValue>
           name="username"
           type="text"
           placeholder="username"
           formik={formik}
+          inputStyle="bg-white my-2"
         />
         <InputComponent<MyFormikValue>
           name="email"
           type="email"
           placeholder="Email"
           formik={formik}
+          inputStyle="bg-white my-2"
         />
         <InputComponent<MyFormikValue>
           name="password"
           type="password"
           placeholder="Password"
           formik={formik}
+          inputStyle="bg-white my-2"
         />
         <div className="flex relative mt-2">
           <button className="rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-12 py-3 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">

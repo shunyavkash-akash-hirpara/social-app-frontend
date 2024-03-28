@@ -2,7 +2,17 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      height: {
+        "calc-screen-minus-nav": "calc(100vh - 80px)",
+      },
+      backgroundColor: {
+        "input-primary": "#F6F5F7",
+      },
+      colors: {
+        "primary": "#DE2C70",
+      },
+    },
   },
   plugins: [],
 };
