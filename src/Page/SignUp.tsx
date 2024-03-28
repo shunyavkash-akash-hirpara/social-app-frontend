@@ -6,6 +6,7 @@ import useApi from "../hooks/useApi";
 import { APIS } from "../api/apiList";
 import { useSnack } from "../hooks/store/useSnack";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/store/useAuth";
 
 interface MyFormikValue {
   name: string;
@@ -17,6 +18,7 @@ interface MyFormikValue {
 export default function SignUp(): React.JSX.Element {
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
+  const { login } = useAuth();
   const navigate = useNavigate();
   // schema for yup validation
   const schema = yup.object().shape({
@@ -37,6 +39,21 @@ export default function SignUp(): React.JSX.Element {
           data: JSON.stringify(values, null, 2),
         });
         if (res.status === 200) {
+          const {
+            username,
+            name,
+            email,
+            role,
+            profile_img,
+            mobileNumber,
+            accessToken,
+            _id,
+          } = res.data.data;
+          login({
+            user: { username, name, email, role, mobileNumber, profile_img },
+            accessToken: accessToken,
+            userId: _id,
+          });
           setSnack(res.data.message);
           navigate("/");
         }
