@@ -3,7 +3,7 @@ import { useAuth } from "../hooks/store/useAuth";
 import Header from "../Component/Header";
 import Sidebar from "../Component/Sidebar";
 import RecentChat from "../Component/RecentChat";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 const posts = [
   {
@@ -35,6 +35,8 @@ const posts = [
 
 export default function Profile(): React.JSX.Element {
   const { accessToken } = useAuth();
+  const { id } = useParams();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -59,26 +61,29 @@ export default function Profile(): React.JSX.Element {
                     <button className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-7 py-2 mr-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
                       Follow
                     </button>
-                    <button className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-6 py-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
+                    <button
+                      className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-6 py-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none"
+                      onClick={() => navigate(`/chat/${id}`)}
+                    >
                       Message
                     </button>
                   </div>
                 </div>
                 <div className="w-full flex justify-between items-center mb-4">
                   <Link
-                    to="#"
+                    to={`./posts`}
                     className="text-sm font-bold text-gray-600 hover:text-gray-400"
                   >
                     2352 posts
                   </Link>
                   <Link
-                    to="#"
+                    to={`./friends`}
                     className="text-sm font-bold text-gray-600 hover:text-gray-400"
                   >
                     20k followers
                   </Link>
                   <Link
-                    to="#"
+                    to={`friends`}
                     className="text-sm font-bold text-gray-600 hover:text-gray-400"
                   >
                     235 following

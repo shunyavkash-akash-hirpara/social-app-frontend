@@ -18,7 +18,7 @@ const siderbarItems = [
   },
   {
     name: "Messages",
-    href: "/messages",
+    href: "/chat/:id",
     svg: <MessageIcon />,
   },
   {
@@ -79,7 +79,7 @@ export default function Sidebar(): React.JSX.Element {
     <>
       <aside
         id="separator-sidebar"
-        className="fixed top-14 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0 border-t-2 border-[#F6F5F7]"
+        className="fixed top-14 left-0 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0 border-t-2 border-[#F6F5F7]"
         aria-label="Sidebar"
       >
         <div className="h-full px-3 py-4 overflow-y-auto bg-white">
