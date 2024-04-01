@@ -13,7 +13,7 @@ const siderbarItems = [
   },
   {
     name: "My favorites",
-    href: "/my-favorites",
+    href: "#",
     svg: <FavoriteIcon />,
   },
   {
