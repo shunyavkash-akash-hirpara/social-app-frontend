@@ -103,7 +103,7 @@ export default function RecentChat(): React.JSX.Element {
               <span className="text-sm mt-2">Add</span>
             </SwiperSlide>
             {peoples.map((item) => (
-              <SwiperSlide className="flex items-center justify-center flex-col">
+              <SwiperSlide className="flex items-center justify-center flex-col" key={item.id}>
                 <button onClick={() => setOpenStory(true)}>
                   <img
                     className="w-14 h-14 rounded-full ring-2 ring-primary"
@@ -135,7 +135,7 @@ export default function RecentChat(): React.JSX.Element {
               </div>
             </li>
             {users.map((people) => (
-              <li className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group">
+              <li key={people.id} className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group">
                 <img
                   className="w-10 h-10 rounded-full"
                   src={people.avatar}

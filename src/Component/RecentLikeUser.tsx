@@ -60,6 +60,7 @@ export default function RecentLikeUser(): React.JSX.Element {
                     className="w-7 h-7 border-2 border-white rounded-full"
                     src={people.avatar}
                     alt=""
+                    key={people.id}
                   />
                 ))}
               </div>

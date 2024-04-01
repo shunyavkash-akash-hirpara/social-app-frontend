@@ -42,6 +42,8 @@ input:-webkit-autofill:active {
 
 button.react-input-emoji--button {
   padding: 2px;
+  /* padding-right: 100px; */
+  /* opacity: 0; */
 }
 .modal-popup-chat {
   padding: 20px;

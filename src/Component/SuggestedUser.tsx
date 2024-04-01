@@ -46,6 +46,7 @@ export default function SuggestedUser(): React.JSX.Element {
             className={`${
               index !== 0 && "mt-3 pt-3 border-t-2"
             } border-gray-100`}
+            key={index}
           >
             <div className="flex">
               <Link to={`/profile/${people.id}`}>
@@ -69,6 +70,7 @@ export default function SuggestedUser(): React.JSX.Element {
                         className="w-7 h-7 border-2 border-white rounded-full"
                         src={people.avatar}
                         alt=""
+                        key={people.id}
                       />
                     ))}
                   </div>

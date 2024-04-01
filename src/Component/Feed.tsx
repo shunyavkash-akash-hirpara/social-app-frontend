@@ -140,20 +140,22 @@ export default function Feed(): React.JSX.Element {
             />
             <span className="text-gray-500 ml-1 text-sm">Photos</span>
           </label>
-          <button className="flex flex-row items-center">
+          <div className="flex items-center">
             <InputEmoji
               value={formik.values.description}
               onChange={handleOnEnter}
               cleanOnEnter
               keepOpened
-            />
-            {/* <img
-              width={25}
-              src="/public/icons/emoji-smile-svgrepo-com.svg"
-              alt="feeling"
-            /> */}
-            <span className="text-gray-500 ml-1 text-sm">Feeling</span>
-          </button>
+            ></InputEmoji>
+            <button className="flex flex-row items-center">
+              <span className="text-gray-500 ml-1 text-sm">Feeling</span>
+              {/* <img
+                width={25}
+                src="/public/icons/emoji-smile-svgrepo-com.svg"
+                alt="photos"
+              /> */}
+            </button>
+          </div>
           <button className="rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-sm font-bold px-7 py-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
             Post
           </button>
@@ -161,7 +163,7 @@ export default function Feed(): React.JSX.Element {
       </div>
       {/* feed data */}
       {peoples.map((item) => (
-        <SingleFeed item={item} peoples={peoples} />
+        <SingleFeed item={item} peoples={peoples} key={item.id} />
       ))}
     </>
   );

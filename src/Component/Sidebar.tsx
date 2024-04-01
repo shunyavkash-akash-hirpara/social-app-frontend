@@ -84,8 +84,8 @@ export default function Sidebar(): React.JSX.Element {
       >
         <div className="h-full px-3 py-4 overflow-y-auto bg-white">
           <ul className="space-y-2 font-medium">
-            {siderbarItems.map((item) => (
-              <li>
+            {siderbarItems.map((item, index) => (
+              <li key={index}>
                 <Link
                   to={item.href}
                   className={`flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group ${
@@ -111,7 +111,7 @@ export default function Sidebar(): React.JSX.Element {
               </div>
             </li>
             {peoples.map((people) => (
-              <li>
+              <li key={people.id}>
                 <Link
                   to="#"
                   className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group"
