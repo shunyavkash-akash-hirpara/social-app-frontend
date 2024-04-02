@@ -1,8 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import ChatBox from "./ChatBox";
 import StoryModel from "./StoryModel";
+import SearchIcon from "./icons/SearchIcon";
+
+interface peoples {
+  id: number;
+  name: string;
+  avatar: string;
+  location: string;
+}
+[];
 
 const peoples = [
   {
@@ -54,11 +63,22 @@ export default function RecentChat(): React.JSX.Element {
   const [openStory, setOpenStory] = useState(false);
   const [chatUser, setChatUser] = useState({ avatar: "", name: "" });
   const [activeSlide, setActiveSlide] = useState<number>(0);
+  const [search, setSearch] = useState<string>("");
+  const [users, setUsers] = useState<peoples[]>([]);
+
+  useEffect(() => {
+    if (!search) return setUsers(peoples); // Exit early if searchData is falsy
+    setUsers(() =>
+      peoples.filter((people) =>
+        people.name.toLowerCase().includes(search.toLowerCase())
+      )
+    );
+  }, [search]);
   return (
     <>
       <aside
         id="separator-sidebar"
-        className="fixed top-14 right-0 z-40 w-80 h-screen transition-transform -translate-x-full sm:translate-x-0 border-t-2 border-[#F6F5F7]"
+        className="fixed top-14 right-0 w-80 h-screen sm:translate-x-0 border-t-2 border-[#F6F5F7]"
         aria-label="Sidebar"
       >
         <div className="h-full px-3 py-4 overflow-y-auto bg-white">
@@ -83,7 +103,7 @@ export default function RecentChat(): React.JSX.Element {
               <span className="text-sm mt-2">Add</span>
             </SwiperSlide>
             {peoples.map((item) => (
-              <SwiperSlide className="flex items-center justify-center flex-col">
+              <SwiperSlide className="flex items-center justify-center flex-col" key={item.id}>
                 <button onClick={() => setOpenStory(true)}>
                   <img
                     className="w-14 h-14 rounded-full ring-2 ring-primary"
@@ -97,12 +117,25 @@ export default function RecentChat(): React.JSX.Element {
           </Swiper>
           <ul className="space-y-2 font-medium">
             <li>
-              <div className="text-gray-700 font-bold text-left ml-2 mt-5">
+              <div className="text-gray-700 font-bold text-left ml-2 mt-5 mb-2">
                 Recent Chats
               </div>
+              <div className="relative">
+                <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                  <SearchIcon />
+                </div>
+                <input
+                  type="search"
+                  id="default-search"
+                  className="block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50"
+                  placeholder="Search"
+                  required
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
             </li>
-            {peoples.map((people) => (
-              <li className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group">
+            {users.map((people) => (
+              <li key={people.id} className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group">
                 <img
                   className="w-10 h-10 rounded-full"
                   src={people.avatar}

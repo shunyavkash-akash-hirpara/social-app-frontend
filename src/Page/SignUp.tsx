@@ -32,25 +32,18 @@ export default function SignUp(): React.JSX.Element {
     validationSchema: schema,
     initialValues: { name: "", username: "", email: "", password: "" },
     onSubmit: async (values) => {
+      console.log(values);
       try {
         const res = await apiCall({
           url: APIS.AUTHENTICATION.SIGNUP,
           method: "post",
           data: JSON.stringify(values, null, 2),
         });
-        if (res.status === 200) {
-          const {
-            username,
-            name,
-            email,
-            role,
-            profile_img,
-            mobileNumber,
-            accessToken,
-            _id,
-          } = res.data.data;
+        if (res.status === 201) {
+          const { username, name, email, role, accessToken, _id } =
+            res.data.data;
           login({
-            user: { username, name, email, role, mobileNumber, profile_img },
+            user: { username, name, email, role },
             accessToken: accessToken,
             userId: _id,
           });
@@ -124,7 +117,10 @@ export default function SignUp(): React.JSX.Element {
           inputStyle="bg-white my-2"
         />
         <div className="flex relative mt-2">
-          <button className="rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-12 py-3 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
+          <button
+            type="submit"
+            className="rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-12 py-3 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none"
+          >
             Sign Up
           </button>
           {/* <a href="#" className="flex p-2 absolute left-[115%]">

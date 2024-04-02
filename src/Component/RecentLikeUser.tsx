@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const peoples = [
   {
@@ -41,13 +42,17 @@ export default function RecentLikeUser(): React.JSX.Element {
       </div>
       <div className="bg-white border-t-2 border-gray-100 p-4 pt-3 rounded-b-xl">
         <div className="flex">
-          <img
-            className="w-11 h-11 rounded-full"
-            src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-            alt="Rounded avatar"
-          />
+          <Link to={`/profile/${"1"}`}>
+            <img
+              className="w-11 h-11 rounded-full"
+              src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+              alt="Rounded avatar"
+            />
+          </Link>
           <div className="flex flex-col text-justify mt-1">
-            <span className="ms-3 text-sm text-gray-600">Arlene Mccoy</span>
+            <Link to={`/profile/${"1"}`} className="ms-3 text-sm text-gray-600">
+              Arlene Mccoy
+            </Link>
             <div className="flex items-center justify-between ml-2 mt-1">
               <div className="flex -space-x-3 rtl:space-x-reverse">
                 {peoples.slice(0, 3).map((people) => (
@@ -55,6 +60,7 @@ export default function RecentLikeUser(): React.JSX.Element {
                     className="w-7 h-7 border-2 border-white rounded-full"
                     src={people.avatar}
                     alt=""
+                    key={people.id}
                   />
                 ))}
               </div>

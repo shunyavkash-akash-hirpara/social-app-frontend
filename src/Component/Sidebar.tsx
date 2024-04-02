@@ -13,12 +13,12 @@ const siderbarItems = [
   },
   {
     name: "My favorites",
-    href: "/my-favorites",
+    href: "#",
     svg: <FavoriteIcon />,
   },
   {
     name: "Messages",
-    href: "/messages",
+    href: "/chat/:id",
     svg: <MessageIcon />,
   },
   {
@@ -79,13 +79,13 @@ export default function Sidebar(): React.JSX.Element {
     <>
       <aside
         id="separator-sidebar"
-        className="fixed top-14 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0 border-t-2 border-[#F6F5F7]"
+        className="fixed top-14 left-0 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0 border-t-2 border-[#F6F5F7]"
         aria-label="Sidebar"
       >
         <div className="h-full px-3 py-4 overflow-y-auto bg-white">
           <ul className="space-y-2 font-medium">
-            {siderbarItems.map((item) => (
-              <li>
+            {siderbarItems.map((item, index) => (
+              <li key={index}>
                 <Link
                   to={item.href}
                   className={`flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group ${
@@ -111,7 +111,7 @@ export default function Sidebar(): React.JSX.Element {
               </div>
             </li>
             {peoples.map((people) => (
-              <li>
+              <li key={people.id}>
                 <Link
                   to="#"
                   className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group"

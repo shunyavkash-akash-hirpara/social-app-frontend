@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const peoples = [
   {
@@ -45,17 +46,23 @@ export default function SuggestedUser(): React.JSX.Element {
             className={`${
               index !== 0 && "mt-3 pt-3 border-t-2"
             } border-gray-100`}
+            key={index}
           >
             <div className="flex">
-              <img
-                className="w-11 h-11 rounded-full"
-                src={people.avatar}
-                alt="Rounded avatar"
-              />
+              <Link to={`/profile/${people.id}`}>
+                <img
+                  className="w-11 h-11 rounded-full"
+                  src={people.avatar}
+                  alt="Rounded avatar"
+                />
+              </Link>
               <div className="flex flex-col text-justify mt-1">
-                <span className="ms-3 text-sm text-gray-600">
+                <Link
+                  to={`/profile/${people.id}`}
+                  className="ms-3 text-sm text-gray-600"
+                >
                   {people.name}
-                </span>
+                </Link>
                 <div className="flex items-center justify-between ml-2 mt-1">
                   <div className="flex -space-x-3 rtl:space-x-reverse">
                     {peoples.slice(0, 3).map((people) => (
@@ -63,6 +70,7 @@ export default function SuggestedUser(): React.JSX.Element {
                         className="w-7 h-7 border-2 border-white rounded-full"
                         src={people.avatar}
                         alt=""
+                        key={people.id}
                       />
                     ))}
                   </div>
