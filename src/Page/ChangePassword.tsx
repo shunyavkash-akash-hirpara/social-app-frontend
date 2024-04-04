@@ -49,13 +49,16 @@ export default function ChangePassword(): React.JSX.Element {
       console.log(values);
       try {
         const res = await apiCall({
-          url: APIS.AUTHENTICATION.SIGNIN,
-          method: "post",
-          data: JSON.stringify(values, null, 2),
+          url: APIS.USER.CHANGEPASSWORD,
+          method: "patch",
+          data: {
+            oldPassword: values.currentPassword,
+            newPassword: values.newPassword,
+          },
         });
         if (res.status === 200) {
+          formik.handleReset();
           setSnack(res.data.message);
-          navigate("/account-information");
         }
       } catch (error) {
         if (checkAxiosError(error)) {

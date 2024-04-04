@@ -10,6 +10,9 @@ export default function InputComponent<MyFormikValues>({
   inputStyle,
   labelStyle,
   formik,
+  disabled,
+  serverError,
+  serverErrorMessage,
 }: {
   name: keyof MyFormikValues;
   label?: string;
@@ -19,6 +22,9 @@ export default function InputComponent<MyFormikValues>({
   labelStyle?: string;
   currency?: boolean;
   formik: FormikProps<MyFormikValues>;
+  disabled?: boolean;
+  serverError?: boolean;
+  serverErrorMessage?: string;
 }): React.JSX.Element {
   return (
     <div>
@@ -37,6 +43,7 @@ export default function InputComponent<MyFormikValues>({
           <span className="text-gray-500 sm:text-sm">$</span>
         </div> */}
         <input
+          disabled={disabled}
           type={type}
           name={name as string}
           className={
@@ -48,9 +55,13 @@ export default function InputComponent<MyFormikValues>({
           onChange={formik.handleChange}
           value={formik.values[name] as string}
         />
-        {formik.touched[name] && Boolean(formik.errors[name]) && (
+        {((formik.touched[name] && Boolean(formik.errors[name])) ||
+          serverError) && (
           <div className="text-red-500">
-            {(formik.touched[name] && formik.errors[name]) as string}
+            {
+              ((formik.touched[name] && formik.errors[name]) ||
+                serverErrorMessage) as string
+            }
           </div>
         )}
         {/* {type === "date" && (

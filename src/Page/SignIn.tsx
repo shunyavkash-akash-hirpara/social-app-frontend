@@ -40,13 +40,13 @@ export default function SignIn(): React.JSX.Element {
             name,
             email,
             role,
-            profile_img,
+            profileImg,
             mobileNumber,
             accessToken,
             _id,
           } = res.data.data;
           login({
-            user: { username, name, email, role, mobileNumber, profile_img },
+            user: { username, name, email, role, mobileNumber, profileImg },
             accessToken: accessToken,
             userId: _id,
           });

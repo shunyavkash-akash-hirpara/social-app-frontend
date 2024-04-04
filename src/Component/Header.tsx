@@ -10,7 +10,7 @@ export default function Header({
   accessToken: string;
 }): React.JSX.Element {
   const navigate = useNavigate();
-  const { userId } = useAuth();
+  const { userId, user } = useAuth();
   const { searchData, setSearchData } = useSearch();
 
   useEffect(() => {
@@ -63,12 +63,12 @@ export default function Header({
 
           <div className="md:w-auto flex items-center" id="navbar-default">
             <label className="mr-2 text-sm text-gray-700 font-bold">
-              John Alex
+              {user.username}
             </label>
             <Link to={`/profile/${userId}`}>
               <img
-                className="w-10 h-10 rounded-full"
-                src="https://plm-staging.s3.amazonaws.com/profiles/65264e33d2ac619310e6687a?v=27"
+                className="w-10 h-10 rounded-full object-cover"
+                src={user.profileImg}
                 alt="Rounded avatar"
               />
             </Link>

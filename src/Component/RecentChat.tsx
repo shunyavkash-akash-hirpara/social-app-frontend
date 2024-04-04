@@ -82,7 +82,7 @@ export default function RecentChat(): React.JSX.Element {
         aria-label="Sidebar"
       >
         <div className="h-full px-3 py-4 overflow-y-auto bg-white">
-          <Swiper className="swiper" spaceBetween={5} slidesPerView={4}>
+          <Swiper className="swiper" spaceBetween={5} slidesPerView={4} >
             <SwiperSlide className="relative flex items-center justify-center flex-col">
               <button>
                 <img

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import LikeIcon from "./icons/LikeIcon";
 import CloseIcon from "./icons/CloseIcon";
 import SingleComment from "./SingleComment";
+import { useAuth } from "../hooks/store/useAuth";
 
 interface likePeoples {
   id: number;
@@ -200,29 +201,37 @@ const CommentPeoples = [
 ];
 
 export default function SingleFeed({
-  item,
-  peoples,
+  post,
 }: {
-  item: {
-    id: number;
-    name: string;
-    avatar: string;
-    location: string;
+  post: {
+    _id: string;
+    user: {
+      _id: string;
+      username: string;
+      profileImg: string;
+      city?: string;
+      country?: string;
+    };
     description?: string;
+    mentionedUsers: {
+      _id: string;
+      username: string;
+      name: string;
+      profileImg: string;
+    }[];
+    photos: { _id: string; url: string; type: string }[];
+    like: number;
+    comment: number;
   };
-  peoples: {
-    id: number;
-    name: string;
-    avatar: string;
-    location?: string;
-  }[];
 }): React.JSX.Element {
   const [openLike, setOpenLike] = useState<boolean>(false);
   const [openComment, setOpenComment] = useState<boolean>(false);
   const [like, setLike] = useState<boolean>(false);
   const [comment, setComment] = useState({ id: "", text: "" });
+  const { user } = useAuth();
 
-  const handleLike = (id: number) => {
+  const handleLike = (id: string) => {
+    post.like = like ? post.like - 1 : post.like + 1;
     console.log(id);
   };
 
@@ -235,67 +244,82 @@ export default function SingleFeed({
     <>
       <div className="w-full bg-white rounded-xl mb-5 p-4">
         <div className="flex items-center">
-          <Link to={`/profile/${item.id}`}>
+          <Link to={`/profile/${post._id}`}>
             <img
-              className="w-10 h-10 rounded-full"
-              src={item.avatar}
+              className="w-10 h-10 rounded-full object-cover"
+              src={
+                post.user.profileImg ||
+                "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
+              }
               alt="Rounded avatar"
             />
           </Link>
           <div className="flex flex-col text-justify">
             <Link
-              to={`/profile/${item.id}`}
+              to={`/profile/${post.user._id}`}
               className="ms-3 text-sm text-gray-600 font-bold"
             >
-              {item.name}
+              {post.user.username || "social_user"}
             </Link>
-            <span className="ms-3 text-sm text-gray-400">{item.location}</span>
+            <span className="ms-3 text-sm text-gray-400">
+              {post.user.city && post.user.country
+                ? post.user.city + "," + post.user.country
+                : "India"}
+            </span>
           </div>
         </div>
-        {item.description && (
+        {post.description && (
           <div className="mt-2 w-full">
             <p className="text-start text-sm text-gray-700">
-              {item.description}
+              {post.description}
             </p>
           </div>
         )}
 
-        <img
-          className="my-3 mx-[auto] rounded-xl h-[409px] object-cover"
-          src={item.avatar}
-          alt="photo"
-        />
+        {post.photos.length > 0 &&
+          post.photos.map((media) => (
+            <img
+              className="my-3 mx-[auto] rounded-xl h-[409px] object-cover"
+              src={media.url}
+              alt="photo"
+            />
+          ))}
 
         <div className="flex items-center justify-between">
-          <div className="flex -space-x-3 rtl:space-x-reverse">
-            {peoples.slice(0, 3).map((people) => (
-              <img
-                className="w-8 h-8 border-2 border-white rounded-full"
-                src={people.avatar}
-                alt=""
-                key={people.id}
-              />
-            ))}
-
-            <a
-              className="flex items-center justify-center w-8 h-8 text-xs font-medium text-white bg-primary border-2 border-white rounded-full hover:bg-pink-600"
-              href="#"
-            >
-              +{peoples.length - 3}
-            </a>
+          <div className="">
+            {post.mentionedUsers.length > 0 && (
+              <div className="flex -space-x-3 rtl:space-x-reverse">
+                {post.mentionedUsers.slice(0, 3).map((people) => (
+                  <img
+                    className="w-8 h-8 border-2 border-white rounded-full object-cover"
+                    src={people.profileImg}
+                    alt=""
+                    key={people._id}
+                  />
+                ))}
+                {post.mentionedUsers.length > 3 && (
+                  <a
+                    className="flex items-center justify-center w-8 h-8 text-xs font-medium text-white bg-primary border-2 border-white rounded-full hover:bg-pink-600"
+                    href="#"
+                  >
+                    +{post.mentionedUsers.length - 3}
+                  </a>
+                )}
+              </div>
+            )}
           </div>
           <div>
             <button
               className="text-gray-500 text-sm mr-6 cursor-pointer"
               onClick={() => setOpenComment(true)}
             >
-              13 Comments
+              {post.comment} Comments
             </button>
             <button
               className="text-gray-500 ml-1 text-sm cursor-pointer"
               onClick={() => setOpenLike(true)}
             >
-              340 Likes
+              {post.like} Likes
             </button>
           </div>
         </div>
@@ -304,7 +328,7 @@ export default function SingleFeed({
             className={`flex flex-row items-center`}
             onClick={() => {
               setLike(!like);
-              handleLike(item.id);
+              handleLike(post._id);
             }}
           >
             <LikeIcon like={like} />
@@ -329,18 +353,19 @@ export default function SingleFeed({
         </div>
         <div className="flex items-center justify-between border-t-2 border-gray-200 mt-3 pt-3">
           <img
-            className="w-11 h-11 rounded-full"
-            src="https://plm-staging.s3.amazonaws.com/profiles/65264e33d2ac619310e6687a?v=27"
+            className="w-11 h-11 rounded-full object-cover"
+            src={
+              user.profileImg ||
+              "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
+            }
             alt="Rounded avatar"
           />
           <input
             type="text"
             placeholder="Write a comment..."
             className="border-gray border rounded-xl py-3 px-4 pr-3 w-[432px] bg-input-primary border-none my-0 text-sm"
-            onChange={(e) =>
-              setComment({ id: item.id.toString(), text: e.target.value })
-            }
-            value={comment.id === item.id.toString() ? comment.text : ""}
+            onChange={(e) => setComment({ id: post._id, text: e.target.value })}
+            value={comment.id === post._id ? comment.text : ""}
           />
           <button
             className="bg-[#f48bb34c] py-1 pl-1 pr-2 rounded-xl"

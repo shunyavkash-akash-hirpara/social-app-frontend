@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import * as yup from "yup";
 import { FormikProps, useFormik } from "formik";
 import InputComponent from "../Component/InputComponent";
@@ -16,6 +16,8 @@ interface MyFormikValue {
 }
 
 export default function SignUp(): React.JSX.Element {
+  const [serverError, setServerError] = useState<boolean>(false);
+  const [serverErrorMessage, setserverErrorMessage] = useState<string>("");
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
   const { login } = useAuth();
@@ -58,6 +60,33 @@ export default function SignUp(): React.JSX.Element {
       }
     },
   });
+
+  // username change per debounce call
+  useEffect(() => {
+    if (!formik.values.username) {
+      return;
+    }
+    const getData = setTimeout(async () => {
+      try {
+        const result = await apiCall({
+          url: APIS.USER.CHECKUSERNAME,
+          method: "get",
+          params: { username: formik.values.username },
+        });
+        console.log(result.data);
+        if (result.data.data.username) return setServerError(false);
+        else {
+          setServerError(true);
+          return setserverErrorMessage("This username is not available.");
+        }
+      } catch (error) {
+        setServerError(false);
+        return setserverErrorMessage("");
+      }
+    }, 2000);
+
+    return () => clearTimeout(getData);
+  }, [apiCall, formik.values.username]);
   return (
     <div className="absolute top-0 h-full transition-all duration-600 ease-in-out left-0 w-1/2 transform translate-x-full opacity-100 z-5 animate-show">
       <form
@@ -101,6 +130,8 @@ export default function SignUp(): React.JSX.Element {
           placeholder="username"
           formik={formik}
           inputStyle="bg-white my-2"
+          serverError={serverError}
+          serverErrorMessage={serverErrorMessage}
         />
         <InputComponent<MyFormikValue>
           name="email"

@@ -61,7 +61,7 @@ export default function StoryModel({
           }}
           className="transform translate-y-[50%]"
           autoplay={{
-            delay: 500,
+            delay: 2500,
             disableOnInteraction: true,
             stopOnLastSlide: true,
           }}
