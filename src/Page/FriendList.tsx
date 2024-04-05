@@ -110,7 +110,10 @@ export default function FriendList(): React.JSX.Element {
               </ul>
             </div>
             {users.map((people) => (
-              <div className="flex items-center justify-between p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group">
+              <div
+                key={people.id}
+                className="flex items-center justify-between p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group"
+              >
                 <Link
                   to={`/profile/${people.id}`}
                   className="flex items-center"

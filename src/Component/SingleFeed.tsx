@@ -1,204 +1,31 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import LikeIcon from "./icons/LikeIcon";
 import CloseIcon from "./icons/CloseIcon";
 import SingleComment from "./SingleComment";
 import { useAuth } from "../hooks/store/useAuth";
+import useApi from "../hooks/useApi";
+import { useSnack } from "../hooks/store/useSnack";
+import { APIS } from "../api/apiList";
 
-interface likePeoples {
-  id: number;
-  name: string;
-  avatar: string;
-  username: string;
+interface comment {
+  _id: string;
+  user: { _id: string; profileImg: string; username: string };
+  postId: string;
+  description: string;
+  like: boolean;
+  subComment: number;
+  likeCount: number;
 }
-[];
 
-const likePeoples = [
-  {
-    id: 1,
-    name: "Wade Cooper",
-    avatar:
-      "https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "wadecooper",
-  },
-  {
-    id: 2,
-    name: "Arlene Mccoy",
-    avatar:
-      "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "arlenemccoy",
-  },
-  {
-    id: 3,
-    name: "Devon Webb",
-    avatar:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80",
-    username: "devonwebb",
-  },
-  {
-    id: 4,
-    name: "Tom Cook",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "tomcook",
-  },
-  {
-    id: 5,
-    name: "Tanya Fox",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "tanyafox",
-  },
-  {
-    id: 6,
-    name: "Hellen Schmidt",
-    avatar:
-      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "hellenschmidt",
-  },
-  {
-    id: 7,
-    name: "Wade Cooper",
-    avatar:
-      "https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "wadecooper",
-  },
-  {
-    id: 8,
-    name: "Arlene Mccoy",
-    avatar:
-      "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "arlenemccoy",
-  },
-  {
-    id: 9,
-    name: "Devon Webb",
-    avatar:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80",
-    username: "devonwebb",
-  },
-  {
-    id: 10,
-    name: "Tom Cook",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "tomcook",
-  },
-  {
-    id: 11,
-    name: "Tanya Fox",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "tanyafox",
-  },
-  {
-    id: 12,
-    name: "Hellen Schmidt",
-    avatar:
-      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "hellenschmidt",
-  },
-];
-
-const CommentPeoples = [
-  {
-    id: 1,
-    name: "Wade Cooper",
-    avatar:
-      "https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "wadecooper",
-    comment: "vvdsccfvsdd",
-  },
-  {
-    id: 2,
-    name: "Arlene Mccoy",
-    avatar:
-      "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "arlenemccoy",
-    comment: "le bolo...",
-  },
-  {
-    id: 3,
-    name: "Devon Webb",
-    avatar:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80",
-    username: "devonwebb",
-    comment: "wat chhe ho!!!",
-  },
-  {
-    id: 4,
-    name: "Tom Cook",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "tomcook",
-    comment: "jordar bapu",
-  },
-  {
-    id: 5,
-    name: "Tanya Fox",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "tanyafox",
-    comment: "awesome",
-  },
-  {
-    id: 6,
-    name: "Hellen Schmidt",
-    avatar:
-      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "hellenschmidt",
-    comment: "well played",
-  },
-  {
-    id: 7,
-    name: "Wade Cooper",
-    avatar:
-      "https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "wadecooper",
-    comment:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod, quis.",
-  },
-  {
-    id: 8,
-    name: "Arlene Mccoy",
-    avatar:
-      "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "arlenemccoy",
-    comment: "vvdsccfvsdd",
-  },
-  {
-    id: 9,
-    name: "Devon Webb",
-    avatar:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80",
-    username: "devonwebb",
-    comment: "great",
-  },
-  {
-    id: 10,
-    name: "Tom Cook",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "tomcook",
-    comment: "good",
-  },
-  {
-    id: 11,
-    name: "Tanya Fox",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "tanyafox",
-    comment: "thanks",
-  },
-  {
-    id: 12,
-    name: "Hellen Schmidt",
-    avatar:
-      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "hellenschmidt",
-    comment: "nice",
-  },
-];
+interface like {
+  _id: string;
+  user: { _id: string; profileImg: string; username: string; name: string };
+  postId: string;
+  itemId: string;
+  type: number;
+  flag: string;
+}
 
 export default function SingleFeed({
   post,
@@ -222,17 +49,26 @@ export default function SingleFeed({
     photos: { _id: string; url: string; type: string }[];
     like: number;
     comment: number;
+    isLike: boolean;
   };
 }): React.JSX.Element {
   const [openLike, setOpenLike] = useState<boolean>(false);
   const [openComment, setOpenComment] = useState<boolean>(false);
-  const [like, setLike] = useState<boolean>(false);
+  const [like, setLike] = useState<boolean>(post.isLike);
   const [comment, setComment] = useState({ id: "", text: "" });
+  const [commentList, setCommentList] = useState<comment[]>([]);
+  const [likeList, setLikeList] = useState<like[]>([]);
   const { user } = useAuth();
+  const { apiCall, checkAxiosError } = useApi();
+  const { setSnack } = useSnack();
 
   const handleLike = (id: string) => {
     post.like = like ? post.like - 1 : post.like + 1;
-    console.log(id);
+    likeCreate(id);
+  };
+  const handleComment = (id: string, commentId?: string) => {
+    post.comment = post.comment + 1;
+    commentCreate(id, commentId);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -240,11 +76,113 @@ export default function SingleFeed({
     setComment((prev) => ({ id: prev.id, text: newText }));
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const likeCreate = useCallback(
+    async (id: string) => {
+      try {
+        const res = await apiCall({
+          url: like ? APIS.LIKE.UNLIKE(id) : APIS.LIKE.LIKE,
+          method: like ? "delete" : "post",
+          data: { postId: id, type: 1 },
+        });
+        if (res.status === 200) {
+          console.log(res.data.data);
+          setSnack(res.data.message);
+        }
+      } catch (error) {
+        if (checkAxiosError(error)) {
+          const errorMessage = error?.response?.data.message;
+          setSnack(errorMessage, "warning");
+        }
+      }
+    },
+    [apiCall, checkAxiosError, like, setSnack]
+  );
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const commentCreate = useCallback(
+    async (id: string, commentId?: string) => {
+      try {
+        const res = await apiCall({
+          url: APIS.COMMENT.POST,
+          method: "post",
+          data: { postId: id, commentId: commentId, description: comment.text },
+        });
+        if (res.status === 201) {
+          setComment({ id: "", text: "" });
+          setSnack(res.data.message);
+        }
+      } catch (error) {
+        if (checkAxiosError(error)) {
+          const errorMessage = error?.response?.data.message;
+          setSnack(errorMessage, "warning");
+        }
+      }
+    },
+    [apiCall, checkAxiosError, comment.text, setSnack]
+  );
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const getComment = useCallback(
+    async (id: string) => {
+      try {
+        const res = await apiCall({
+          url: APIS.COMMENT.GETCOMMENT(id),
+          method: "get",
+        });
+        if (res.status === 200) {
+          setCommentList(res.data.data);
+          setSnack(res.data.message);
+        }
+      } catch (error) {
+        if (checkAxiosError(error)) {
+          const errorMessage = error?.response?.data.message;
+          setSnack(errorMessage, "warning");
+        }
+      }
+    },
+    [apiCall, checkAxiosError, setSnack]
+  );
+
+  useEffect(() => {
+    if (openComment && post.comment > 0) {
+      getComment(post._id);
+    }
+  }, [getComment, openComment, post._id, post.comment]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const getLike = useCallback(
+    async (id: string) => {
+      try {
+        const res = await apiCall({
+          url: APIS.LIKE.GETLIKE(id),
+          method: "get",
+        });
+        if (res.status === 200) {
+          setLikeList(res.data.data);
+          setSnack(res.data.message);
+        }
+      } catch (error) {
+        if (checkAxiosError(error)) {
+          const errorMessage = error?.response?.data.message;
+          setSnack(errorMessage, "warning");
+        }
+      }
+    },
+    [apiCall, checkAxiosError, setSnack]
+  );
+
+  useEffect(() => {
+    if (openLike && post.like > 0) {
+      getLike(post._id);
+    }
+  }, [getLike, openLike, post._id, post.like]);
+
   return (
     <>
       <div className="w-full bg-white rounded-xl mb-5 p-4">
         <div className="flex items-center">
-          <Link to={`/profile/${post._id}`}>
+          <Link to={`/profile/${post.user._id}`}>
             <img
               className="w-10 h-10 rounded-full object-cover"
               src={
@@ -278,16 +216,27 @@ export default function SingleFeed({
 
         {post.photos.length > 0 &&
           post.photos.map((media) => (
-            <img
-              className="my-3 mx-[auto] rounded-xl h-[409px] object-cover"
-              src={media.url}
-              alt="photo"
-            />
+            <>
+              {media.type === "image" ? (
+                <img
+                  className="my-3 mx-[auto] rounded-xl h-[409px] object-cover"
+                  src={media.url}
+                  alt="photo"
+                  key={media._id}
+                />
+              ) : (
+                <video
+                  className="my-3 mx-[auto] rounded-xl h-[409px] object-cover"
+                  src="media.url"
+                  key={media._id}
+                ></video>
+              )}
+            </>
           ))}
 
         <div className="flex items-center justify-between">
           <div className="">
-            {post.mentionedUsers.length > 0 && (
+            {post.mentionedUsers?.length > 0 && (
               <div className="flex -space-x-3 rtl:space-x-reverse">
                 {post.mentionedUsers.slice(0, 3).map((people) => (
                   <img
@@ -311,13 +260,13 @@ export default function SingleFeed({
           <div>
             <button
               className="text-gray-500 text-sm mr-6 cursor-pointer"
-              onClick={() => setOpenComment(true)}
+              onClick={() => post.comment > 0 && setOpenComment(true)}
             >
               {post.comment} Comments
             </button>
             <button
               className="text-gray-500 ml-1 text-sm cursor-pointer"
-              onClick={() => setOpenLike(true)}
+              onClick={() => post.like > 0 && setOpenLike(true)}
             >
               {post.like} Likes
             </button>
@@ -327,8 +276,8 @@ export default function SingleFeed({
           <button
             className={`flex flex-row items-center`}
             onClick={() => {
-              setLike(!like);
               handleLike(post._id);
+              setLike(!like);
             }}
           >
             <LikeIcon like={like} />
@@ -369,7 +318,7 @@ export default function SingleFeed({
           />
           <button
             className="bg-[#f48bb34c] py-1 pl-1 pr-2 rounded-xl"
-            onClick={() => console.log(comment.text)}
+            onClick={() => handleComment(post._id)}
           >
             <img
               className="transform rotate-[30deg]"
@@ -395,26 +344,26 @@ export default function SingleFeed({
               <h2>Likes</h2>
             </div>
             <div className="feed-scroll max-h-[70%] overflow-y-auto bg-white rounded-b-xl p-6 pt-2 border-t-2 border-gray-200">
-              {likePeoples.map((people) => (
+              {likeList.map((likeData) => (
                 <div
-                  key={people.id}
+                  key={likeData._id}
                   className="flex items-center justify-between p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group"
                 >
                   <Link
-                    to={`/profile/${people.id}`}
+                    to={`/profile/${likeData._id}`}
                     className="flex items-center"
                   >
                     <img
-                      className="w-12 h-12 rounded-full"
-                      src={people.avatar}
+                      className="w-12 h-12 rounded-full object-cover"
+                      src={likeData.user.profileImg}
                       alt="Rounded avatar"
                     />
                     <div className="flex flex-col text-justify">
                       <span className="ms-3 text-sm text-gray-700 font-bold">
-                        {people.username}
+                        {likeData.user.username}
                       </span>
                       <span className="ms-3 text-[12px] text-gray-400">
-                        {people.name}
+                        {likeData.user.name}
                       </span>
                     </div>
                   </Link>
@@ -442,11 +391,11 @@ export default function SingleFeed({
               <h2>Comments</h2>
             </div>
             <div className="feed-scroll max-h-[70%] overflow-y-auto bg-white p-6 pt-2 border-t-2 border-gray-200">
-              {CommentPeoples.map((people) => (
+              {commentList.map((commentData) => (
                 <SingleComment
-                  people={people}
+                  commentData={commentData}
                   setComment={setComment}
-                  key={people.id}
+                  key={commentData._id}
                 />
               ))}
             </div>
@@ -460,7 +409,7 @@ export default function SingleFeed({
               />
               <button
                 className="bg-[#f48bb34c] py-1 pl-1 pr-2 rounded-xl"
-                onClick={() => console.log(comment.text)}
+                onClick={() => handleComment(post._id, comment.id)}
               >
                 <img
                   className="transform rotate-[30deg]"

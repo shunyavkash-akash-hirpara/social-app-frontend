@@ -18,4 +18,14 @@ export const APIS = {
     DELETE: (id: string) => `/post/${id}`,
     POSTBYUSER: (userId: string) => `/post/user/${userId}`,
   },
+  LIKE: {
+    LIKE: "/like",
+    UNLIKE: (itemId: string) => `/like/${itemId}`,
+    GETLIKE: (itemId: string) => `/like/${itemId}`,
+  },
+  COMMENT: {
+    POST: "/comment",
+    GETCOMMENT: (postId: string) => `/comment/postId/${postId}`,
+    GETSUBCOMMENT: (commentId: string) => `/comment/commentId/${commentId}`,
+  },
 };

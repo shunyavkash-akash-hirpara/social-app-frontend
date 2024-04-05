@@ -12,9 +12,14 @@ import CloseIcon from "./icons/CloseIcon";
 import SearchIcon from "./icons/SearchIcon";
 import { useAuth } from "../hooks/store/useAuth";
 
+interface FileType {
+  element: Blob;
+  type: "image" | "video";
+}
+
 interface MyFormikValue {
   description: string;
-  file: string[] | File[];
+  file: FileType[];
   mention: string[];
 }
 interface mention {
@@ -42,6 +47,7 @@ interface posts {
   photos: { _id: string; url: string; type: string }[];
   like: number;
   comment: number;
+  isLike: boolean;
 }
 [];
 
@@ -121,11 +127,11 @@ export default function Feed(): React.JSX.Element {
       "description-photos",
       "Both description and photos are required",
       function (value) {
-        const { description, file } = value;
-        if (!description && (!file || !file.length)) {
+        const { file } = value;
+        if (!file || !file.length) {
           return this.createError({
             path: "description",
-            message: "Description is required",
+            message: "Photos is required",
           });
         }
         return true;
@@ -140,8 +146,9 @@ export default function Feed(): React.JSX.Element {
       Object.entries(values).forEach(([key, value]) => {
         if (value) {
           if (key === "file") {
-            value.forEach((element: string | Blob) => {
-              formData.append(key, element);
+            console.log(value);
+            value.forEach((element: { element: Blob; type: string }) => {
+              formData.append(key, element.element);
             });
           } else {
             formData.append(key, value);
@@ -183,7 +190,6 @@ export default function Feed(): React.JSX.Element {
         method: "get",
       });
       if (res.status === 200) {
-        console.log(res.data.data);
         setPosts(res.data.data);
         setSnack(res.data.message);
       }
@@ -225,16 +231,25 @@ export default function Feed(): React.JSX.Element {
         </div>
         {formik.values.file.length > 0 && (
           <div className="relative grid grid-cols-4">
-            {formik.values.file?.map((media) => (
-              <img
-                className="rounded-lg h-32 mx-1 bg-cover w-32 object-contain"
-                src={
-                  typeof media === "string"
-                    ? media // Use the provided URL if it's already a string
-                    : URL.createObjectURL(media) // Create a URL for the File object
-                }
-                alt="photos"
-              />
+            {formik.values.file?.map((media, index) => (
+              <>
+                {media?.type === "video" ? (
+                  <video
+                    className="rounded-lg h-32 mx-1 bg-cover w-32 object-contain"
+                    src={URL.createObjectURL(media.element)}
+                    key={index}
+                  ></video>
+                ) : (
+                  <img
+                    className="rounded-lg h-32 mx-1 bg-cover w-32 object-contain"
+                    src={
+                      URL.createObjectURL(media.element) // Create a URL for the File object
+                    }
+                    alt="photos"
+                    key={index}
+                  />
+                )}
+              </>
             ))}
             <button
               onClick={() => formik.setFieldValue("file", [])}
@@ -308,8 +323,7 @@ export default function Feed(): React.JSX.Element {
                   const arr = [];
                   for (let i = 0; i < file.length; i++) {
                     const element = new Blob([file[i]], { type: file[i].type });
-                    console.log(element);
-                    arr.push(element);
+                    arr.push({ element, type: file[i].type.split("/")[0] });
                   }
                   formik.setFieldValue("file", arr);
                 }
