@@ -1,8 +1,4 @@
 import React, { useState } from "react";
-import { useAuth } from "../hooks/store/useAuth";
-import Header from "../Component/Header";
-import Sidebar from "../Component/Sidebar";
-import RecentChat from "../Component/RecentChat";
 import { useNavigate } from "react-router-dom";
 import BackIcon from "../Component/icons/BackIcon";
 
@@ -19,7 +15,6 @@ const reasons = [
 
 export default function DeleteMyAccount(): React.JSX.Element {
   const [selectReason, setSelectReason] = useState({ id: 0, text: "" });
-  const { accessToken } = useAuth();
   const navigate = useNavigate();
 
   const handleDeleteAccount = () => {
@@ -28,9 +23,6 @@ export default function DeleteMyAccount(): React.JSX.Element {
 
   return (
     <>
-      <Header accessToken={accessToken} />
-      <Sidebar />
-
       <main className="fixed w-[848px] top-[80px] left-[280px] right-[344px] mx-[auto] rounded-xl flex h-calc-screen-minus-nav">
         <div className="feed-scroll w-full mx-[auto] overflow-y-auto p-6 pt-0">
           <div className="bg-white rounded-xl">
@@ -81,7 +73,6 @@ export default function DeleteMyAccount(): React.JSX.Element {
           </div>
         </div>
       </main>
-      <RecentChat />
     </>
   );
 }

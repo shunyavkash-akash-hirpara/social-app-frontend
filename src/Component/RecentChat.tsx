@@ -1,15 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import ChatBox from "./ChatBox";
 import StoryModel from "./StoryModel";
 import SearchIcon from "./icons/SearchIcon";
+import useApi from "../hooks/useApi";
+import { useSnack } from "../hooks/store/useSnack";
+import { APIS } from "../api/apiList";
 
 interface peoples {
   id: number;
   name: string;
   avatar: string;
   location: string;
+}
+[];
+interface user {
+  _id: number;
+  name: string;
+  username: string;
+  profileImg: string;
 }
 [];
 
@@ -61,19 +71,40 @@ const peoples = [
 export default function RecentChat(): React.JSX.Element {
   const [openChat, setOpenChat] = useState(false);
   const [openStory, setOpenStory] = useState(false);
-  const [chatUser, setChatUser] = useState({ avatar: "", name: "" });
+  const [chatUser, setChatUser] = useState({ profileImg: "", username: "" });
   const [activeSlide, setActiveSlide] = useState<number>(0);
   const [search, setSearch] = useState<string>("");
-  const [users, setUsers] = useState<peoples[]>([]);
+  const [users, setUsers] = useState<user[]>([]);
+  const { apiCall, checkAxiosError } = useApi();
+  const { setSnack } = useSnack();
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const searchUser = useCallback(
+    async (searchData: string) => {
+      try {
+        const res = await apiCall({
+          url: APIS.USER.SEARCHUSER,
+          method: "post",
+          data: { username: searchData.toLowerCase() },
+        });
+        if (res.status === 200) {
+          setUsers(res.data.data);
+          setSnack(res.data.message);
+        }
+      } catch (error) {
+        if (checkAxiosError(error)) {
+          const errorMessage = error?.response?.data.message;
+          setSnack(errorMessage, "warning");
+        }
+      }
+    },
+    [apiCall, checkAxiosError, setSnack]
+  );
 
   useEffect(() => {
-    if (!search) return setUsers(peoples); // Exit early if searchData is falsy
-    setUsers(() =>
-      peoples.filter((people) =>
-        people.name.toLowerCase().includes(search.toLowerCase())
-      )
-    );
-  }, [search]);
+    if (!search) return setUsers([]); // Exit early if search is falsy
+    searchUser(search);
+  }, [search, searchUser]);
   return (
     <>
       <aside
@@ -82,7 +113,7 @@ export default function RecentChat(): React.JSX.Element {
         aria-label="Sidebar"
       >
         <div className="h-full px-3 py-4 overflow-y-auto bg-white">
-          <Swiper className="swiper" spaceBetween={5} slidesPerView={4} >
+          <Swiper className="swiper" spaceBetween={5} slidesPerView={4}>
             <SwiperSlide className="relative flex items-center justify-center flex-col">
               <button>
                 <img
@@ -103,7 +134,10 @@ export default function RecentChat(): React.JSX.Element {
               <span className="text-sm mt-2">Add</span>
             </SwiperSlide>
             {peoples.map((item) => (
-              <SwiperSlide className="flex items-center justify-center flex-col" key={item.id}>
+              <SwiperSlide
+                className="flex items-center justify-center flex-col"
+                key={item.id}
+              >
                 <button onClick={() => setOpenStory(true)}>
                   <img
                     className="w-14 h-14 rounded-full ring-2 ring-primary"
@@ -135,10 +169,13 @@ export default function RecentChat(): React.JSX.Element {
               </div>
             </li>
             {users.map((people) => (
-              <li key={people.id} className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group">
+              <li
+                key={people._id}
+                className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group"
+              >
                 <img
-                  className="w-10 h-10 rounded-full"
-                  src={people.avatar}
+                  className="w-10 h-10 rounded-full object-cover"
+                  src={people.profileImg}
                   alt="Rounded avatar"
                 />
                 <div className="flex flex-col text-justify">
@@ -146,7 +183,7 @@ export default function RecentChat(): React.JSX.Element {
                     {people.name}
                   </span>
                   <span className="ms-3 text-[13px] text-gray-400">
-                    {people.location}
+                    {people.username}
                   </span>
                 </div>
                 <button

@@ -1,17 +1,12 @@
 import React from "react";
-import Header from "../Component/Header";
-import Sidebar from "../Component/Sidebar";
-import RecentChat from "../Component/RecentChat";
 import { useAuth } from "../hooks/store/useAuth";
 import { Link } from "react-router-dom";
 
 export default function Setting(): React.JSX.Element {
-  const { accessToken, logout } = useAuth();
+  const { logout } = useAuth();
 
   return (
     <>
-      <Header accessToken={accessToken} />
-      <Sidebar />
       <main className="fixed w-[900px] top-[80px] left-[280px] right-[344px] mx-[auto] flex">
         <div className="w-[800px] mx-[auto] mb-6 overflow-y-auto p-10 bg-white rounded-xl">
           <div className="">
@@ -183,7 +178,6 @@ export default function Setting(): React.JSX.Element {
           </div>
         </div>
       </main>
-      <RecentChat />
     </>
   );
 }

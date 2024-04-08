@@ -15,7 +15,7 @@ export default function ChatBox({
   chatUser,
 }: {
   setOpenChat: Dispatch<SetStateAction<boolean>>;
-  chatUser: { avatar: string; name: string };
+  chatUser: { profileImg: string; username: string };
 }): React.JSX.Element {
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
@@ -52,11 +52,11 @@ export default function ChatBox({
       <div className="w-full border-b-2 border-gray-100 flex items-center p-3 text-gray-900">
         <img
           className="w-10 h-10 rounded-full"
-          src={chatUser.avatar}
+          src={chatUser.profileImg}
           alt="Rounded avatar"
         />
         <div className="flex flex-col text-justify">
-          <h3 className="ms-3 text-sm text-gray-700">{chatUser.name}</h3>
+          <h3 className="ms-3 text-sm text-gray-700">{chatUser.username}</h3>
           <h4 className="ms-3 text-[13px] text-gray-400">
             <span className="inline-block bg-green-500 p-1 mr-1 rounded-full"></span>
             Available

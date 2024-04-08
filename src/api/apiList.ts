@@ -9,6 +9,7 @@ export const APIS = {
     DELETE: (id: string) => `/user/${id}`,
     CHANGEPASSWORD: "/user/changePassword",
     CHECKUSERNAME: "/user",
+    SEARCHUSER: "/user/serach",
   },
   POST: {
     GET: (id: string) => `/post/${id}`,
@@ -27,5 +28,11 @@ export const APIS = {
     POST: "/comment",
     GETCOMMENT: (postId: string) => `/comment/postId/${postId}`,
     GETSUBCOMMENT: (commentId: string) => `/comment/commentId/${commentId}`,
+  },
+  FOLLOW: {
+    FOLLOW: "/follow/follow",
+    UNFOLLOW: "/follow/unfollow",
+    FOLLOWERS: "/follow/followers",
+    FOLLOWING: "/follow/following",
   },
 };

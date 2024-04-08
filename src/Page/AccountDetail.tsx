@@ -1,9 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import * as yup from "yup";
 import { useAuth } from "../hooks/store/useAuth";
-import Header from "../Component/Header";
-import Sidebar from "../Component/Sidebar";
-import RecentChat from "../Component/RecentChat";
 import InputComponent from "../Component/InputComponent";
 import useApi from "../hooks/useApi";
 import { useSnack } from "../hooks/store/useSnack";
@@ -44,7 +41,7 @@ export default function AccountDetail(): React.JSX.Element {
   });
   const [serverError, setServerError] = useState<boolean>(false);
   const [serverErrorMessage, setserverErrorMessage] = useState<string>("");
-  const { accessToken, userId, setUserDatail } = useAuth();
+  const { userId, setUserDatail } = useAuth();
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
   const navigate = useNavigate();
@@ -152,9 +149,6 @@ export default function AccountDetail(): React.JSX.Element {
 
   return (
     <>
-      <Header accessToken={accessToken} />
-      <Sidebar />
-
       <main className="fixed w-[848px] top-[80px] left-[280px] right-[344px] mx-[auto] rounded-xl flex h-calc-screen-minus-nav">
         <div className="feed-scroll w-full mx-[auto] overflow-y-auto p-6 pt-0">
           <div className="bg-white rounded-xl">
@@ -271,7 +265,6 @@ export default function AccountDetail(): React.JSX.Element {
           </div>
         </div>
       </main>
-      <RecentChat />
     </>
   );
 }

@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from "react";
 import * as yup from "yup";
-import { useAuth } from "../hooks/store/useAuth";
-import Header from "../Component/Header";
-import Sidebar from "../Component/Sidebar";
-import RecentChat from "../Component/RecentChat";
 import { Link, useNavigate } from "react-router-dom";
 import SearchIcon from "../Component/icons/SearchIcon";
 import BackIcon from "../Component/icons/BackIcon";
@@ -121,7 +117,6 @@ export default function ChatList(): React.JSX.Element {
     avatar: string;
     username: string;
   }>();
-  const { accessToken } = useAuth();
   const navigate = useNavigate();
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
@@ -165,9 +160,6 @@ export default function ChatList(): React.JSX.Element {
 
   return (
     <>
-      <Header accessToken={accessToken} />
-      <Sidebar />
-
       <main className="fixed w-[848px] top-[80px] left-[280px] right-[344px] mx-[auto] rounded-xl">
         <div className="w-full p-6 pt-0 flex justify-between">
           <div className="w-[35%] bg-white rounded-xl flex flex-col h-calc-for-chat">
@@ -200,6 +192,7 @@ export default function ChatList(): React.JSX.Element {
                 <button
                   className="w-full flex items-center p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group"
                   onClick={() => setChatUser(people)}
+                  key={people.id}
                 >
                   <img
                     className="w-12 h-12 rounded-full"
@@ -305,7 +298,6 @@ export default function ChatList(): React.JSX.Element {
           )}
         </div>
       </main>
-      <RecentChat />
     </>
   );
 }

@@ -1,9 +1,5 @@
 import React from "react";
 import * as yup from "yup";
-import { useAuth } from "../hooks/store/useAuth";
-import Header from "../Component/Header";
-import Sidebar from "../Component/Sidebar";
-import RecentChat from "../Component/RecentChat";
 import InputComponent from "../Component/InputComponent";
 import useApi from "../hooks/useApi";
 import { useSnack } from "../hooks/store/useSnack";
@@ -24,7 +20,6 @@ interface MyFormikValues {
 }
 
 export default function SocialDetail(): React.JSX.Element {
-  const { accessToken } = useAuth();
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
   const navigate = useNavigate();
@@ -75,9 +70,6 @@ export default function SocialDetail(): React.JSX.Element {
 
   return (
     <>
-      <Header accessToken={accessToken} />
-      <Sidebar />
-
       <main className="fixed w-[848px] top-[80px] left-[280px] right-[344px] mx-[auto] rounded-xl">
         <div className="w-full mx-[auto] overflow-y-auto p-6 pt-0">
           <div className="bg-white rounded-xl">
@@ -171,7 +163,6 @@ export default function SocialDetail(): React.JSX.Element {
           </div>
         </div>
       </main>
-      <RecentChat />
     </>
   );
 }

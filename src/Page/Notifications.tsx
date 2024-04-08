@@ -1,8 +1,4 @@
 import React from "react";
-import { useAuth } from "../hooks/store/useAuth";
-import Header from "../Component/Header";
-import Sidebar from "../Component/Sidebar";
-import RecentChat from "../Component/RecentChat";
 import { useNavigate } from "react-router-dom";
 import BackIcon from "../Component/icons/BackIcon";
 
@@ -106,14 +102,10 @@ const peoples = [
 ];
 
 export default function Notifications(): React.JSX.Element {
-  const { accessToken } = useAuth();
   const navigate = useNavigate();
 
   return (
     <>
-      <Header accessToken={accessToken} />
-      <Sidebar />
-
       <main className="fixed w-[848px] top-[80px] left-[280px] right-[344px] mx-[auto] rounded-xl flex h-calc-screen-minus-nav">
         <div className="feed-scroll w-full mx-[auto] overflow-y-auto p-6 pt-0">
           <div className="bg-white rounded-xl">
@@ -176,7 +168,6 @@ export default function Notifications(): React.JSX.Element {
           </div>
         </div>
       </main>
-      <RecentChat />
     </>
   );
 }

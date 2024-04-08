@@ -50,67 +50,20 @@ interface posts {
   isLike: boolean;
 }
 [];
-
-const peoples = [
-  {
-    id: 1,
-    name: "Wade Cooper",
-    username: "wadecooper",
-    avatar:
-      "https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    location: "Surat,India",
-  },
-  {
-    id: 2,
-    name: "Arlene Mccoy",
-    username: "arlenemccoy",
-    avatar:
-      "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    location: "Mumbai,India",
-    description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis amet voluptatem praesentium?",
-  },
-  {
-    id: 3,
-    name: "Devon Webb",
-    username: "devonwebb",
-    avatar:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80",
-    location: "Kolkata,India",
-  },
-  {
-    id: 4,
-    name: "Tom Cook",
-    username: "tomcook",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    location: "Chennai,India",
-  },
-  {
-    id: 5,
-    name: "Tanya Fox",
-    username: "tanyafox",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    location: "Delhi,India",
-    description:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Officiis possimus culpa tempore. Repellat recusandae quisquam deserunt quam voluptates rerum officiis harum necessitatibus corrupti voluptate delectus exercitationem modi eum cupiditate, sint ducimus quasi dignissimos molestiae?",
-  },
-  {
-    id: 6,
-    name: "Hellen Schmidt",
-    username: "hellenschmidt",
-    avatar:
-      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    location: "Jammu,India",
-  },
-];
+interface user {
+  _id: number;
+  name: string;
+  username: string;
+  profileImg: string;
+}
+[];
 
 export default function Feed(): React.JSX.Element {
   const [openMention, setOpenMention] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("");
   const [mention, setMention] = useState<mention[]>([]);
   const [posts, setPosts] = useState<posts[]>([]);
+  const [users, setUsers] = useState<user[]>([]);
   const { apiCall, checkAxiosError } = useApi();
   const { user } = useAuth();
   const { setSnack } = useSnack();
@@ -204,6 +157,34 @@ export default function Feed(): React.JSX.Element {
   useEffect(() => {
     getPosts();
   }, [getPosts]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const searchUser = useCallback(
+    async (searchData: string) => {
+      try {
+        const res = await apiCall({
+          url: APIS.USER.SEARCHUSER,
+          method: "post",
+          data: { username: searchData.toLowerCase() },
+        });
+        if (res.status === 200) {
+          setUsers(res.data.data);
+          setSnack(res.data.message);
+        }
+      } catch (error) {
+        if (checkAxiosError(error)) {
+          const errorMessage = error?.response?.data.message;
+          setSnack(errorMessage, "warning");
+        }
+      }
+    },
+    [apiCall, checkAxiosError, setSnack]
+  );
+
+  useEffect(() => {
+    if (!search) return setUsers([]); // Exit early if search is falsy
+    searchUser(search);
+  }, [search, searchUser]);
 
   return (
     <>
@@ -394,21 +375,21 @@ export default function Feed(): React.JSX.Element {
                       />
                     </div>
                     {search &&
-                      peoples.map((people) => (
+                      users.map((people) => (
                         <button
-                          key={people.id}
+                          key={people._id}
                           onClick={() => {
                             setMention([
                               ...mention,
                               {
-                                _id: people.id.toString(),
+                                _id: people._id.toString(),
                                 username: people.username,
-                                profileImg: people.avatar,
+                                profileImg: people.profileImg,
                               },
                             ]);
                             formik.setFieldValue("mention", [
                               ...formik.values.mention,
-                              people.id.toString(),
+                              people._id.toString(),
                             ]);
                             setSearch("");
                             setOpenMention(false);
@@ -417,8 +398,8 @@ export default function Feed(): React.JSX.Element {
                         >
                           <div className="flex items-center">
                             <img
-                              className="w-12 h-12 rounded-full"
-                              src={people.avatar}
+                              className="w-12 h-12 rounded-full object-cover"
+                              src={people.profileImg}
                               alt="Rounded avatar"
                             />
                             <div className="flex flex-col text-justify">

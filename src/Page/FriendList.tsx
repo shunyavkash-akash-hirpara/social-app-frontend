@@ -1,77 +1,108 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { APIS } from "../api/apiList";
+import { useSnack } from "../hooks/store/useSnack";
+import useApi from "../hooks/useApi";
 import { useAuth } from "../hooks/store/useAuth";
-import Header from "../Component/Header";
-import Sidebar from "../Component/Sidebar";
-import RecentChat from "../Component/RecentChat";
-import { Link } from "react-router-dom";
 
 interface peoples {
-  id: number;
-  name: string;
-  avatar: string;
-  username: string;
+  _id: string;
+  user: { _id: string; username: string; name: string; profileImg: string };
+  follow: string;
+  followBackFlag?: boolean;
 }
 [];
 
-const peoples = [
-  {
-    id: 1,
-    name: "Wade Cooper",
-    avatar:
-      "https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "wadecooper",
-  },
-  {
-    id: 2,
-    name: "Arlene Mccoy",
-    avatar:
-      "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "arlenemccoy",
-  },
-  {
-    id: 3,
-    name: "Devon Webb",
-    avatar:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80",
-    username: "devonwebb",
-  },
-  {
-    id: 4,
-    name: "Tom Cook",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "tomcook",
-  },
-  {
-    id: 5,
-    name: "Tanya Fox",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "tanyafox",
-  },
-  {
-    id: 6,
-    name: "Hellen Schmidt",
-    avatar:
-      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "hellenschmidt",
-  },
-];
+interface user {
+  _id: string;
+  following: number;
+  followers: number;
+}
 
 export default function FriendList(): React.JSX.Element {
-  const [users, setUsers] = useState<peoples[]>([]);
+  const [userList, setUserList] = useState<peoples[]>([]);
+  const [user, setUser] = useState<user>();
   const [tab, setTab] = useState<string>("followers");
-  const { accessToken } = useAuth();
+  const { apiCall, checkAxiosError } = useApi();
+  const { setSnack } = useSnack();
+  const { userId } = useAuth();
+  const id: string = useParams().id as string;
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const getProfileDetail = useCallback(async () => {
+    try {
+      const res = await apiCall({
+        url: APIS.USER.GET(id),
+        method: "get",
+      });
+      if (res.status === 200) {
+        setUser(res.data.data);
+        setSnack(res.data.message);
+      }
+    } catch (error) {
+      if (checkAxiosError(error)) {
+        const errorMessage = error?.response?.data.message;
+        setSnack(errorMessage, "warning");
+      }
+    }
+  }, [apiCall, checkAxiosError, id, setSnack]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const getFollowList = useCallback(async () => {
+    try {
+      const res = await apiCall({
+        url:
+          tab === "followers" ? APIS.FOLLOW.FOLLOWERS : APIS.FOLLOW.FOLLOWING,
+        method: "get",
+      });
+      if (res.status === 200) {
+        setUserList(res.data.data);
+        setSnack(res.data.message);
+      }
+    } catch (error) {
+      if (checkAxiosError(error)) {
+        const errorMessage = error?.response?.data.message;
+        setSnack(errorMessage, "warning");
+      }
+    }
+  }, [apiCall, checkAxiosError, setSnack, tab]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleFollow = useCallback(
+    async (followId: string) => {
+      try {
+        const res = await apiCall({
+          url: APIS.FOLLOW.FOLLOW,
+          method: "post",
+          data: { follow: followId },
+        });
+        if (res.status === 201) {
+          getFollowList();
+          getProfileDetail();
+          setSnack(res.data.message);
+        }
+      } catch (error) {
+        if (checkAxiosError(error)) {
+          const errorMessage = error?.response?.data.message;
+          setSnack(errorMessage, "warning");
+        }
+      }
+    },
+    [apiCall, checkAxiosError, getFollowList, getProfileDetail, setSnack]
+  );
 
   useEffect(() => {
-    if (!tab) return;
-    setUsers(peoples);
-  }, [tab]);
+    if (!id && !tab) return;
+    getFollowList();
+  }, [getFollowList, id, tab]);
+
+  useEffect(() => {
+    if (!id) return;
+    getProfileDetail();
+  }, [getProfileDetail, id]);
+
   return (
     <>
-      <Header accessToken={accessToken} />
-      <Sidebar />
-
       <main className="fixed w-[848px] top-[80px] left-[280px] right-[344px] mx-[auto] rounded-xl flex h-calc-screen-minus-nav">
         <div className="feed-scroll w-[580px] mx-[auto] overflow-y-auto p-6 pt-0">
           <div className="bg-white rounded-xl p-6">
@@ -86,10 +117,9 @@ export default function FriendList(): React.JSX.Element {
                     }`}
                     onClick={() => {
                       setTab("followers");
-                      setUsers(peoples);
                     }}
                   >
-                    6 followers
+                    {user?.followers} followers
                   </button>
                 </li>
                 <li className="w-[50%]">
@@ -101,34 +131,33 @@ export default function FriendList(): React.JSX.Element {
                     }`}
                     onClick={() => {
                       setTab("following");
-                      setUsers(peoples);
                     }}
                   >
-                    7 following
+                    {user?.following} following
                   </button>
                 </li>
               </ul>
             </div>
-            {users.map((people) => (
+            {userList.map((people) => (
               <div
-                key={people.id}
+                key={people.user._id}
                 className="flex items-center justify-between p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group"
               >
                 <Link
-                  to={`/profile/${people.id}`}
+                  to={`/profile/${people.user._id}`}
                   className="flex items-center"
                 >
                   <img
                     className="w-12 h-12 rounded-full"
-                    src={people.avatar}
+                    src={people.user.profileImg}
                     alt="Rounded avatar"
                   />
                   <div className="flex flex-col text-justify">
                     <span className="ms-3 text-sm text-gray-700 font-bold">
-                      {people.username}
+                      {people.user.username}
                     </span>
                     <span className="ms-3 text-[12px] text-gray-400">
-                      {people.name}
+                      {people.user.name}
                     </span>
                   </div>
                 </Link>
@@ -137,16 +166,27 @@ export default function FriendList(): React.JSX.Element {
                     Following
                   </button>
                 ) : (
-                  <button className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold px-7 py-2 mr-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
-                    Remove
-                  </button>
+                  <>
+                    <div className="flex items-center">
+                      {people.followBackFlag && id !== userId && (
+                        <button
+                          onClick={() => handleFollow(people.user._id)}
+                          className="mr-2 text-sm text-blue-500 font-bold"
+                        >
+                          Follow
+                        </button>
+                      )}
+                      <button className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold px-7 py-2 mr-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
+                        {id === userId ? "Remove" : "Follow"}
+                      </button>
+                    </div>
+                  </>
                 )}
               </div>
             ))}
           </div>
         </div>
       </main>
-      <RecentChat />
     </>
   );
 }

@@ -17,6 +17,7 @@ interface user {
   following: number;
   followers: number;
   post: number;
+  follow: boolean;
 }
 
 interface post {
@@ -42,16 +43,7 @@ interface post {
 }
 
 export default function Profile(): React.JSX.Element {
-  const [user, setUser] = useState<user>({
-    _id: "",
-    username: "",
-    name: "",
-    profileImg: "",
-    bio: "",
-    following: 0,
-    followers: 0,
-    post: 0,
-  });
+  const [user, setUser] = useState<user>();
   const [posts, setPosts] = useState<post[]>([]);
   const { accessToken, userId } = useAuth();
   const { apiCall, checkAxiosError } = useApi();
@@ -97,6 +89,26 @@ export default function Profile(): React.JSX.Element {
     }
   }, [apiCall, checkAxiosError, id, setSnack]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleFollow = useCallback(async () => {
+    try {
+      const res = await apiCall({
+        url: user?.follow ? APIS.FOLLOW.UNFOLLOW : APIS.FOLLOW.FOLLOW,
+        method: "post",
+        data: { follow: id },
+      });
+      if (res.status === 200 || res.status === 201) {
+        getProfileDetail();
+        setSnack(res.data.message);
+      }
+    } catch (error) {
+      if (checkAxiosError(error)) {
+        const errorMessage = error?.response?.data.message;
+        setSnack(errorMessage, "warning");
+      }
+    }
+  }, [apiCall, checkAxiosError, getProfileDetail, id, setSnack, user?.follow]);
+
   useEffect(() => {
     if (!id) return;
     getProfileDetail();
@@ -125,8 +137,11 @@ export default function Profile(): React.JSX.Element {
                     </span>
                     {id !== userId && (
                       <div className="flex">
-                        <button className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-7 py-2 mr-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
-                          Follow
+                        <button
+                          className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-7 py-2 mr-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none"
+                          onClick={handleFollow}
+                        >
+                          {user.follow ? "Following" : "Follow"}
                         </button>
                         <button
                           className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-6 py-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none"
@@ -171,7 +186,7 @@ export default function Profile(): React.JSX.Element {
             {posts.length > 0 ? (
               <div className="border-t-2 border-gray-300 mt-10 pt-10 grid grid-cols-3 gap-1">
                 {posts.map((item, index) => (
-                  <Link key={index} to="#" className="relative">
+                  <Link key={index} to="./posts" className="relative">
                     {item.photos[0].type === "image" ? (
                       <img
                         className="h-full object-cover"
