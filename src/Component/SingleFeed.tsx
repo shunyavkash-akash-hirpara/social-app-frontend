@@ -7,6 +7,9 @@ import { useAuth } from "../hooks/store/useAuth";
 import useApi from "../hooks/useApi";
 import { useSnack } from "../hooks/store/useSnack";
 import { APIS } from "../api/apiList";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import { Pagination } from "swiper/modules";
 
 interface comment {
   _id: string;
@@ -201,7 +204,7 @@ export default function SingleFeed({
             </Link>
             <span className="ms-3 text-sm text-gray-400">
               {post.user.city && post.user.country
-                ? post.user.city + "," + post.user.country
+                ? post.user.city + ", " + post.user.country
                 : "India"}
             </span>
           </div>
@@ -214,25 +217,34 @@ export default function SingleFeed({
           </div>
         )}
 
-        {post.photos.length > 0 &&
-          post.photos.map((media) => (
-            <>
-              {media.type === "image" ? (
-                <img
-                  className="my-3 mx-[auto] rounded-xl h-[409px] object-cover"
-                  src={media.url}
-                  alt="photo"
-                  key={media._id}
-                />
-              ) : (
-                <video
-                  className="my-3 mx-[auto] rounded-xl h-[409px] object-cover"
-                  src="media.url"
-                  key={media._id}
-                ></video>
-              )}
-            </>
-          ))}
+        {post.photos.length > 0 && (
+          <div className="feed-scroll w-full h-full overflow-y-auto">
+            <Swiper
+              pagination={{ clickable: true }}
+              modules={[Pagination]}
+              className="swiper"
+            >
+              {post.photos.map((media) => (
+                <SwiperSlide className="relative flex items-center justify-center flex-col">
+                  {media.type === "image" ? (
+                    <img
+                      className="my-3 mx-[auto] rounded-xl h-[409px] object-contain"
+                      src={media.url}
+                      alt="photo"
+                      key={media._id}
+                    />
+                  ) : (
+                    <video
+                      className="my-3 mx-[auto] rounded-xl h-[409px] object-cover"
+                      src="media.url"
+                      key={media._id}
+                    ></video>
+                  )}
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+        )}
 
         <div className="flex items-center justify-between">
           <div className="">

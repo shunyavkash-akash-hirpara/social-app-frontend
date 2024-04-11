@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import * as yup from "yup";
 import InputComponent from "../Component/InputComponent";
 import useApi from "../hooks/useApi";
@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { FormikProps, useFormik } from "formik";
 import { APIS } from "../api/apiList";
 import BackIcon from "../Component/icons/BackIcon";
+import { useAuth } from "../hooks/store/useAuth";
 
 interface MyFormikValues {
   country: string;
@@ -14,11 +15,26 @@ interface MyFormikValues {
   address: string;
   pincode: string;
 }
+interface user {
+  _id: string;
+  country: string;
+  city: string;
+  pincode: string;
+  address: string;
+}
 
 export default function ContactDetail(): React.JSX.Element {
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
   const navigate = useNavigate();
+  const { userId } = useAuth();
+  const [user, setUser] = useState<user>({
+    _id: "",
+    country: "",
+    city: "",
+    address: "",
+    pincode: "",
+  });
   // schema for yup validation
   const schema = yup.object().shape({
     country: yup.string().required(),
@@ -30,22 +46,23 @@ export default function ContactDetail(): React.JSX.Element {
   const formik: FormikProps<MyFormikValues> = useFormik<MyFormikValues>({
     validationSchema: schema,
     initialValues: {
-      country: "",
-      city: "",
-      address: "",
-      pincode: "",
+      country: user.country,
+      city: user.city,
+      address: user.address,
+      pincode: user.pincode,
     },
+    enableReinitialize: true,
     onSubmit: async (values) => {
       console.log(values);
       try {
         const res = await apiCall({
-          url: APIS.AUTHENTICATION.SIGNIN,
-          method: "post",
+          url: APIS.USER.PATCH(userId),
+          method: "patch",
           data: JSON.stringify(values, null, 2),
         });
         if (res.status === 200) {
           setSnack(res.data.message);
-          navigate("/account-information");
+          // navigate("/account-information");
         }
       } catch (error) {
         if (checkAxiosError(error)) {
@@ -55,6 +72,30 @@ export default function ContactDetail(): React.JSX.Element {
       }
     },
   });
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const getProfileDetail = useCallback(async () => {
+    try {
+      const res = await apiCall({
+        url: APIS.USER.GET(userId),
+        method: "get",
+      });
+      if (res.status === 200) {
+        setUser(res.data.data);
+        setSnack(res.data.message);
+      }
+    } catch (error) {
+      if (checkAxiosError(error)) {
+        const errorMessage = error?.response?.data.message;
+        setSnack(errorMessage, "warning");
+      }
+    }
+  }, [apiCall, checkAxiosError, setSnack, userId]);
+
+  useEffect(() => {
+    if (!userId) return;
+    getProfileDetail();
+  }, [getProfileDetail, userId]);
 
   return (
     <>

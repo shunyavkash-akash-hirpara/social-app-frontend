@@ -85,7 +85,7 @@ export default function AccountDetail(): React.JSX.Element {
         if (res.status === 200) {
           setUserDatail(res.data.data.username, res.data.data.profileImg);
           setSnack(res.data.message);
-          navigate("/account-information");
+          // navigate("/account-information");
         }
       } catch (error) {
         if (checkAxiosError(error)) {

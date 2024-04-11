@@ -1,144 +1,128 @@
-import React, { useEffect, useState } from "react";
-import * as yup from "yup";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SearchIcon from "../Component/icons/SearchIcon";
 import BackIcon from "../Component/icons/BackIcon";
-import InputComponent from "../Component/InputComponent";
 import useApi from "../hooks/useApi";
 import { useSnack } from "../hooks/store/useSnack";
 import { APIS } from "../api/apiList";
-import { FormikProps, useFormik } from "formik";
-
-interface peoples {
-  id: number;
+import { useAuth } from "../hooks/store/useAuth";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+import { socket } from "../socket";
+dayjs.extend(duration);
+interface user {
+  _id: number;
   name: string;
-  avatar: string;
   username: string;
+  profileImg: string;
+  conversationId: string;
 }
 [];
 
-interface MyFormikValue {
-  message: string;
+interface chat {
+  _id?: string;
+  sender: string;
+  receiver?: string;
+  msg: string;
+  type: number;
+  read?: boolean;
+  conversationId?: string;
+  createdAt: string;
 }
 
-const peoples = [
-  {
-    id: 1,
-    name: "Wade Cooper",
-    avatar:
-      "https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "wadecooper",
-  },
-  {
-    id: 2,
-    name: "Arlene Mccoy",
-    avatar:
-      "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "arlenemccoy",
-  },
-  {
-    id: 3,
-    name: "Devon Webb",
-    avatar:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80",
-    username: "devonwebb",
-  },
-  {
-    id: 4,
-    name: "Tom Cook",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "tomcook",
-  },
-  {
-    id: 5,
-    name: "Tanya Fox",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "tanyafox",
-  },
-  {
-    id: 6,
-    name: "Hellen Schmidt",
-    avatar:
-      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "hellenschmidt",
-  },
-  {
-    id: 1,
-    name: "Wade Cooper",
-    avatar:
-      "https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "wadecooper",
-  },
-  {
-    id: 2,
-    name: "Arlene Mccoy",
-    avatar:
-      "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "arlenemccoy",
-  },
-  {
-    id: 3,
-    name: "Devon Webb",
-    avatar:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80",
-    username: "devonwebb",
-  },
-  {
-    id: 4,
-    name: "Tom Cook",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "tomcook",
-  },
-  {
-    id: 5,
-    name: "Tanya Fox",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "tanyafox",
-  },
-  {
-    id: 6,
-    name: "Hellen Schmidt",
-    avatar:
-      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    username: "hellenschmidt",
-  },
-];
-
 export default function ChatList(): React.JSX.Element {
-  const [users, setUsers] = useState<peoples[]>([]);
+  const [users, setUsers] = useState<user[]>([]);
   const [search, setSearch] = useState<string>("");
-  const [chatUser, setChatUser] = useState<{
-    id: number;
-    name: string;
-    avatar: string;
-    username: string;
-  }>();
+  const [chatUser, setChatUser] = useState<user>();
+  const [message, setMessage] = useState<string>("");
+  const [chats, setChats] = useState<chat[]>([]);
   const navigate = useNavigate();
+  const { userId } = useAuth();
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
-  // schema for yup validation
-  const schema = yup.object().shape({
-    description: yup.string(),
-    photos: yup.string(),
-    feeling: yup.string(),
-  });
 
-  const formik: FormikProps<MyFormikValue> = useFormik<MyFormikValue>({
-    validationSchema: schema,
-    initialValues: { message: "" },
-    onSubmit: async (values) => {
+  const handleSendMessage = () => {
+    // Simulate receiving a new chat
+    const newChat: chat = {
+      sender: userId,
+      msg: message,
+      type: 1,
+      createdAt: dayjs().toISOString(), // Use current time
+    };
+    socket.emit("sendMessage", {
+      sender: userId,
+      receiver: chatUser?._id,
+      msg: message,
+      type: 1,
+      createdAt: dayjs().toISOString(),
+    });
+
+    // Append the new chat to the existing chats
+    setChats((prevChats) => [...prevChats, newChat]);
+    setMessage("");
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSendMessage();
+    }
+  };
+
+  const getTimeLapse = (inputTime: string): string => {
+    const date = dayjs(inputTime);
+
+    // Calculate the duration between the input time and now
+    const timeDifference = dayjs.duration(dayjs().diff(date));
+    // Get the time lapse in minutes
+    const minutes = timeDifference.asMinutes();
+    // Define the thresholds for different time lapses
+    const thresholds = [
+      { threshold: 1, label: "just now" },
+      { threshold: 60, label: "a few minutes ago" },
+      { threshold: 24 * 60, label: "hours ago" },
+      { threshold: 24 * 60 * 7, label: "days ago" },
+      { threshold: 24 * 60 * 30, label: "weeks ago" },
+      { threshold: 24 * 60 * 365, label: "months ago" },
+      { threshold: Infinity, label: "years ago" },
+    ];
+    // Find the appropriate time lapse label based on the time difference
+    const timeLapse =
+      thresholds.find(({ threshold }) => minutes < threshold)?.label || "";
+
+    return timeLapse;
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const ChatList = useCallback(async () => {
+    try {
+      const res = await apiCall({
+        url: APIS.CHAT.CHATLIST,
+        method: "get",
+      });
+      if (res.status === 200) {
+        setUsers(res.data.data);
+        setSnack(res.data.message);
+      }
+    } catch (error) {
+      if (checkAxiosError(error)) {
+        const errorMessage = error?.response?.data.message;
+        setSnack(errorMessage, "warning");
+      }
+    }
+  }, [apiCall, checkAxiosError, setSnack]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const searchUser = useCallback(
+    async (searchData: string) => {
       try {
         const res = await apiCall({
-          url: APIS.AUTHENTICATION.SIGNUP,
+          url: APIS.USER.SEARCHUSER,
           method: "post",
-          data: JSON.stringify(values, null, 2),
+          data: { username: searchData.toLowerCase() },
         });
         if (res.status === 200) {
-          console.log(res.data.message);
+          setUsers(res.data.data);
+          setSnack(res.data.message);
         }
       } catch (error) {
         if (checkAxiosError(error)) {
@@ -147,16 +131,57 @@ export default function ChatList(): React.JSX.Element {
         }
       }
     },
-  });
+    [apiCall, checkAxiosError, setSnack]
+  );
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const getUserChats = useCallback(async () => {
+    try {
+      const res = await apiCall({
+        url: APIS.CHAT.CHAT,
+        method: "get",
+        params: { conversationId: chatUser?.conversationId, limit: 20 },
+      });
+      if (res.status === 200) {
+        setChats(res.data.data);
+        setSnack(res.data.message);
+      }
+    } catch (error) {
+      if (checkAxiosError(error)) {
+        const errorMessage = error?.response?.data.message;
+        setSnack(errorMessage, "warning");
+      }
+    }
+  }, [apiCall, chatUser?.conversationId, checkAxiosError, setSnack]);
 
   useEffect(() => {
-    if (!search) return setUsers(peoples); // Exit early if searchData is falsy
-    setUsers(() =>
-      peoples.filter((people) =>
-        people.name.toLowerCase().includes(search.toLowerCase())
-      )
-    );
-  }, [search]);
+    if (!chatUser) return;
+    getUserChats();
+    socket.emit("onScreen", { userId: userId, screenId: chatUser._id });
+  }, [chatUser, getUserChats, userId]);
+
+  useEffect(() => {
+    if (!search) ChatList(); // Exit early if search is falsy
+    else searchUser(search);
+  }, [ChatList, search, searchUser]);
+
+  useEffect(() => {
+    socket.on("sendMessage", (data) => {
+      const newChat: chat = {
+        sender: data.sender,
+        receiver: data.receiver,
+        conversationId: data.conversationId,
+        msg: data.msg,
+        type: data.type,
+        read: data.read,
+        createdAt: dayjs().toISOString(), // Use current time
+      };
+      setChats((prevChats) => [...prevChats, newChat]);
+    });
+    return () => {
+      socket.off("sendMessage");
+    };
+  }, []);
 
   return (
     <>
@@ -192,11 +217,11 @@ export default function ChatList(): React.JSX.Element {
                 <button
                   className="w-full flex items-center p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group"
                   onClick={() => setChatUser(people)}
-                  key={people.id}
+                  key={people._id}
                 >
                   <img
-                    className="w-12 h-12 rounded-full"
-                    src={people.avatar}
+                    className="w-11 h-11 rounded-full object-cover"
+                    src={people.profileImg}
                     alt="Rounded avatar"
                   />
                   <div className="flex flex-col text-justify">
@@ -215,16 +240,16 @@ export default function ChatList(): React.JSX.Element {
             <div className="relative w-[62%] rounded-xl bg-white">
               <div className="w-full h-14 p-3 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center flex items-center justify-between">
                 <div className="h-full flex items-center justify-start">
-                  <Link to={`/profile/${chatUser.id}`}>
+                  <Link to={`/profile/${chatUser._id}`}>
                     <img
-                      className="w-10 h-10 rounded-full"
-                      src={chatUser.avatar}
+                      className="w-10 h-10 rounded-full object-cover"
+                      src={chatUser.profileImg}
                       alt="Rounded avatar"
                     />
                   </Link>
                   <div className="flex flex-col text-justify">
                     <Link
-                      to={`/profile/${chatUser.id}`}
+                      to={`/profile/${chatUser._id}`}
                       className="ms-3 text-sm text-white font-bold"
                     >
                       {chatUser.username}
@@ -250,30 +275,41 @@ export default function ChatList(): React.JSX.Element {
                 </div>
               </div>
               <div className="w-full p-3 h-[auto]">
-                <div className="flex flex-col items-start">
-                  <p className="text-sm text-gray-700 bg-[#E2EFFF] px-5 py-[10px] rounded-t-2xl rounded-r-2xl max-w-[80%] text-start">
-                    Hi, how can I help you?
-                  </p>
-                  <span className="text-xs text-gray-400 my-2">
-                    Mon 10:20am
-                  </span>
-                </div>
-                <div className="flex flex-col items-end">
-                  <p className="text-sm text-gray-700 bg-[#fcf1f5] px-5 py-[10px] rounded-t-2xl rounded-l-2xl max-w-[80%] text-start">
-                    I want those files for you. I want you to send 1 PDF and 1
-                    image file.
-                  </p>
-                  <span className="text-xs text-gray-400 my-2">Just now</span>
-                </div>
+                {chats.length > 0 &&
+                  chats.map((chat) => (
+                    <>
+                      {chat.receiver === userId ? (
+                        <div className="flex flex-col items-start">
+                          <p className="text-sm text-gray-700 bg-[#E2EFFF] px-5 py-[10px] rounded-t-2xl rounded-r-2xl max-w-[80%] text-start">
+                            {chat.msg}{" "}
+                          </p>
+                          <span className="text-xs text-gray-400 my-2">
+                            {getTimeLapse(chat.createdAt)}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-end">
+                          <p className="text-sm text-gray-700 bg-[#fcf1f5] px-5 py-[10px] rounded-t-2xl rounded-l-2xl max-w-[80%] text-start">
+                            {chat.msg}
+                          </p>
+                          <span className="text-xs text-gray-400 my-2">
+                            {getTimeLapse(chat.createdAt)}
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  ))}
               </div>
               <div className="absolute bottom-0 w-full">
                 <div className="relative w-full border-t-2 border-gray-100 p-3">
-                  <InputComponent
+                  <input
                     name="message"
                     type="text"
                     placeholder="Start typing..."
-                    formik={formik}
-                    inputStyle="w-full bg-input-primary border-none my-0 text-sm"
+                    className="border-gray border text-gray-700 rounded-xl py-3 px-4 pr-3 w-full bg-input-primary my-0 text-sm"
+                    onChange={(e) => setMessage(e.target.value)}
+                    value={message}
+                    onKeyDown={handleKeyPress}
                   />
                   <div className="absolute right-5 bottom-[18px] flex">
                     <input type="file" id="chat-media" className="hidden" />
@@ -284,7 +320,7 @@ export default function ChatList(): React.JSX.Element {
                         alt="photo"
                       />
                     </label>
-                    <button>
+                    <button onClick={handleSendMessage}>
                       <img
                         width={30}
                         src="/public/icons/share-2-svgrepo-com.svg"

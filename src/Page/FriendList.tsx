@@ -52,7 +52,9 @@ export default function FriendList(): React.JSX.Element {
     try {
       const res = await apiCall({
         url:
-          tab === "followers" ? APIS.FOLLOW.FOLLOWERS : APIS.FOLLOW.FOLLOWING,
+          tab === "followers"
+            ? APIS.FOLLOW.FOLLOWERS(id)
+            : APIS.FOLLOW.FOLLOWING(id),
         method: "get",
       });
       if (res.status === 200) {
@@ -65,7 +67,7 @@ export default function FriendList(): React.JSX.Element {
         setSnack(errorMessage, "warning");
       }
     }
-  }, [apiCall, checkAxiosError, setSnack, tab]);
+  }, [apiCall, checkAxiosError, id, setSnack, tab]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleFollow = useCallback(
@@ -148,7 +150,7 @@ export default function FriendList(): React.JSX.Element {
                   className="flex items-center"
                 >
                   <img
-                    className="w-12 h-12 rounded-full"
+                    className="w-12 h-12 rounded-full object-cover"
                     src={people.user.profileImg}
                     alt="Rounded avatar"
                   />
@@ -161,27 +163,32 @@ export default function FriendList(): React.JSX.Element {
                     </span>
                   </div>
                 </Link>
-                {tab === "following" ? (
-                  <button className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold px-7 py-2 mr-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
-                    Following
-                  </button>
-                ) : (
-                  <>
-                    <div className="flex items-center">
-                      {people.followBackFlag && id !== userId && (
-                        <button
-                          onClick={() => handleFollow(people.user._id)}
-                          className="mr-2 text-sm text-blue-500 font-bold"
-                        >
-                          Follow
+                {people.user._id !== userId &&
+                  (tab === "following" ? (
+                    <button className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold px-7 py-2 mr-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
+                      {people.followBackFlag ? "Following" : "Follow"}
+                    </button>
+                  ) : (
+                    <>
+                      <div className="flex items-center">
+                        {!people.followBackFlag && id === userId && (
+                          <button
+                            onClick={() => handleFollow(people.user._id)}
+                            className="mr-2 text-sm text-blue-500 font-bold"
+                          >
+                            Follow
+                          </button>
+                        )}
+                        <button className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold px-7 py-2 mr-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
+                          {id === userId
+                            ? "Remove"
+                            : people.followBackFlag
+                            ? "Following"
+                            : "Follow"}
                         </button>
-                      )}
-                      <button className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold px-7 py-2 mr-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
-                        {id === userId ? "Remove" : "Follow"}
-                      </button>
-                    </div>
-                  </>
-                )}
+                      </div>
+                    </>
+                  ))}
               </div>
             ))}
           </div>

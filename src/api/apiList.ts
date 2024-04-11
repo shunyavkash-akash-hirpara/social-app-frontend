@@ -32,7 +32,11 @@ export const APIS = {
   FOLLOW: {
     FOLLOW: "/follow/follow",
     UNFOLLOW: "/follow/unfollow",
-    FOLLOWERS: "/follow/followers",
-    FOLLOWING: "/follow/following",
+    FOLLOWERS: (friendId: string) => `/follow/${friendId}/followers`,
+    FOLLOWING: (friendId: string) => `/follow/${friendId}/following`,
+  },
+  CHAT: {
+    CHATLIST: "/chat",
+    CHAT: "/chat/chatMessage"
   },
 };

@@ -1,6 +1,7 @@
 import React from "react";
 import { useAuth } from "../hooks/store/useAuth";
 import { Link } from "react-router-dom";
+import { socket } from "../socket";
 
 export default function Setting(): React.JSX.Element {
   const { logout } = useAuth();
@@ -155,7 +156,10 @@ export default function Setting(): React.JSX.Element {
               <li className="d-block me-0">
                 <button
                   className="pt-2 pb-2 flex items-center w-full"
-                  onClick={() => logout()}
+                  onClick={() => {
+                    logout();
+                    socket.on("disconnect", () => {});
+                  }}
                 >
                   <div className="bg-[#E65026] w-10 h-10 rounded-full flex items-center justify-center mr-2">
                     <img

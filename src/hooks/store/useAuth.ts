@@ -14,15 +14,18 @@ interface AuthState {
   accessToken: string;
   userId: string;
   setProfile: boolean;
+  isLoggedIn: boolean;
   logout: () => void;
   login: ({
     user,
     accessToken,
     userId,
+    isLoggedIn,
   }: {
     user: User;
     accessToken: string;
     userId: string;
+    isLoggedIn: boolean;
   }) => void;
   setAccessToken: (accessToken: string) => void;
   setUserDatail: (username: string, profileImg: string) => void;
@@ -42,20 +45,24 @@ export const useAuth = create(
       accessToken: "",
       userId: "",
       setProfile: false,
+      isLoggedIn: false,
       login: ({
         user,
         accessToken,
         userId,
+        isLoggedIn,
       }: {
         user: User;
         accessToken: string;
         userId: string;
+        isLoggedIn: boolean;
       }) => {
         set((state) => ({
           ...state,
           user,
           accessToken,
           userId,
+          isLoggedIn,
         }));
       },
       logout: () =>
@@ -71,6 +78,7 @@ export const useAuth = create(
           accessToken: "",
           userId: "",
           setProfile: false,
+          isLoggedIn: false,
         })),
       setUserDatail: (username: string, profileImg: string) => {
         set((state) => ({

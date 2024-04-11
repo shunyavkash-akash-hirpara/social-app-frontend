@@ -7,6 +7,7 @@ import { useSnack } from "../hooks/store/useSnack";
 import { useNavigate } from "react-router-dom";
 import { APIS } from "../api/apiList";
 import { useAuth } from "../hooks/store/useAuth";
+import { socket } from "../socket";
 
 interface MyFormikValues {
   email: string;
@@ -49,10 +50,12 @@ export default function SignIn(): React.JSX.Element {
             user: { username, name, email, role, mobileNumber, profileImg },
             accessToken: accessToken,
             userId: _id,
+            isLoggedIn: true,
           });
           setSnack(res.data.message);
           navigate("/");
         }
+        socket.on("disconnect", () => {});
       } catch (error) {
         if (checkAxiosError(error)) {
           const errorMessage = error?.response?.data.message;

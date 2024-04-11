@@ -79,6 +79,25 @@ export default function RecentChat(): React.JSX.Element {
   const { setSnack } = useSnack();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  const recentChatList = useCallback(async () => {
+    try {
+      const res = await apiCall({
+        url: APIS.CHAT.CHATLIST,
+        method: "get",
+      });
+      if (res.status === 200) {
+        setUsers(res.data.data);
+        setSnack(res.data.message);
+      }
+    } catch (error) {
+      if (checkAxiosError(error)) {
+        const errorMessage = error?.response?.data.message;
+        setSnack(errorMessage, "warning");
+      }
+    }
+  }, [apiCall, checkAxiosError, setSnack]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const searchUser = useCallback(
     async (searchData: string) => {
       try {
@@ -102,9 +121,13 @@ export default function RecentChat(): React.JSX.Element {
   );
 
   useEffect(() => {
-    if (!search) return setUsers([]); // Exit early if search is falsy
-    searchUser(search);
-  }, [search, searchUser]);
+    recentChatList();
+  }, [recentChatList]);
+
+  useEffect(() => {
+    if (!search) recentChatList(); // Exit early if search is falsy
+    else searchUser(search);
+  }, [recentChatList, search, searchUser]);
   return (
     <>
       <aside
