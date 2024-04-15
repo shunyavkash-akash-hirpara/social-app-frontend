@@ -16,12 +16,12 @@ interface peoples {
 }
 [];
 interface user {
-  _id: number;
+  _id: string;
   name: string;
   username: string;
   profileImg: string;
+  conversationId: string;
 }
-[];
 
 const peoples = [
   {
@@ -71,7 +71,7 @@ const peoples = [
 export default function RecentChat(): React.JSX.Element {
   const [openChat, setOpenChat] = useState(false);
   const [openStory, setOpenStory] = useState(false);
-  const [chatUser, setChatUser] = useState({ profileImg: "", username: "" });
+  const [chatUser, setChatUser] = useState<user>();
   const [activeSlide, setActiveSlide] = useState<number>(0);
   const [search, setSearch] = useState<string>("");
   const [users, setUsers] = useState<user[]>([]);
@@ -224,11 +224,13 @@ export default function RecentChat(): React.JSX.Element {
                 </button>
               </li>
             ))}
-            <div
-              className={`modal-popup-chat ${openChat ? "block" : "hidden"}`}
-            >
-              <ChatBox setOpenChat={setOpenChat} chatUser={chatUser} />
-            </div>
+            {chatUser && (
+              <div
+                className={`modal-popup-chat ${openChat ? "block" : "hidden"}`}
+              >
+                <ChatBox setOpenChat={setOpenChat} chatUser={chatUser} />
+              </div>
+            )}
           </ul>
         </div>
       </aside>

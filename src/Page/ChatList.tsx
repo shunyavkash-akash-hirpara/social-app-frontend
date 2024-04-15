@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, {
+  LegacyRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SearchIcon from "../Component/icons/SearchIcon";
 import BackIcon from "../Component/icons/BackIcon";
@@ -8,16 +14,22 @@ import { APIS } from "../api/apiList";
 import { useAuth } from "../hooks/store/useAuth";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import { socket } from "../socket";
+import { useOnline } from "../hooks/store/useOnline";
 dayjs.extend(duration);
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(customParseFormat);
 interface user {
-  _id: number;
+  _id: string;
   name: string;
   username: string;
   profileImg: string;
   conversationId: string;
 }
-[];
 
 interface chat {
   _id?: string;
@@ -36,10 +48,16 @@ export default function ChatList(): React.JSX.Element {
   const [chatUser, setChatUser] = useState<user>();
   const [message, setMessage] = useState<string>("");
   const [chats, setChats] = useState<chat[]>([]);
+  const [typing, setTyping] = useState<boolean>(false);
+  const [currPage, setCurrPage] = useState<number>(0);
+  const [nextPage, setNextPage] = useState<boolean>(false);
   const navigate = useNavigate();
   const { userId } = useAuth();
+  const { onlineUsers } = useOnline();
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
+  const messageRef: LegacyRef<HTMLInputElement> = useRef(null);
+  const listInnerRef: LegacyRef<HTMLDivElement> = useRef(null);
 
   const handleSendMessage = () => {
     // Simulate receiving a new chat
@@ -58,7 +76,7 @@ export default function ChatList(): React.JSX.Element {
     });
 
     // Append the new chat to the existing chats
-    setChats((prevChats) => [...prevChats, newChat]);
+    setChats((prevChats) => [newChat, ...prevChats]);
     setMessage("");
   };
 
@@ -66,30 +84,21 @@ export default function ChatList(): React.JSX.Element {
     if (e.key === "Enter") {
       handleSendMessage();
     }
+    socket.emit("typing", { userId: userId, typing: true });
   };
 
-  const getTimeLapse = (inputTime: string): string => {
-    const date = dayjs(inputTime);
+  const handleKeyPressUp = () => {
+    setTimeout(() => {
+      socket.emit("typing", { userId: userId, typing: false });
+    }, 2000);
+  };
 
-    // Calculate the duration between the input time and now
-    const timeDifference = dayjs.duration(dayjs().diff(date));
-    // Get the time lapse in minutes
-    const minutes = timeDifference.asMinutes();
-    // Define the thresholds for different time lapses
-    const thresholds = [
-      { threshold: 1, label: "just now" },
-      { threshold: 60, label: "a few minutes ago" },
-      { threshold: 24 * 60, label: "hours ago" },
-      { threshold: 24 * 60 * 7, label: "days ago" },
-      { threshold: 24 * 60 * 30, label: "weeks ago" },
-      { threshold: 24 * 60 * 365, label: "months ago" },
-      { threshold: Infinity, label: "years ago" },
-    ];
-    // Find the appropriate time lapse label based on the time difference
-    const timeLapse =
-      thresholds.find(({ threshold }) => minutes < threshold)?.label || "";
-
-    return timeLapse;
+  const formatTime = (timestamp: string) => {
+    // Parse the timestamp and convert it to local time
+    const localTime = dayjs(timestamp).utc().local();
+    // Format the local time as "10:29pm"
+    const formattedTime = localTime.format("h:mmA");
+    return formattedTime;
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -111,7 +120,6 @@ export default function ChatList(): React.JSX.Element {
     }
   }, [apiCall, checkAxiosError, setSnack]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const searchUser = useCallback(
     async (searchData: string) => {
       try {
@@ -134,25 +142,51 @@ export default function ChatList(): React.JSX.Element {
     [apiCall, checkAxiosError, setSnack]
   );
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const getUserChats = useCallback(async () => {
-    try {
-      const res = await apiCall({
-        url: APIS.CHAT.CHAT,
-        method: "get",
-        params: { conversationId: chatUser?.conversationId, limit: 20 },
-      });
-      if (res.status === 200) {
-        setChats(res.data.data);
-        setSnack(res.data.message);
-      }
-    } catch (error) {
-      if (checkAxiosError(error)) {
-        const errorMessage = error?.response?.data.message;
-        setSnack(errorMessage, "warning");
+    if (nextPage || currPage === 0) {
+      try {
+        const res = await apiCall({
+          url: APIS.CHAT.CHAT,
+          method: "get",
+          params: {
+            conversationId: chatUser?.conversationId,
+            limit: 10,
+            page: currPage,
+          },
+        });
+        if (res.status === 200) {
+          if (currPage === 0) {
+            setChats(res.data.data.chatData);
+          } else {
+            setChats((prevChats) => [...prevChats, ...res.data.data.chatData]);
+          }
+          setNextPage(res.data.data.hasNextPage);
+          setSnack(res.data.message);
+        }
+      } catch (error) {
+        if (checkAxiosError(error)) {
+          const errorMessage = error?.response?.data.message;
+          setSnack(errorMessage, "warning");
+        }
       }
     }
-  }, [apiCall, chatUser?.conversationId, checkAxiosError, setSnack]);
+  }, [
+    apiCall,
+    chatUser?.conversationId,
+    checkAxiosError,
+    currPage,
+    nextPage,
+    setSnack,
+  ]);
+
+  const onScroll = () => {
+    if (listInnerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = listInnerRef.current;
+      if (-scrollTop + clientHeight === scrollHeight && nextPage) {
+        setCurrPage(currPage + 1);
+      }
+    }
+  };
 
   useEffect(() => {
     if (!chatUser) return;
@@ -165,6 +199,10 @@ export default function ChatList(): React.JSX.Element {
     else searchUser(search);
   }, [ChatList, search, searchUser]);
 
+  if (messageRef.current) {
+    messageRef.current?.focus();
+  }
+
   useEffect(() => {
     socket.on("sendMessage", (data) => {
       const newChat: chat = {
@@ -176,7 +214,10 @@ export default function ChatList(): React.JSX.Element {
         read: data.read,
         createdAt: dayjs().toISOString(), // Use current time
       };
-      setChats((prevChats) => [...prevChats, newChat]);
+      setChats((prevChats) => [newChat, ...prevChats]);
+    });
+    socket.on("typing", (data) => {
+      setTyping(data.typing);
     });
     return () => {
       socket.off("sendMessage");
@@ -187,7 +228,7 @@ export default function ChatList(): React.JSX.Element {
     <>
       <main className="fixed w-[848px] top-[80px] left-[280px] right-[344px] mx-[auto] rounded-xl">
         <div className="w-full p-6 pt-0 flex justify-between">
-          <div className="w-[35%] bg-white rounded-xl flex flex-col h-calc-for-chat">
+          <div className="w-[35%] bg-white rounded-xl flex flex-col h-calc-for-chatList">
             <div className="w-full h-14 p-3 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center">
               <div className="h-full flex items-center justify-start">
                 <button
@@ -237,7 +278,7 @@ export default function ChatList(): React.JSX.Element {
             </div>
           </div>
           {chatUser && (
-            <div className="relative w-[62%] rounded-xl bg-white">
+            <div className="relative h-calc-for-chatList w-[62%] rounded-xl bg-white">
               <div className="w-full h-14 p-3 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center flex items-center justify-between">
                 <div className="h-full flex items-center justify-start">
                   <Link to={`/profile/${chatUser._id}`}>
@@ -254,7 +295,11 @@ export default function ChatList(): React.JSX.Element {
                     >
                       {chatUser.username}
                     </Link>
-                    <span className="ms-3 text-sm text-white">online</span>
+                    {onlineUsers.includes(chatUser._id) && (
+                      <span className="ms-3 text-sm text-white">
+                        {typing ? "typing" : "online"}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div>
@@ -274,17 +319,21 @@ export default function ChatList(): React.JSX.Element {
                   </button>
                 </div>
               </div>
-              <div className="w-full p-3 h-[auto]">
+              <div
+                onScroll={onScroll}
+                ref={listInnerRef}
+                className="h-calc-for-chats w-full p-3 feed-scroll overflow-y-auto flex flex-col-reverse"
+              >
                 {chats.length > 0 &&
                   chats.map((chat) => (
                     <>
                       {chat.receiver === userId ? (
                         <div className="flex flex-col items-start">
                           <p className="text-sm text-gray-700 bg-[#E2EFFF] px-5 py-[10px] rounded-t-2xl rounded-r-2xl max-w-[80%] text-start">
-                            {chat.msg}{" "}
+                            {chat.msg}
                           </p>
                           <span className="text-xs text-gray-400 my-2">
-                            {getTimeLapse(chat.createdAt)}
+                            {formatTime(chat.createdAt)}
                           </span>
                         </div>
                       ) : (
@@ -293,7 +342,7 @@ export default function ChatList(): React.JSX.Element {
                             {chat.msg}
                           </p>
                           <span className="text-xs text-gray-400 my-2">
-                            {getTimeLapse(chat.createdAt)}
+                            {formatTime(chat.createdAt)}
                           </span>
                         </div>
                       )}
@@ -310,6 +359,8 @@ export default function ChatList(): React.JSX.Element {
                     onChange={(e) => setMessage(e.target.value)}
                     value={message}
                     onKeyDown={handleKeyPress}
+                    onKeyUp={handleKeyPressUp}
+                    ref={messageRef}
                   />
                   <div className="absolute right-5 bottom-[18px] flex">
                     <input type="file" id="chat-media" className="hidden" />
