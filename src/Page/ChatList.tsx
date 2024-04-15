@@ -295,7 +295,7 @@ export default function ChatList(): React.JSX.Element {
                     >
                       {chatUser.username}
                     </Link>
-                    {onlineUsers.includes(chatUser._id) && (
+                    {onlineUsers.includes(chatUser._id.toString()) && (
                       <span className="ms-3 text-sm text-white">
                         {typing ? "typing" : "online"}
                       </span>

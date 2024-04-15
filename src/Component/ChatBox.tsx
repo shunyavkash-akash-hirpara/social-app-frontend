@@ -192,12 +192,12 @@ export default function ChatBox({
           <h4 className="ms-3 text-[13px] text-gray-400">
             <span
               className={`inline-block ${
-                onlineUsers.includes(chatUser._id)
+                onlineUsers.includes(chatUser._id.toString())
                   ? "bg-green-500"
                   : "bg-red-500"
               } p-1 mr-1 rounded-full`}
             ></span>
-            {onlineUsers.includes(chatUser._id)
+            {onlineUsers.includes(chatUser._id.toString())
               ? typing
                 ? "typing"
                 : "online"
