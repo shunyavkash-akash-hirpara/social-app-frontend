@@ -143,7 +143,7 @@ export default function Feed(): React.JSX.Element {
         method: "get",
       });
       if (res.status === 200) {
-        setPosts(res.data.data);
+        setPosts(res.data.data.data);
         setSnack(res.data.message);
       }
     } catch (error) {

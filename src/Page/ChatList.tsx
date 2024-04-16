@@ -19,6 +19,8 @@ import timezone from "dayjs/plugin/timezone";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { socket } from "../socket";
 import { useOnline } from "../hooks/store/useOnline";
+import Draggable from "react-draggable";
+import CloseIcon from "../Component/icons/CloseIcon";
 dayjs.extend(duration);
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -51,13 +53,18 @@ export default function ChatList(): React.JSX.Element {
   const [typing, setTyping] = useState<boolean>(false);
   const [currPage, setCurrPage] = useState<number>(0);
   const [nextPage, setNextPage] = useState<boolean>(false);
+  const [openCallRequestModel, setOpenCallRequestModel] =
+    useState<boolean>(false);
+  const [openCallModel, setOpenCallModel] = useState<boolean>(false);
+  const [currentRotate, setCurrentRotate] = useState(0);
   const navigate = useNavigate();
-  const { userId } = useAuth();
+  const { userId, user } = useAuth();
   const { onlineUsers } = useOnline();
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
   const messageRef: LegacyRef<HTMLInputElement> = useRef(null);
   const listInnerRef: LegacyRef<HTMLDivElement> = useRef(null);
+  const isDraggingRef = useRef(false);
 
   const handleSendMessage = () => {
     // Simulate receiving a new chat
@@ -224,6 +231,18 @@ export default function ChatList(): React.JSX.Element {
     };
   }, []);
 
+  // dragger model
+  const onDrag = () => {
+    isDraggingRef.current = true;
+  };
+
+  const onStop = () => {
+    if (!isDraggingRef.current) {
+      setCurrentRotate(currentRotate + 90);
+    }
+    isDraggingRef.current = false;
+  };
+
   return (
     <>
       <main className="fixed w-[848px] top-[80px] left-[280px] right-[344px] mx-[auto] rounded-xl">
@@ -303,7 +322,13 @@ export default function ChatList(): React.JSX.Element {
                   </div>
                 </div>
                 <div>
-                  <button className="w-8 h-8 p-1 rounded-lg">
+                  <button
+                    onClick={() => {
+                      // setOpenCallRequestModel(true);
+                      setOpenCallModel(true);
+                    }}
+                    className="w-8 h-8 p-1 rounded-lg"
+                  >
                     <img
                       className="w-8"
                       src="/public/icons/phone-call-svgrepo-com.svg"
@@ -385,6 +410,116 @@ export default function ChatList(): React.JSX.Element {
           )}
         </div>
       </main>
+
+      {/* call request model */}
+      {openCallRequestModel && (
+        <Draggable onStop={onStop} onDrag={onDrag}>
+          <div
+            className={`${
+              openCallRequestModel ? "block" : "hidden"
+            } relative z-10 p-5 bg-yellow-100 max-w-96 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center border-[1px] border-white shadow-lg shadow-gray-400`}
+            style={{ transform: "rotate(" + currentRotate + "deg)" }}
+          >
+            <div className="flex items-center justify-center">
+              <img
+                className="h-8 w-8"
+                src="/public/icons/headphone-svgrepo-com.svg"
+                alt="headphone"
+              />
+              <span className="text-white text-sm font-bold ml-2">
+                invite to connect call
+              </span>
+            </div>
+            <div className="flex flex-col justify-center items-center mt-3">
+              <img
+                className="w-20 h-20 mb-2 rounded-lg object-cover"
+                src={chatUser.profileImg}
+                alt="Rounded avatar"
+              />
+              <div className="text-base text-white font-bold">
+                {chatUser.username}
+              </div>
+            </div>
+            <div className="flex items-center justify-center gap-5 mt-3">
+              <div className="flex flex-col">
+                <button className="p-3 h-13 w-12 rounded-full bg-[#f88989]">
+                  <CloseIcon className="w-6 h-6 text-white"></CloseIcon>
+                </button>
+                <span className="text-white">Decline</span>
+              </div>
+              <div className="flex flex-col">
+                <button className="p-3 h-13 w-12 rounded-full bg-[#f88989]">
+                  <img
+                    className="h-6 w-6"
+                    src="/public/icons/headphone-svgrepo-com.svg"
+                    alt="headphone"
+                  />
+                </button>
+                <span className="text-white">Join</span>
+              </div>
+            </div>
+          </div>
+        </Draggable>
+      )}
+      {/* call model */}
+      {openCallModel && (
+        <Draggable onStop={onStop} onDrag={onDrag}>
+          <div
+            className={`${
+              openCallModel ? "block" : "hidden"
+            } relative z-10 p-5 bg-yellow-100 max-w-96 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center border-[1px] border-white shadow-lg shadow-gray-400`}
+            style={{ transform: "rotate(" + currentRotate + "deg)" }}
+          >
+            <div className="flex items-center justify-center">
+              <img
+                className="h-8 w-8"
+                src="/public/icons/headphone-svgrepo-com.svg"
+                alt="headphone"
+              />
+              <span className="text-white text-sm font-bold ml-2">
+                call with {chatUser.username}
+              </span>
+            </div>
+            <div className="flex justify-center items-center mt-3">
+              <img
+                className="w-20 h-20 mb-2 rounded-lg object-cover"
+                src={user.profileImg}
+                alt="Rounded avatar"
+              />
+              <div className="relative ml-3">
+                <img
+                  className="w-20 h-20 mb-2 rounded-lg object-cover"
+                  src={chatUser.profileImg}
+                  alt="Rounded avatar"
+                />
+                <img
+                  className="absolute h-7 w-7 p-[2px] top-0 left-0 bg-black rounded-lg"
+                  src="/public/icons/headphone-svgrepo-com.svg"
+                  alt="headphone"
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-center gap-5 mt-3">
+              <div className="flex flex-col">
+                <button className="p-3 h-13 w-12 rounded-full bg-[#f88989]">
+                  <CloseIcon className="w-6 h-6 text-white"></CloseIcon>
+                </button>
+                <span className="text-white">Decline</span>
+              </div>
+              <div className="flex flex-col">
+                <button className="p-3 h-13 w-12 rounded-full bg-[#f88989]">
+                  <img
+                    className="h-6 w-6"
+                    src="/public/icons/headphone-svgrepo-com.svg"
+                    alt="headphone"
+                  />
+                </button>
+                <span className="text-white">Join</span>
+              </div>
+            </div>
+          </div>
+        </Draggable>
+      )}
     </>
   );
 }

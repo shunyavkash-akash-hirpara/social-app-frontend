@@ -158,7 +158,7 @@ export default function Setting(): React.JSX.Element {
                   className="pt-2 pb-2 flex items-center w-full"
                   onClick={() => {
                     logout();
-                    socket.on("disconnect", () => {});
+                    socket.disconnect();
                   }}
                 >
                   <div className="bg-[#E65026] w-10 h-10 rounded-full flex items-center justify-center mr-2">

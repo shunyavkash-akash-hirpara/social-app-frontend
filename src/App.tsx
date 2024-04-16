@@ -38,7 +38,7 @@ function App(): React.JSX.Element {
       socket.off("message");
       socket.off("isOnline");
     };
-  }, []);
+  }, [setOnlineUsers, userId]);
   return <Routes />;
 }
 

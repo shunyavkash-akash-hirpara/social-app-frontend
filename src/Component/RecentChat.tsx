@@ -135,9 +135,9 @@ export default function RecentChat(): React.JSX.Element {
         className="fixed top-14 right-0 w-80 h-screen sm:translate-x-0 border-t-2 border-[#F6F5F7]"
         aria-label="Sidebar"
       >
-        <div className="h-full px-3 py-4 overflow-y-auto bg-white">
-          <Swiper className="swiper" spaceBetween={5} slidesPerView={4}>
-            <SwiperSlide className="relative flex items-center justify-center flex-col">
+        <div className="h-full px-4 py-4 overflow-y-auto bg-white">
+          <Swiper className="swiper" spaceBetween={3} slidesPerView={4}>
+            <SwiperSlide className="relative flex items-center justify-center flex-col pt-1">
               <button>
                 <img
                   className="w-14 h-14 rounded-full ring-2 ring-primary"
@@ -158,7 +158,7 @@ export default function RecentChat(): React.JSX.Element {
             </SwiperSlide>
             {peoples.map((item) => (
               <SwiperSlide
-                className="flex items-center justify-center flex-col"
+                className="flex items-center justify-center flex-col pt-1"
                 key={item.id}
               >
                 <button onClick={() => setOpenStory(true)}>

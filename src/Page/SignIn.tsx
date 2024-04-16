@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { APIS } from "../api/apiList";
 import { useAuth } from "../hooks/store/useAuth";
 import { socket } from "../socket";
+import { useSocket } from "../hooks/store/useSocket";
 
 interface MyFormikValues {
   email: string;
@@ -18,7 +19,8 @@ export default function SignIn(): React.JSX.Element {
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isLoggedIn } = useAuth();
+  const { socketConnection } = useSocket();
   // schema for yup validation
   const schema = yup.object().shape({
     email: yup.string().email().required(),
@@ -52,6 +54,9 @@ export default function SignIn(): React.JSX.Element {
             userId: _id,
             isLoggedIn: true,
           });
+          if (isLoggedIn && socketConnection) {
+            socket.emit("joinRoom", { user: _id });
+          }
           setSnack(res.data.message);
           navigate("/");
         }
