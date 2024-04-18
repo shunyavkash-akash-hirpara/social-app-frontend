@@ -19,8 +19,10 @@ import timezone from "dayjs/plugin/timezone";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { socket } from "../socket";
 import { useOnline } from "../hooks/store/useOnline";
-import Draggable from "react-draggable";
-import CloseIcon from "../Component/icons/CloseIcon";
+import ShareIcon from "../Component/icons/ShareIcon";
+import PictureIcon from "../Component/icons/PictureIcon";
+import VideoIcon from "../Component/icons/VideoIcon";
+import { useOnCall } from "../hooks/store/useOnCall";
 dayjs.extend(duration);
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -53,10 +55,7 @@ export default function ChatList(): React.JSX.Element {
   const [typing, setTyping] = useState<boolean>(false);
   const [currPage, setCurrPage] = useState<number>(0);
   const [nextPage, setNextPage] = useState<boolean>(false);
-  const [openCallRequestModel, setOpenCallRequestModel] =
-    useState<boolean>(false);
-  const [openCallModel, setOpenCallModel] = useState<boolean>(false);
-  const [currentRotate, setCurrentRotate] = useState(0);
+  const { setOpenCallModel } = useOnCall();
   const navigate = useNavigate();
   const { userId, user } = useAuth();
   const { onlineUsers } = useOnline();
@@ -64,7 +63,6 @@ export default function ChatList(): React.JSX.Element {
   const { setSnack } = useSnack();
   const messageRef: LegacyRef<HTMLInputElement> = useRef(null);
   const listInnerRef: LegacyRef<HTMLDivElement> = useRef(null);
-  const isDraggingRef = useRef(false);
 
   const handleSendMessage = () => {
     // Simulate receiving a new chat
@@ -107,6 +105,42 @@ export default function ChatList(): React.JSX.Element {
     const formattedTime = localTime.format("h:mmA");
     return formattedTime;
   };
+
+  function getDayLabel(date: string) {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const dayOfWeek = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+
+    // If the date is within the last week, return the day of the week
+    const modDate = new Date(date).getDate();
+    if (new Date(date) >= new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)) {
+      if (modDate === today.getDate()) {
+        return "Today";
+      } else if (modDate === tomorrow.getDate()) {
+        return "Tomorrow";
+      } else {
+        return dayOfWeek[new Date(date).getDay()];
+      }
+    } else {
+      const options: Intl.DateTimeFormatOptions = {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      };
+      const forDate = new Date(date);
+      return forDate.toLocaleDateString("en-US", options);
+    }
+  }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const ChatList = useCallback(async () => {
@@ -231,18 +265,6 @@ export default function ChatList(): React.JSX.Element {
     };
   }, []);
 
-  // dragger model
-  const onDrag = () => {
-    isDraggingRef.current = true;
-  };
-
-  const onStop = () => {
-    if (!isDraggingRef.current) {
-      setCurrentRotate(currentRotate + 90);
-    }
-    isDraggingRef.current = false;
-  };
-
   return (
     <>
       <main className="fixed w-[848px] top-[80px] left-[280px] right-[344px] mx-[auto] rounded-xl">
@@ -324,8 +346,20 @@ export default function ChatList(): React.JSX.Element {
                 <div>
                   <button
                     onClick={() => {
-                      // setOpenCallRequestModel(true);
-                      setOpenCallModel(true);
+                      const data = {
+                        to: {
+                          _id: userId,
+                          username: user.username,
+                          profileImg: user.profileImg,
+                        },
+                        from: {
+                          _id: chatUser._id,
+                          username: chatUser.username,
+                          profileImg: chatUser.profileImg,
+                        },
+                      };
+                      socket.emit("callRequest", data);
+                      setOpenCallModel(data);
                     }}
                     className="w-8 h-8 p-1 rounded-lg"
                   >
@@ -336,11 +370,7 @@ export default function ChatList(): React.JSX.Element {
                     />
                   </button>
                   <button className="w-8 h-8 p-1 rounded-lg ml-2">
-                    <img
-                      className="w-8"
-                      src="/public/icons/video-call-svgrepo-com.svg"
-                      alt="read"
-                    />
+                    <VideoIcon className="w-8 h-full text-white" />
                   </button>
                 </div>
               </div>
@@ -350,7 +380,7 @@ export default function ChatList(): React.JSX.Element {
                 className="h-calc-for-chats w-full p-3 feed-scroll overflow-y-auto flex flex-col-reverse"
               >
                 {chats.length > 0 &&
-                  chats.map((chat) => (
+                  chats.map((chat, index, array) => (
                     <>
                       {chat.receiver === userId ? (
                         <div className="flex flex-col items-start">
@@ -371,6 +401,12 @@ export default function ChatList(): React.JSX.Element {
                           </span>
                         </div>
                       )}
+                      {getDayLabel(array[index + 1]?.createdAt) !==
+                        getDayLabel(chat.createdAt) && (
+                        <div className="rounded-xl border-transparent bg-gray-200 text-gray-600 py-1 px-2 text-xs w-fit h-7 mx-auto">
+                          {getDayLabel(chat.createdAt)}
+                        </div>
+                      )}
                     </>
                   ))}
               </div>
@@ -387,21 +423,16 @@ export default function ChatList(): React.JSX.Element {
                     onKeyUp={handleKeyPressUp}
                     ref={messageRef}
                   />
-                  <div className="absolute right-5 bottom-[18px] flex">
+                  <div className="absolute right-5 bottom-[20px] flex">
                     <input type="file" id="chat-media" className="hidden" />
-                    <label htmlFor="chat-media" className="mr-2 cursor-pointer">
-                      <img
-                        width={30}
-                        src="/public/icons/photo-svgrepo-com.svg"
-                        alt="photo"
-                      />
+                    <label
+                      htmlFor="chat-media"
+                      className="mr-2 cursor-pointer h-[30px]"
+                    >
+                      <PictureIcon className="text-gray-400 w-[30px] h-full hover:text-gray-500" />
                     </label>
-                    <button onClick={handleSendMessage}>
-                      <img
-                        width={30}
-                        src="/public/icons/share-2-svgrepo-com.svg"
-                        alt="send icon"
-                      />
+                    <button className="h-[30px]" onClick={handleSendMessage}>
+                      <ShareIcon className="text-gray-400 w-[30px] h-full hover:text-gray-500" />
                     </button>
                   </div>
                 </div>
@@ -410,116 +441,6 @@ export default function ChatList(): React.JSX.Element {
           )}
         </div>
       </main>
-
-      {/* call request model */}
-      {openCallRequestModel && (
-        <Draggable onStop={onStop} onDrag={onDrag}>
-          <div
-            className={`${
-              openCallRequestModel ? "block" : "hidden"
-            } relative z-10 p-5 bg-yellow-100 max-w-96 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center border-[1px] border-white shadow-lg shadow-gray-400`}
-            style={{ transform: "rotate(" + currentRotate + "deg)" }}
-          >
-            <div className="flex items-center justify-center">
-              <img
-                className="h-8 w-8"
-                src="/public/icons/headphone-svgrepo-com.svg"
-                alt="headphone"
-              />
-              <span className="text-white text-sm font-bold ml-2">
-                invite to connect call
-              </span>
-            </div>
-            <div className="flex flex-col justify-center items-center mt-3">
-              <img
-                className="w-20 h-20 mb-2 rounded-lg object-cover"
-                src={chatUser.profileImg}
-                alt="Rounded avatar"
-              />
-              <div className="text-base text-white font-bold">
-                {chatUser.username}
-              </div>
-            </div>
-            <div className="flex items-center justify-center gap-5 mt-3">
-              <div className="flex flex-col">
-                <button className="p-3 h-13 w-12 rounded-full bg-[#f88989]">
-                  <CloseIcon className="w-6 h-6 text-white"></CloseIcon>
-                </button>
-                <span className="text-white">Decline</span>
-              </div>
-              <div className="flex flex-col">
-                <button className="p-3 h-13 w-12 rounded-full bg-[#f88989]">
-                  <img
-                    className="h-6 w-6"
-                    src="/public/icons/headphone-svgrepo-com.svg"
-                    alt="headphone"
-                  />
-                </button>
-                <span className="text-white">Join</span>
-              </div>
-            </div>
-          </div>
-        </Draggable>
-      )}
-      {/* call model */}
-      {openCallModel && (
-        <Draggable onStop={onStop} onDrag={onDrag}>
-          <div
-            className={`${
-              openCallModel ? "block" : "hidden"
-            } relative z-10 p-5 bg-yellow-100 max-w-96 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center border-[1px] border-white shadow-lg shadow-gray-400`}
-            style={{ transform: "rotate(" + currentRotate + "deg)" }}
-          >
-            <div className="flex items-center justify-center">
-              <img
-                className="h-8 w-8"
-                src="/public/icons/headphone-svgrepo-com.svg"
-                alt="headphone"
-              />
-              <span className="text-white text-sm font-bold ml-2">
-                call with {chatUser.username}
-              </span>
-            </div>
-            <div className="flex justify-center items-center mt-3">
-              <img
-                className="w-20 h-20 mb-2 rounded-lg object-cover"
-                src={user.profileImg}
-                alt="Rounded avatar"
-              />
-              <div className="relative ml-3">
-                <img
-                  className="w-20 h-20 mb-2 rounded-lg object-cover"
-                  src={chatUser.profileImg}
-                  alt="Rounded avatar"
-                />
-                <img
-                  className="absolute h-7 w-7 p-[2px] top-0 left-0 bg-black rounded-lg"
-                  src="/public/icons/headphone-svgrepo-com.svg"
-                  alt="headphone"
-                />
-              </div>
-            </div>
-            <div className="flex items-center justify-center gap-5 mt-3">
-              <div className="flex flex-col">
-                <button className="p-3 h-13 w-12 rounded-full bg-[#f88989]">
-                  <CloseIcon className="w-6 h-6 text-white"></CloseIcon>
-                </button>
-                <span className="text-white">Decline</span>
-              </div>
-              <div className="flex flex-col">
-                <button className="p-3 h-13 w-12 rounded-full bg-[#f88989]">
-                  <img
-                    className="h-6 w-6"
-                    src="/public/icons/headphone-svgrepo-com.svg"
-                    alt="headphone"
-                  />
-                </button>
-                <span className="text-white">Join</span>
-              </div>
-            </div>
-          </div>
-        </Draggable>
-      )}
     </>
   );
 }

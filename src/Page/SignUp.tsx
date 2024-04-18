@@ -32,7 +32,6 @@ export default function SignUp(): React.JSX.Element {
     validationSchema: schema,
     initialValues: { name: "", username: "", email: "", password: "" },
     onSubmit: async (values) => {
-      console.log(values);
       try {
         const res = await apiCall({
           url: APIS.AUTHENTICATION.SIGNUP,

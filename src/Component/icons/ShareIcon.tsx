@@ -1,0 +1,36 @@
+import React from "react";
+
+export default function ShareIcon({
+  className,
+}: {
+  className?: React.SVGAttributes<SVGSVGElement> | string;
+}): React.JSX.Element {
+  return (
+    <svg
+      width="800px"
+      height="800px"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      stroke="currentColor"
+      className={className as string}
+    >
+      <g id="SVGRepo_bgCarrier" stroke-width="0" />
+
+      <g
+        id="SVGRepo_tracerCarrier"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+
+      <g id="SVGRepo_iconCarrier">
+        {" "}
+        <path
+          d="M9.61109 12.4L10.8183 18.5355C11.0462 19.6939 12.6026 19.9244 13.1565 18.8818L19.0211 7.84263C19.248 7.41555 19.2006 6.94354 18.9737 6.58417M9.61109 12.4L5.22642 8.15534C4.41653 7.37131 4.97155 6 6.09877 6H17.9135C18.3758 6 18.7568 6.24061 18.9737 6.58417M9.61109 12.4L18.9737 6.58417M19.0555 6.53333L18.9737 6.58417"
+          stroke="currentColor"
+          stroke-width="2"
+        />{" "}
+      </g>
+    </svg>
+  );
+}

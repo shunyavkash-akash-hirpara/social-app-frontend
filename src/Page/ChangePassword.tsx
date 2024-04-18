@@ -41,7 +41,6 @@ export default function ChangePassword(): React.JSX.Element {
       confirmPassword: "",
     },
     onSubmit: async (values) => {
-      console.log(values);
       try {
         const res = await apiCall({
           url: APIS.USER.CHANGEPASSWORD,

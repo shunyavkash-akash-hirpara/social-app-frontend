@@ -18,6 +18,8 @@ import duration from "dayjs/plugin/duration";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import ShareIcon from "./icons/ShareIcon";
+import PictureIcon from "./icons/PictureIcon";
 dayjs.extend(duration);
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -102,6 +104,42 @@ export default function ChatBox({
     const formattedTime = localTime.format("h:mmA");
     return formattedTime;
   };
+
+  function getDayLabel(date: string) {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const dayOfWeek = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+
+    // If the date is within the last week, return the day of the week
+    const modDate = new Date(date).getDate();
+    if (new Date(date) >= new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)) {
+      if (modDate === today.getDate()) {
+        return "Today";
+      } else if (modDate === tomorrow.getDate()) {
+        return "Tomorrow";
+      } else {
+        return dayOfWeek[new Date(date).getDay()];
+      }
+    } else {
+      const options: Intl.DateTimeFormatOptions = {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      };
+      const forDate = new Date(date);
+      return forDate.toLocaleDateString("en-US", options);
+    }
+  }
 
   const getUserChats = useCallback(async () => {
     if (nextPage || currPage === 0) {
@@ -218,7 +256,7 @@ export default function ChatBox({
         className="w-full p-3 h-[200px] feed-scroll overflow-y-auto flex flex-col-reverse"
       >
         {chats.length > 0 &&
-          chats.map((chat) => (
+          chats.map((chat, index, array) => (
             <>
               {chat.receiver === userId ? (
                 <div className="flex flex-col items-start">
@@ -239,15 +277,21 @@ export default function ChatBox({
                   </span>
                 </div>
               )}
+              {getDayLabel(array[index + 1]?.createdAt) !==
+                getDayLabel(chat.createdAt) && (
+                <div className="rounded-xl border-transparent bg-gray-200 text-gray-600 py-1 px-2 text-xs w-fit h-7 mx-auto">
+                  {getDayLabel(chat.createdAt)}
+                </div>
+              )}
             </>
           ))}
       </div>
-      <div className="relative w-full border-t-2 border-gray-100 p-3">
+      <div className="relative w-full border-t-2 border-gray-100 p-3 h-[70px]">
         <input
           name="message"
           type="text"
           placeholder="Start typing..."
-          className="border-gray border text-gray-700 rounded-xl py-3 px-4 pr-3 w-[296px] bg-input-primary border-none my-0 text-sm"
+          className="border-gray border text-gray-700 rounded-xl py-3 px-4 pr-3 w-[296px] h-11 bg-input-primary border-none my-0 text-sm"
           onChange={(e) => setMessage(e.target.value)}
           value={message}
           onKeyDown={handleKeyPress}
@@ -256,19 +300,11 @@ export default function ChatBox({
         />
         <div className="absolute right-5 bottom-[18px] flex">
           <input type="file" id="chat-media" className="hidden" />
-          <label htmlFor="chat-media" className="mr-2 cursor-pointer">
-            <img
-              width={30}
-              src="/public/icons/photo-svgrepo-com.svg"
-              alt="photo"
-            />
+          <label htmlFor="chat-media" className="mr-2 cursor-pointer h-[30px]">
+            <PictureIcon className="text-gray-400 w-[30px] h-full hover:text-gray-500" />
           </label>
-          <button onClick={handleSendMessage}>
-            <img
-              width={30}
-              src="/public/icons/share-2-svgrepo-com.svg"
-              alt="send icon"
-            />
+          <button className="h-[30px]" onClick={handleSendMessage}>
+            <ShareIcon className="text-gray-400 w-[30px] h-full hover:text-gray-500" />
           </button>
         </div>
       </div>

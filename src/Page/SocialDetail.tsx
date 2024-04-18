@@ -48,7 +48,6 @@ export default function SocialDetail(): React.JSX.Element {
       google: "",
     },
     onSubmit: async (values) => {
-      console.log(values);
       try {
         const res = await apiCall({
           url: APIS.AUTHENTICATION.SIGNIN,

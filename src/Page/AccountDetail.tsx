@@ -132,7 +132,6 @@ export default function AccountDetail(): React.JSX.Element {
           method: "get",
           params: { username: formik.values.username },
         });
-        console.log(result.data);
         if (result.data.data.username) return setServerError(false);
         else {
           setServerError(true);

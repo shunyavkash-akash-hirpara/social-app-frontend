@@ -53,7 +53,6 @@ export default function ContactDetail(): React.JSX.Element {
     },
     enableReinitialize: true,
     onSubmit: async (values) => {
-      console.log(values);
       try {
         const res = await apiCall({
           url: APIS.USER.PATCH(userId),

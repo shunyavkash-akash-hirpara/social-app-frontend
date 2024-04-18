@@ -10,6 +10,7 @@ import { APIS } from "../api/apiList";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { Pagination } from "swiper/modules";
+import ShareIcon from "./icons/ShareIcon";
 
 interface comment {
   _id: string;
@@ -89,7 +90,6 @@ export default function SingleFeed({
           data: { postId: id, type: 1 },
         });
         if (res.status === 200) {
-          console.log(res.data.data);
           setSnack(res.data.message);
         }
       } catch (error) {
@@ -329,15 +329,10 @@ export default function SingleFeed({
             value={comment.id === post._id ? comment.text : ""}
           />
           <button
-            className="bg-[#f48bb34c] py-1 pl-1 pr-2 rounded-xl"
+            className="bg-[#f48bb34c] py-1 pl-1 pr-2 rounded-xl h-[44px]"
             onClick={() => handleComment(post._id)}
           >
-            <img
-              className="transform rotate-[30deg]"
-              width={35}
-              src="/public/icons/share-1-svgrepo-com.svg"
-              alt="enter"
-            />
+            <ShareIcon className="text-[#DE2C70] w-[35px] h-full transform rotate-[30deg]" />
           </button>
         </div>
       </div>
@@ -423,12 +418,7 @@ export default function SingleFeed({
                 className="bg-[#f48bb34c] py-1 pl-1 pr-2 rounded-xl"
                 onClick={() => handleComment(post._id, comment.id)}
               >
-                <img
-                  className="transform rotate-[30deg]"
-                  width={35}
-                  src="/public/icons/share-1-svgrepo-com.svg"
-                  alt="enter"
-                />
+                <ShareIcon className="text-[#DE2C70] w-[35px] h-full transform rotate-[30deg]" />
               </button>
             </div>
           </div>

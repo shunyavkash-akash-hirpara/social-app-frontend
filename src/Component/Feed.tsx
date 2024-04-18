@@ -11,6 +11,8 @@ import SingleFeed from "./SingleFeed";
 import CloseIcon from "./icons/CloseIcon";
 import SearchIcon from "./icons/SearchIcon";
 import { useAuth } from "../hooks/store/useAuth";
+import PictureIcon from "./icons/PictureIcon";
+import VideoIcon from "./icons/VideoIcon";
 
 interface FileType {
   element: Blob;
@@ -99,7 +101,6 @@ export default function Feed(): React.JSX.Element {
       Object.entries(values).forEach(([key, value]) => {
         if (value) {
           if (key === "file") {
-            console.log(value);
             value.forEach((element: { element: Blob; type: string }) => {
               formData.append(key, element.element);
             });
@@ -280,11 +281,7 @@ export default function Feed(): React.JSX.Element {
 
         <div className="flex items-center justify-between">
           <button className="flex flex-row items-center">
-            <img
-              width={25}
-              src="/public/icons/video-svgrepo-com.svg"
-              alt="live video"
-            />
+            <VideoIcon className="w-[30px] h-full text-[#80838a]" />
             <span className="text-gray-500 ml-1 text-sm">Live video</span>
           </button>
           <label
@@ -310,11 +307,7 @@ export default function Feed(): React.JSX.Element {
                 }
               }}
             />
-            <img
-              width={25}
-              src="/public/icons/photo-svgrepo-com.svg"
-              alt="photos"
-            />
+            <PictureIcon className="text-[#80838a] w-[30px] h-full" />
             <span className="text-gray-500 ml-1 text-sm">Photos</span>
           </label>
           <div className="flex items-center">
