@@ -225,7 +225,10 @@ export default function SingleFeed({
               className="swiper"
             >
               {post.photos.map((media) => (
-                <SwiperSlide className="relative flex items-center justify-center flex-col">
+                <SwiperSlide
+                  key={media._id}
+                  className="relative flex items-center justify-center flex-col"
+                >
                   {media.type === "image" ? (
                     <img
                       className="my-3 mx-[auto] rounded-xl h-[409px] object-contain"

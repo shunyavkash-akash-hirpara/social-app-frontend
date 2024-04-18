@@ -381,7 +381,13 @@ export default function ChatList(): React.JSX.Element {
               >
                 {chats.length > 0 &&
                   chats.map((chat, index, array) => (
-                    <>
+                    <div key={index}>
+                      {getDayLabel(array[index + 1]?.createdAt) !==
+                        getDayLabel(chat.createdAt) && (
+                        <div className="rounded-xl border-transparent bg-gray-200 text-gray-600 py-1 px-2 text-xs w-fit h-7 mx-auto">
+                          {getDayLabel(chat.createdAt)}
+                        </div>
+                      )}
                       {chat.receiver === userId ? (
                         <div className="flex flex-col items-start">
                           <p className="text-sm text-gray-700 bg-[#E2EFFF] px-5 py-[10px] rounded-t-2xl rounded-r-2xl max-w-[80%] text-start">
@@ -401,13 +407,7 @@ export default function ChatList(): React.JSX.Element {
                           </span>
                         </div>
                       )}
-                      {getDayLabel(array[index + 1]?.createdAt) !==
-                        getDayLabel(chat.createdAt) && (
-                        <div className="rounded-xl border-transparent bg-gray-200 text-gray-600 py-1 px-2 text-xs w-fit h-7 mx-auto">
-                          {getDayLabel(chat.createdAt)}
-                        </div>
-                      )}
-                    </>
+                    </div>
                   ))}
               </div>
               <div className="absolute bottom-0 w-full">
