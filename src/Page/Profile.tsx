@@ -7,6 +7,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { APIS } from "../api/apiList";
 import useApi from "../hooks/useApi";
 import { useSnack } from "../hooks/store/useSnack";
+import { useChatUser } from "../hooks/store/useChatUser";
 
 interface user {
   _id: string;
@@ -45,6 +46,7 @@ interface post {
 export default function Profile(): React.JSX.Element {
   const [user, setUser] = useState<user>();
   const [posts, setPosts] = useState<post[]>([]);
+  const { setNewChatUser } = useChatUser();
   const { accessToken, userId } = useAuth();
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
@@ -145,7 +147,22 @@ export default function Profile(): React.JSX.Element {
                         </button>
                         <button
                           className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-6 py-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none"
-                          onClick={() => navigate(`/chat/${id}`)}
+                          onClick={() => {
+                            let convId;
+                            if (user._id > userId) {
+                              convId = userId + user._id;
+                            } else {
+                              convId = user._id + userId;
+                            }
+                            setNewChatUser({
+                              _id: user._id,
+                              name: user.name,
+                              username: user.username,
+                              profileImg: user.profileImg,
+                              conversationId: convId,
+                            });
+                            navigate(`/chat/${id}`);
+                          }}
                         >
                           Message
                         </button>

@@ -65,6 +65,9 @@ export default function ChatBox({
 
   const handleSendMessage = () => {
     // Simulate receiving a new chat
+    if (!message) {
+      return;
+    }
     const newChat: chat = {
       sender: userId,
       msg: message,
@@ -222,11 +225,16 @@ export default function ChatBox({
       <div className="w-full border-b-2 border-gray-100 flex items-center p-3 text-gray-900">
         <img
           className="w-10 h-10 rounded-full"
-          src={chatUser?.profileImg}
+          src={
+            chatUser?.profileImg ||
+            "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
+          }
           alt="Rounded avatar"
         />
         <div className="flex flex-col text-justify">
-          <h3 className="ms-3 text-sm text-gray-700">{chatUser?.username}</h3>
+          <h3 className="ms-3 text-sm text-gray-700">
+            {chatUser?.username || "socialapp_user"}
+          </h3>
           <h4 className="ms-3 text-[13px] text-gray-400">
             <span
               className={`inline-block ${
@@ -297,14 +305,32 @@ export default function ChatBox({
           onKeyDown={handleKeyPress}
           onKeyUp={handleKeyPressUp}
           ref={messageRef}
+          disabled={!chatUser.username}
         />
         <div className="absolute right-5 bottom-[18px] flex">
-          <input type="file" id="chat-media" className="hidden" />
+          <input
+            type="file"
+            id="chat-media"
+            className="hidden"
+            disabled={!chatUser.username}
+          />
           <label htmlFor="chat-media" className="mr-2 cursor-pointer h-[30px]">
-            <PictureIcon className="text-gray-400 w-[30px] h-full hover:text-gray-500" />
+            <PictureIcon
+              className={`text-gray-400 w-[30px] h-full hover:text-gray-500 ${
+                !chatUser.username && "cursor-not-allowed"
+              }`}
+            />
           </label>
-          <button className="h-[30px]" onClick={handleSendMessage}>
-            <ShareIcon className="text-gray-400 w-[30px] h-full hover:text-gray-500" />
+          <button
+            className="h-[30px]"
+            onClick={handleSendMessage}
+            disabled={!chatUser.username}
+          >
+            <ShareIcon
+              className={`text-gray-400 w-[30px] h-full hover:text-gray-500 ${
+                !chatUser.username && "cursor-not-allowed"
+              }`}
+            />
           </button>
         </div>
       </div>

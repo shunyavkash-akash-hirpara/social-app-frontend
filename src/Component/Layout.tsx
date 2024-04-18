@@ -1,4 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, {
+  LegacyRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import Peer from "simple-peer";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import RecentChat from "./RecentChat";
@@ -14,6 +21,7 @@ import VideoOffIcon from "../Component/icons/VideoOffIcon";
 import ScreenIcon from "../Component/icons/ScreenIcon";
 import ShareIcon from "./icons/ShareIcon";
 import VideoIcon from "./icons/VideoIcon";
+import { socket } from "../socket";
 
 export default function Layout(): React.JSX.Element {
   const { accessToken } = useAuth();
@@ -23,7 +31,12 @@ export default function Layout(): React.JSX.Element {
   const [screen, setScreen] = useState<boolean>(false);
   const { openCallModel, setOpenCallModel } = useOnCall();
   const { callRequest, setCallRequest } = useCallRequest();
+  const [callerSignal, setCallerSignal] = useState();
+  const [stream, setStream] = useState<MediaStream | undefined>();
   const isDraggingRef = useRef(false);
+  const myMedia: LegacyRef<HTMLVideoElement> = useRef(null);
+  const userMedia: LegacyRef<HTMLVideoElement> = useRef(null);
+  // const connectionRef: LegacyRef<any> = useRef(null);
 
   // dragger model
   const onDrag = () => {
@@ -36,7 +49,79 @@ export default function Layout(): React.JSX.Element {
     }
     isDraggingRef.current = false;
   };
-  
+
+  const callAnswer = () => {
+    setOpenCallModel(callRequest);
+    setCallRequest(undefined);
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream: stream,
+    });
+    peer.on("signal", (data) => {
+      socket.emit("answerCall", {
+        signal: data,
+        to: callRequest.to,
+        from: callRequest.from,
+      });
+    });
+    peer.on("stream", (stream) => {
+      userMedia.current.srcObject = stream;
+    });
+
+    peer.signal(callerSignal);
+    // connectionRef.current = peer;
+  };
+
+  const handleCallUser = useCallback(
+    (data) => {
+      console.log(data);
+      const peer = new Peer({
+        initiator: true,
+        trickle: false,
+        stream: stream,
+      });
+      console.log(peer);
+      peer.on("signal", (signalData) => {
+        console.log("first");
+        data.signalData = signalData;
+        socket.emit("callRequest", data);
+      });
+      peer.on("stream", (stream) => {
+        if (userMedia.current) {
+          userMedia.current.srcObject = stream;
+        }
+      });
+      // connectionRef.current = peer;
+    },
+    [stream]
+  );
+
+  useEffect(() => {
+    navigator.mediaDevices
+      .getUserMedia({ video: false, audio: true })
+      .then((stream) => {
+        setStream(stream);
+        if (myMedia.current) {
+          myMedia.current.srcObject = stream;
+        }
+      });
+    if (openCallModel) {
+      handleCallUser(openCallModel);
+    }
+  }, [handleCallUser, openCallModel]);
+
+  useEffect(() => {
+    // call request socket
+    socket.on("sendCallRequest", (data) => {
+      setCallRequest(data);
+      setCallerSignal(data.signal);
+    });
+    return () => {
+      socket.off("sendCallRequest");
+    };
+  }, [setCallRequest]);
+
   return (
     <div className="relative">
       <div className="absolute z-10">
@@ -67,11 +152,11 @@ export default function Layout(): React.JSX.Element {
             <div className="flex flex-col justify-center items-center mt-3">
               <img
                 className="w-20 h-20 mb-2 rounded-lg object-cover"
-                src={callRequest.from.profileImg}
+                src={callRequest.to.profileImg}
                 alt="Rounded avatar"
               />
               <div className="text-base text-white font-bold">
-                {callRequest.from.username}
+                {callRequest.to.username}
               </div>
             </div>
             <div className="flex items-center justify-center gap-5 mt-3">
@@ -89,10 +174,7 @@ export default function Layout(): React.JSX.Element {
               <div className="flex flex-col">
                 <button
                   className="p-3 h-13 w-12 rounded-full bg-[#f88989]"
-                  onClick={() => {
-                    setOpenCallModel(callRequest);
-                    setCallRequest(undefined);
-                  }}
+                  onClick={callAnswer}
                 >
                   <img
                     className="h-6 w-6"

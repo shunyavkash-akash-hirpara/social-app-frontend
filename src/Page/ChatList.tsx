@@ -23,6 +23,7 @@ import ShareIcon from "../Component/icons/ShareIcon";
 import PictureIcon from "../Component/icons/PictureIcon";
 import VideoIcon from "../Component/icons/VideoIcon";
 import { useOnCall } from "../hooks/store/useOnCall";
+import { useChatUser } from "../hooks/store/useChatUser";
 dayjs.extend(duration);
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -55,6 +56,7 @@ export default function ChatList(): React.JSX.Element {
   const [typing, setTyping] = useState<boolean>(false);
   const [currPage, setCurrPage] = useState<number>(0);
   const [nextPage, setNextPage] = useState<boolean>(false);
+  const { newChatUser } = useChatUser();
   const { setOpenCallModel } = useOnCall();
   const navigate = useNavigate();
   const { userId, user } = useAuth();
@@ -64,7 +66,17 @@ export default function ChatList(): React.JSX.Element {
   const messageRef: LegacyRef<HTMLInputElement> = useRef(null);
   const listInnerRef: LegacyRef<HTMLDivElement> = useRef(null);
 
+  // new chat user
+  useEffect(() => {
+    if (newChatUser) {
+      setChatUser(newChatUser);
+    }
+  }, [newChatUser]);
+
   const handleSendMessage = () => {
+    if (!message) {
+      return;
+    }
     // Simulate receiving a new chat
     const newChat: chat = {
       sender: userId,
@@ -150,7 +162,14 @@ export default function ChatList(): React.JSX.Element {
         method: "get",
       });
       if (res.status === 200) {
-        setUsers(res.data.data);
+        const allReadyUser = res.data.data.find(
+          (x) => x._id === newChatUser?._id
+        );
+        if (newChatUser && !allReadyUser) {
+          setUsers([newChatUser, ...res.data.data]);
+        } else {
+          setUsers(res.data.data);
+        }
         setSnack(res.data.message);
       }
     } catch (error) {
@@ -159,7 +178,7 @@ export default function ChatList(): React.JSX.Element {
         setSnack(errorMessage, "warning");
       }
     }
-  }, [apiCall, checkAxiosError, setSnack]);
+  }, [apiCall, checkAxiosError, newChatUser, setSnack]);
 
   const searchUser = useCallback(
     async (searchData: string) => {
@@ -303,12 +322,15 @@ export default function ChatList(): React.JSX.Element {
                 >
                   <img
                     className="w-11 h-11 rounded-full object-cover"
-                    src={people.profileImg}
+                    src={
+                      people.profileImg ||
+                      "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
+                    }
                     alt="Rounded avatar"
                   />
                   <div className="flex flex-col text-justify">
                     <span className="ms-3 text-sm text-gray-700 font-bold">
-                      {people.username}
+                      {people.username || "socialapp_user"}
                     </span>
                     <span className="ms-3 text-[12px] text-gray-400">
                       {people.name}
@@ -322,19 +344,32 @@ export default function ChatList(): React.JSX.Element {
             <div className="relative h-calc-for-chatList w-[62%] rounded-xl bg-white">
               <div className="w-full h-14 p-3 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center flex items-center justify-between">
                 <div className="h-full flex items-center justify-start">
-                  <Link to={`/profile/${chatUser._id}`}>
+                  <Link
+                    to={
+                      !chatUser.username
+                        ? undefined
+                        : `/profile/${chatUser._id}`
+                    }
+                  >
                     <img
                       className="w-10 h-10 rounded-full object-cover"
-                      src={chatUser.profileImg}
+                      src={
+                        chatUser.profileImg ||
+                        "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
+                      }
                       alt="Rounded avatar"
                     />
                   </Link>
                   <div className="flex flex-col text-justify">
                     <Link
-                      to={`/profile/${chatUser._id}`}
+                      to={
+                        !chatUser.username
+                          ? undefined
+                          : `/profile/${chatUser._id}`
+                      }
                       className="ms-3 text-sm text-white font-bold"
                     >
-                      {chatUser.username}
+                      {chatUser.username || "socialapp_user"}
                     </Link>
                     {onlineUsers.includes(chatUser._id.toString()) && (
                       <span className="ms-3 text-sm text-white">
@@ -348,20 +383,20 @@ export default function ChatList(): React.JSX.Element {
                     onClick={() => {
                       const data = {
                         to: {
-                          _id: userId,
-                          username: user.username,
-                          profileImg: user.profileImg,
-                        },
-                        from: {
                           _id: chatUser._id,
                           username: chatUser.username,
                           profileImg: chatUser.profileImg,
                         },
+                        from: {
+                          _id: userId,
+                          username: user.username,
+                          profileImg: user.profileImg,
+                        },
                       };
-                      socket.emit("callRequest", data);
                       setOpenCallModel(data);
                     }}
                     className="w-8 h-8 p-1 rounded-lg"
+                    disabled={!chatUser.username}
                   >
                     <img
                       className="w-8"
@@ -369,7 +404,10 @@ export default function ChatList(): React.JSX.Element {
                       alt="read"
                     />
                   </button>
-                  <button className="w-8 h-8 p-1 rounded-lg ml-2">
+                  <button
+                    className="w-8 h-8 p-1 rounded-lg ml-2"
+                    disabled={!chatUser.username}
+                  >
                     <VideoIcon className="w-8 h-full text-white" />
                   </button>
                 </div>
@@ -410,6 +448,7 @@ export default function ChatList(): React.JSX.Element {
                     </div>
                   ))}
               </div>
+              {/* {chatUser.username && ()} */}
               <div className="absolute bottom-0 w-full">
                 <div className="relative w-full border-t-2 border-gray-100 p-3">
                   <input
@@ -422,17 +461,35 @@ export default function ChatList(): React.JSX.Element {
                     onKeyDown={handleKeyPress}
                     onKeyUp={handleKeyPressUp}
                     ref={messageRef}
+                    disabled={!chatUser.username}
                   />
                   <div className="absolute right-5 bottom-[20px] flex">
-                    <input type="file" id="chat-media" className="hidden" />
+                    <input
+                      disabled={!chatUser.username}
+                      type="file"
+                      id="chat-media"
+                      className="hidden"
+                    />
                     <label
                       htmlFor="chat-media"
                       className="mr-2 cursor-pointer h-[30px]"
                     >
-                      <PictureIcon className="text-gray-400 w-[30px] h-full hover:text-gray-500" />
+                      <PictureIcon
+                        className={`text-gray-400 w-[30px] h-full hover:text-gray-500 ${
+                          !chatUser.username && "cursor-not-allowed"
+                        }`}
+                      />
                     </label>
-                    <button className="h-[30px]" onClick={handleSendMessage}>
-                      <ShareIcon className="text-gray-400 w-[30px] h-full hover:text-gray-500" />
+                    <button
+                      className="h-[30px]"
+                      onClick={handleSendMessage}
+                      disabled={!chatUser.username}
+                    >
+                      <ShareIcon
+                        className={`text-gray-400 w-[30px] h-full hover:text-gray-500 ${
+                          !chatUser.username && "cursor-not-allowed"
+                        }`}
+                      />
                     </button>
                   </div>
                 </div>
