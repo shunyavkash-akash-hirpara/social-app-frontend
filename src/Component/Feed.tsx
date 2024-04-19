@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, {
+  LegacyRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import * as yup from "yup";
 import { FormikProps, useFormik } from "formik";
 import InputEmoji from "react-input-emoji";
@@ -66,10 +72,13 @@ export default function Feed(): React.JSX.Element {
   const [mention, setMention] = useState<mention[]>([]);
   const [posts, setPosts] = useState<posts[]>([]);
   const [users, setUsers] = useState<user[]>([]);
+  const [currPage, setCurrPage] = useState<number>(0);
+  const [nextPage, setNextPage] = useState<boolean>(false);
   const { apiCall, checkAxiosError } = useApi();
   const { user } = useAuth();
   const { setSnack } = useSnack();
   const navigate = useNavigate();
+  const listInnerRef: LegacyRef<HTMLDivElement> = useRef(null);
   // schema for yup validation
   const schema = yup
     .object()
@@ -138,22 +147,39 @@ export default function Feed(): React.JSX.Element {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const getPosts = useCallback(async () => {
-    try {
-      const res = await apiCall({
-        url: APIS.POST.ALLPOST,
-        method: "get",
-      });
-      if (res.status === 200) {
-        setPosts(res.data.data.data);
-        setSnack(res.data.message);
-      }
-    } catch (error) {
-      if (checkAxiosError(error)) {
-        const errorMessage = error?.response?.data.message;
-        setSnack(errorMessage, "warning");
+    if (nextPage || currPage === 0) {
+      try {
+        const res = await apiCall({
+          url: APIS.POST.ALLPOST,
+          method: "get",
+          params: { limit: 20, page: currPage },
+        });
+        if (res.status === 200) {
+          if (currPage === 0) {
+            setPosts(res.data.data.post);
+          } else {
+            setPosts((prevPosts) => [...prevPosts, ...res.data.data.post]);
+          }
+          setNextPage(res.data.data.hasNextPage);
+          setSnack(res.data.message);
+        }
+      } catch (error) {
+        if (checkAxiosError(error)) {
+          const errorMessage = error?.response?.data.message;
+          setSnack(errorMessage, "warning");
+        }
       }
     }
-  }, [apiCall, checkAxiosError, setSnack]);
+  }, [apiCall, checkAxiosError, currPage, nextPage, setSnack]);
+
+  const onScroll = () => {
+    if (listInnerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = listInnerRef.current;
+      if (-scrollTop + clientHeight === scrollHeight && nextPage) {
+        setCurrPage(currPage + 1);
+      }
+    }
+  };
 
   useEffect(() => {
     getPosts();
@@ -420,8 +446,10 @@ export default function Feed(): React.JSX.Element {
         </div>
       </form>
       {/* feed data */}
-      {posts.length > 0 &&
-        posts.map((post) => <SingleFeed post={post} key={post._id} />)}
+      <div onScroll={onScroll} ref={listInnerRef}>
+        {posts.length > 0 &&
+          posts.map((post) => <SingleFeed post={post} key={post._id} />)}
+      </div>
     </>
   );
 }

@@ -129,7 +129,7 @@ export default function ChatBox({
       if (modDate === today.getDate()) {
         return "Today";
       } else if (modDate === tomorrow.getDate()) {
-        return "Tomorrow";
+        return "Yesterday";
       } else {
         return dayOfWeek[new Date(date).getDay()];
       }
@@ -152,7 +152,7 @@ export default function ChatBox({
           method: "get",
           params: {
             conversationId: chatUser?.conversationId,
-            limit: 10,
+            limit: 20,
             page: currPage,
           },
         });
@@ -268,7 +268,7 @@ export default function ChatBox({
             <div key={index}>
               {getDayLabel(array[index + 1]?.createdAt) !==
                 getDayLabel(chat.createdAt) && (
-                <div className="rounded-xl border-transparent bg-gray-200 text-gray-600 py-1 px-2 text-xs w-fit h-7 mx-auto">
+                <div className="rounded-xl border-transparent bg-gray-200 text-gray-600 py-1 px-2 text-xs w-fit mx-auto">
                   {getDayLabel(chat.createdAt)}
                 </div>
               )}

@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, {
+  LegacyRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Link } from "react-router-dom";
 import LikeIcon from "./icons/LikeIcon";
 import CloseIcon from "./icons/CloseIcon";
@@ -62,9 +68,12 @@ export default function SingleFeed({
   const [comment, setComment] = useState({ id: "", text: "" });
   const [commentList, setCommentList] = useState<comment[]>([]);
   const [likeList, setLikeList] = useState<like[]>([]);
+  const [currPage, setCurrPage] = useState<number>(0);
+  const [nextPage, setNextPage] = useState<boolean>(false);
   const { user } = useAuth();
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
+  const listInnerRef: LegacyRef<HTMLDivElement> = useRef(null);
 
   const handleLike = (id: string) => {
     post.like = like ? post.like - 1 : post.like + 1;
@@ -128,30 +137,52 @@ export default function SingleFeed({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const getComment = useCallback(
     async (id: string) => {
-      try {
-        const res = await apiCall({
-          url: APIS.COMMENT.GETCOMMENT(id),
-          method: "get",
-        });
-        if (res.status === 200) {
-          setCommentList(res.data.data);
-          setSnack(res.data.message);
-        }
-      } catch (error) {
-        if (checkAxiosError(error)) {
-          const errorMessage = error?.response?.data.message;
-          setSnack(errorMessage, "warning");
+      if (nextPage || currPage === 0) {
+        try {
+          const res = await apiCall({
+            url: APIS.COMMENT.GETCOMMENT(id),
+            method: "get",
+            params: { limit: 20, page: currPage },
+          });
+          if (res.status === 200) {
+            if (currPage === 0) {
+              setCommentList(res.data.data.comment);
+            } else {
+              setCommentList((prevComments) => [
+                ...prevComments,
+                ...res.data.data.comment,
+              ]);
+            }
+            setNextPage(res.data.data.hasNextPage);
+            setSnack(res.data.message);
+          }
+        } catch (error) {
+          if (checkAxiosError(error)) {
+            const errorMessage = error?.response?.data.message;
+            setSnack(errorMessage, "warning");
+          }
         }
       }
     },
-    [apiCall, checkAxiosError, setSnack]
+    [apiCall, checkAxiosError, currPage, nextPage, setSnack]
   );
 
+  const onScroll = () => {
+    if (listInnerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = listInnerRef.current;
+      if (-scrollTop + clientHeight === scrollHeight && nextPage) {
+        setCurrPage(currPage + 1);
+      }
+    }
+  };
+
   useEffect(() => {
-    if (openComment && post.comment > 0) {
+    // console.log("run hook");
+
+    if (openComment) {
       getComment(post._id);
     }
-  }, [getComment, openComment, post._id, post.comment]);
+  }, [getComment, openComment, post._id]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const getLike = useCallback(
@@ -234,13 +265,13 @@ export default function SingleFeed({
                       className="my-3 mx-[auto] rounded-xl h-[409px] object-contain"
                       src={media.url}
                       alt="photo"
-                      key={media._id}
+                      // key={media._id}
                     />
                   ) : (
                     <video
                       className="my-3 mx-[auto] rounded-xl h-[409px] object-cover"
                       src="media.url"
-                      key={media._id}
+                      // key={media._id}
                     ></video>
                   )}
                 </SwiperSlide>
@@ -400,9 +431,14 @@ export default function SingleFeed({
               </button>
               <h2>Comments</h2>
             </div>
-            <div className="feed-scroll max-h-[70%] overflow-y-auto bg-white p-6 pt-2 border-t-2 border-gray-200">
+            <div
+              onScroll={onScroll}
+              ref={listInnerRef}
+              className="feed-scroll max-h-[70%] overflow-y-auto bg-white p-6 pt-2 border-t-2 border-gray-200"
+            >
               {commentList.map((commentData) => (
                 <SingleComment
+                openComment={openComment}
                   commentData={commentData}
                   setComment={setComment}
                   key={commentData._id}
