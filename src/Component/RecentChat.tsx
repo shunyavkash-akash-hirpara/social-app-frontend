@@ -198,15 +198,18 @@ export default function RecentChat(): React.JSX.Element {
               >
                 <img
                   className="w-10 h-10 rounded-full object-cover"
-                  src={people.profileImg || "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"}
+                  src={
+                    people.profileImg ||
+                    "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
+                  }
                   alt="Rounded avatar"
                 />
                 <div className="flex flex-col text-justify">
                   <span className="ms-3 text-sm text-gray-700">
-                    {people.name}
+                    {people.username || "socialapp_user"}
                   </span>
                   <span className="ms-3 text-[13px] text-gray-400">
-                    {people.username || "socialapp_user"}
+                    {people.name}
                   </span>
                 </div>
                 <button

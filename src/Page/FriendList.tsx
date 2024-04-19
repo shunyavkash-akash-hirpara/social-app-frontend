@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, {
+  LegacyRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Link, useParams } from "react-router-dom";
 import { APIS } from "../api/apiList";
 import { useSnack } from "../hooks/store/useSnack";
@@ -27,6 +33,9 @@ export default function FriendList(): React.JSX.Element {
   const { setSnack } = useSnack();
   const { userId } = useAuth();
   const id: string = useParams().id as string;
+  const [currPage, setCurrPage] = useState<number>(0);
+  const [nextPage, setNextPage] = useState<boolean>(false);
+  const listInnerRef: LegacyRef<HTMLDivElement> = useRef(null);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const getProfileDetail = useCallback(async () => {
@@ -49,25 +58,45 @@ export default function FriendList(): React.JSX.Element {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const getFollowList = useCallback(async () => {
-    try {
-      const res = await apiCall({
-        url:
-          tab === "followers"
-            ? APIS.FOLLOW.FOLLOWERS(id)
-            : APIS.FOLLOW.FOLLOWING(id),
-        method: "get",
-      });
-      if (res.status === 200) {
-        setUserList(res.data.data);
-        setSnack(res.data.message);
-      }
-    } catch (error) {
-      if (checkAxiosError(error)) {
-        const errorMessage = error?.response?.data.message;
-        setSnack(errorMessage, "warning");
+    if (nextPage || currPage === 0) {
+      try {
+        const res = await apiCall({
+          url:
+            tab === "followers"
+              ? APIS.FOLLOW.FOLLOWERS(id)
+              : APIS.FOLLOW.FOLLOWING(id),
+          method: "get",
+          params: { limit: 20, page: currPage },
+        });
+        if (res.status === 200) {
+          if (currPage === 0) {
+            setUserList(res.data.data.followers);
+          } else {
+            setUserList((prevFollowers) => [
+              ...prevFollowers,
+              ...res.data.data.followers,
+            ]);
+          }
+          setNextPage(res.data.data.hasNextPage);
+          setSnack(res.data.message);
+        }
+      } catch (error) {
+        if (checkAxiosError(error)) {
+          const errorMessage = error?.response?.data.message;
+          setSnack(errorMessage, "warning");
+        }
       }
     }
   }, [apiCall, checkAxiosError, id, setSnack, tab]);
+
+  const onScroll = () => {
+    if (listInnerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = listInnerRef.current;
+      if (-scrollTop + clientHeight === scrollHeight && nextPage) {
+        setCurrPage(currPage + 1);
+      }
+    }
+  };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleFollow = useCallback(
@@ -140,57 +169,59 @@ export default function FriendList(): React.JSX.Element {
                 </li>
               </ul>
             </div>
-            {userList.map((people) => (
-              <div
-                key={people.user._id}
-                className="flex items-center justify-between p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group"
-              >
-                <Link
-                  to={`/profile/${people.user._id}`}
-                  className="flex items-center"
+            <div onScroll={onScroll} ref={listInnerRef}>
+              {userList.map((people) => (
+                <div
+                  key={people.user._id}
+                  className="flex items-center justify-between p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group"
                 >
-                  <img
-                    className="w-12 h-12 rounded-full object-cover"
-                    src={people.user.profileImg}
-                    alt="Rounded avatar"
-                  />
-                  <div className="flex flex-col text-justify">
-                    <span className="ms-3 text-sm text-gray-700 font-bold">
-                      {people.user.username}
-                    </span>
-                    <span className="ms-3 text-[12px] text-gray-400">
-                      {people.user.name}
-                    </span>
-                  </div>
-                </Link>
-                {people.user._id !== userId &&
-                  (tab === "following" ? (
-                    <button className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold px-7 py-2 mr-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
-                      {people.followBackFlag ? "Following" : "Follow"}
-                    </button>
-                  ) : (
-                    <>
-                      <div className="flex items-center">
-                        {!people.followBackFlag && id === userId && (
-                          <button
-                            onClick={() => handleFollow(people.user._id)}
-                            className="mr-2 text-sm text-blue-500 font-bold"
-                          >
-                            Follow
+                  <Link
+                    to={`/profile/${people.user._id}`}
+                    className="flex items-center"
+                  >
+                    <img
+                      className="w-12 h-12 rounded-full object-cover"
+                      src={people.user.profileImg}
+                      alt="Rounded avatar"
+                    />
+                    <div className="flex flex-col text-justify">
+                      <span className="ms-3 text-sm text-gray-700 font-bold">
+                        {people.user.username}
+                      </span>
+                      <span className="ms-3 text-[12px] text-gray-400">
+                        {people.user.name}
+                      </span>
+                    </div>
+                  </Link>
+                  {people.user._id !== userId &&
+                    (tab === "following" ? (
+                      <button className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold px-7 py-2 mr-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
+                        {people.followBackFlag ? "Following" : "Follow"}
+                      </button>
+                    ) : (
+                      <>
+                        <div className="flex items-center">
+                          {!people.followBackFlag && id === userId && (
+                            <button
+                              onClick={() => handleFollow(people.user._id)}
+                              className="mr-2 text-sm text-blue-500 font-bold"
+                            >
+                              Follow
+                            </button>
+                          )}
+                          <button className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold px-7 py-2 mr-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
+                            {id === userId
+                              ? "Remove"
+                              : people.followBackFlag
+                              ? "Following"
+                              : "Follow"}
                           </button>
-                        )}
-                        <button className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold px-7 py-2 mr-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
-                          {id === userId
-                            ? "Remove"
-                            : people.followBackFlag
-                            ? "Following"
-                            : "Follow"}
-                        </button>
-                      </div>
-                    </>
-                  ))}
-              </div>
-            ))}
+                        </div>
+                      </>
+                    ))}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </main>

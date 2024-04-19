@@ -265,13 +265,13 @@ export default function SingleFeed({
                       className="my-3 mx-[auto] rounded-xl h-[409px] object-contain"
                       src={media.url}
                       alt="photo"
-                      // key={media._id}
                     />
                   ) : (
                     <video
                       className="my-3 mx-[auto] rounded-xl h-[409px] object-cover"
-                      src="media.url"
-                      // key={media._id}
+                      src={media.url}
+                      controls
+                      autoPlay
                     ></video>
                   )}
                 </SwiperSlide>
@@ -329,7 +329,12 @@ export default function SingleFeed({
             <LikeIcon like={like} />
             <span className="text-gray-500 ml-1 text-sm">Like</span>
           </button>
-          <button className="flex flex-row items-center">
+          <button
+            className="flex flex-row items-center"
+            onClick={() => {
+              document.getElementById(`${post._id}`).focus();
+            }}
+          >
             <img
               width={25}
               src="/public/icons/comment-1-svgrepo-com.svg"
@@ -356,6 +361,7 @@ export default function SingleFeed({
             alt="Rounded avatar"
           />
           <input
+            id={post._id}
             type="text"
             placeholder="Write a comment..."
             className="border-gray border rounded-xl py-3 px-4 pr-3 w-[432px] bg-input-primary border-none my-0 text-sm"
@@ -438,7 +444,7 @@ export default function SingleFeed({
             >
               {commentList.map((commentData) => (
                 <SingleComment
-                openComment={openComment}
+                  openComment={openComment}
                   commentData={commentData}
                   setComment={setComment}
                   key={commentData._id}
