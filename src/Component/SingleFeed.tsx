@@ -129,30 +129,6 @@ export default function SingleFeed({
   );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const commentCreate = useCallback(
-    async (id: string, commentId?: string) => {
-      try {
-        const res = await apiCall({
-          url: APIS.COMMENT.POST,
-          method: "post",
-          data: { postId: id, commentId: commentId, description: comment.text },
-        });
-        if (res.status === 201) {
-          setComment({ id: "", text: "" });
-          getComment(id);
-          setSnack(res.data.message);
-        }
-      } catch (error) {
-        if (checkAxiosError(error)) {
-          const errorMessage = error?.response?.data.message;
-          setSnack(errorMessage, "warning");
-        }
-      }
-    },
-    [apiCall, checkAxiosError, comment.text, setSnack]
-  );
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const getComment = useCallback(
     async (id: string) => {
       if (nextPage || currPage === 0) {
@@ -183,6 +159,30 @@ export default function SingleFeed({
       }
     },
     [apiCall, checkAxiosError, currPage, nextPage, setSnack]
+  );
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const commentCreate = useCallback(
+    async (id: string, commentId?: string) => {
+      try {
+        const res = await apiCall({
+          url: APIS.COMMENT.POST,
+          method: "post",
+          data: { postId: id, commentId: commentId, description: comment.text },
+        });
+        if (res.status === 201) {
+          setComment({ id: "", text: "" });
+          getComment(id);
+          setSnack(res.data.message);
+        }
+      } catch (error) {
+        if (checkAxiosError(error)) {
+          const errorMessage = error?.response?.data.message;
+          setSnack(errorMessage, "warning");
+        }
+      }
+    },
+    [apiCall, checkAxiosError, comment.text, getComment, setSnack]
   );
 
   const onScroll = () => {
