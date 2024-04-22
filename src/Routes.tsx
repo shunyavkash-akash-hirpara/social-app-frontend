@@ -33,7 +33,7 @@ const routes = createBrowserRouter([
       { path: "/search", Component: SearchPage },
       { path: "/profile/:id/posts", Component: UserPostList },
       { path: "/profile/:id/friends", Component: FriendList },
-      { path: "/chat/:id", Component: ChatList },
+      { path: "/chat", Component: ChatList },
     ],
   },
   { path: "/auth", Component: Auth },

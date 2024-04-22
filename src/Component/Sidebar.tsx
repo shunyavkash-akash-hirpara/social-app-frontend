@@ -18,7 +18,7 @@ const siderbarItems = [
   },
   {
     name: "Messages",
-    href: "/chat/:id",
+    href: "/chat",
     svg: <MessageIcon />,
   },
   {

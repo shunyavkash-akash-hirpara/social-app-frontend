@@ -70,11 +70,11 @@ export default function FriendList(): React.JSX.Element {
         });
         if (res.status === 200) {
           if (currPage === 0) {
-            setUserList(res.data.data.followers);
+            setUserList(res.data.data.data);
           } else {
             setUserList((prevFollowers) => [
               ...prevFollowers,
-              ...res.data.data.followers,
+              ...res.data.data.data,
             ]);
           }
           setNextPage(res.data.data.hasNextPage);
@@ -87,7 +87,7 @@ export default function FriendList(): React.JSX.Element {
         }
       }
     }
-  }, [apiCall, checkAxiosError, id, setSnack, tab]);
+  }, [apiCall, checkAxiosError, currPage, id, nextPage, setSnack, tab]);
 
   const onScroll = () => {
     if (listInnerRef.current) {
@@ -100,14 +100,14 @@ export default function FriendList(): React.JSX.Element {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleFollow = useCallback(
-    async (followId: string) => {
+    async (followId: string, follow?: boolean) => {
       try {
         const res = await apiCall({
-          url: APIS.FOLLOW.FOLLOW,
+          url: follow ? APIS.FOLLOW.UNFOLLOW : APIS.FOLLOW.FOLLOW,
           method: "post",
           data: { follow: followId },
         });
-        if (res.status === 201) {
+        if (res.status === 201 || res.status === 200) {
           getFollowList();
           getProfileDetail();
           setSnack(res.data.message);
@@ -195,7 +195,12 @@ export default function FriendList(): React.JSX.Element {
                   </Link>
                   {people.user._id !== userId &&
                     (tab === "following" ? (
-                      <button className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold px-7 py-2 mr-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
+                      <button
+                        className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold px-7 py-2 mr-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none"
+                        onClick={() =>
+                          handleFollow(people.user._id, people.followBackFlag)
+                        }
+                      >
                         {people.followBackFlag ? "Following" : "Follow"}
                       </button>
                     ) : (
@@ -209,7 +214,15 @@ export default function FriendList(): React.JSX.Element {
                               Follow
                             </button>
                           )}
-                          <button className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold px-7 py-2 mr-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
+                          <button
+                            className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold px-7 py-2 mr-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none"
+                            onClick={() =>
+                              handleFollow(
+                                people.user._id,
+                                people.followBackFlag
+                              )
+                            }
+                          >
                             {id === userId
                               ? "Remove"
                               : people.followBackFlag

@@ -152,7 +152,7 @@ export default function Feed(): React.JSX.Element {
         const res = await apiCall({
           url: APIS.POST.ALLPOST,
           method: "get",
-          params: { limit: 20, page: currPage },
+          params: { limit: 10, page: currPage },
         });
         if (res.status === 200) {
           if (currPage === 0) {
@@ -175,6 +175,7 @@ export default function Feed(): React.JSX.Element {
   const onScroll = () => {
     if (listInnerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = listInnerRef.current;
+      console.log(scrollTop, scrollHeight, clientHeight);
       if (-scrollTop + clientHeight === scrollHeight && nextPage) {
         setCurrPage(currPage + 1);
       }

@@ -17,6 +17,22 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { Pagination } from "swiper/modules";
 import ShareIcon from "./icons/ShareIcon";
+import {
+  EmailShareButton,
+  FacebookShareButton,
+  FacebookMessengerShareButton,
+  LinkedinShareButton,
+  TelegramShareButton,
+  TwitterShareButton,
+  WhatsappShareButton,
+  EmailIcon,
+  FacebookIcon,
+  FacebookMessengerIcon,
+  LinkedinIcon,
+  TelegramIcon,
+  TwitterIcon,
+  WhatsappIcon,
+} from "react-share";
 
 interface comment {
   _id: string;
@@ -70,6 +86,7 @@ export default function SingleFeed({
   const [likeList, setLikeList] = useState<like[]>([]);
   const [currPage, setCurrPage] = useState<number>(0);
   const [nextPage, setNextPage] = useState<boolean>(false);
+  const [openShare, setOpenShare] = useState<boolean>(false);
   const { user } = useAuth();
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
@@ -122,6 +139,7 @@ export default function SingleFeed({
         });
         if (res.status === 201) {
           setComment({ id: "", text: "" });
+          getComment(id);
           setSnack(res.data.message);
         }
       } catch (error) {
@@ -205,6 +223,16 @@ export default function SingleFeed({
     },
     [apiCall, checkAxiosError, setSnack]
   );
+
+  const handleKeyPress = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    postId: string,
+    commentId?: string
+  ) => {
+    if (e.key === "Enter") {
+      handleComment(postId, commentId);
+    }
+  };
 
   useEffect(() => {
     if (openLike && post.like > 0) {
@@ -342,7 +370,10 @@ export default function SingleFeed({
             />
             <span className="text-gray-500 ml-1 text-sm">Comments</span>
           </button>
-          <button className="flex flex-row items-center">
+          <button
+            className="flex flex-row items-center"
+            onClick={() => setOpenShare(true)}
+          >
             <img
               width={25}
               src="/public/icons/share-arrow-svgrepo-com.svg"
@@ -353,7 +384,7 @@ export default function SingleFeed({
         </div>
         <div className="flex items-center justify-between border-t-2 border-gray-200 mt-3 pt-3">
           <img
-            className="w-11 h-11 rounded-full object-cover"
+            className="w-11 h-11 rounded-full object-cover shrink-0"
             src={
               user.profileImg ||
               "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
@@ -364,13 +395,18 @@ export default function SingleFeed({
             id={post._id}
             type="text"
             placeholder="Write a comment..."
-            className="border-gray border rounded-xl py-3 px-4 pr-3 w-[432px] bg-input-primary border-none my-0 text-sm"
+            className="border-gray border rounded-xl py-3 px-4 pr-3 w-full bg-input-primary border-none my-0 mx-2 text-sm"
             onChange={(e) => setComment({ id: post._id, text: e.target.value })}
+            onKeyDown={(e) => handleKeyPress(e, post._id)}
             value={comment.id === post._id ? comment.text : ""}
           />
           <button
             className="bg-[#f48bb34c] py-1 pl-1 pr-2 rounded-xl h-[44px]"
-            onClick={() => handleComment(post._id)}
+            onClick={() => {
+              if (comment.text) {
+                handleComment(post._id);
+              }
+            }}
           >
             <ShareIcon className="text-[#DE2C70] w-[35px] h-full transform rotate-[30deg]" />
           </button>
@@ -457,6 +493,7 @@ export default function SingleFeed({
                 placeholder="Write a comment..."
                 className="border-gray border rounded-xl py-3 px-4 pr-3 w-[500px] bg-input-primary border-none my-0 text-sm"
                 onChange={handleChange}
+                onKeyDown={(e) => handleKeyPress(e, post._id, comment.id)}
                 value={comment.text}
               />
               <button
@@ -465,6 +502,46 @@ export default function SingleFeed({
               >
                 <ShareIcon className="text-[#DE2C70] w-[35px] h-full transform rotate-[30deg]" />
               </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* share model */}
+      <div className={`modal-popup-story ${openShare ? "block" : "hidden"}`}>
+        <div className="w-full h-full relative flex justify-center items-center">
+          <div className="w-auto">
+            <div className="relative w-full text-base font-bold text-gray-700 bg-white rounded-t-xl p-6 pb-2">
+              <button
+                className="p-1 rounded-xl border-2 border-grey text-gray-400 absolute right-2 top-3"
+                onClick={() => setOpenShare(false)}
+              >
+                <CloseIcon className="w-6 h-6"></CloseIcon>
+              </button>
+              <h2>Share</h2>
+            </div>
+            <div className="feed-scroll max-h-[70%] overflow-y-auto bg-white rounded-b-xl p-6 pt-2 border-t-2 border-gray-200 grid grid-cols-3 gap-5">
+              <EmailShareButton className="mx-1" url="">
+                <EmailIcon className="rounded-full h-12 w-12" />
+              </EmailShareButton>
+              <FacebookShareButton className="mx-1" url="">
+                <FacebookIcon className="rounded-full h-12 w-12" />
+              </FacebookShareButton>
+              <FacebookMessengerShareButton className="mx-1" url="" appId="">
+                <FacebookMessengerIcon className="rounded-full h-12 w-12" />
+              </FacebookMessengerShareButton>
+              <LinkedinShareButton className="mx-1" url="">
+                <LinkedinIcon className="rounded-full h-12 w-12" />
+              </LinkedinShareButton>
+              <TelegramShareButton className="mx-1" url="">
+                <TelegramIcon className="rounded-full h-12 w-12" />
+              </TelegramShareButton>
+              <WhatsappShareButton className="mx-1" url="">
+                <WhatsappIcon className="rounded-full h-12 w-12" />
+              </WhatsappShareButton>
+              <TwitterShareButton className="mx-1" url="">
+                <TwitterIcon className="rounded-full h-12 w-12" />
+              </TwitterShareButton>
             </div>
           </div>
         </div>

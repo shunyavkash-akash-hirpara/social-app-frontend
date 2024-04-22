@@ -161,7 +161,7 @@ export default function Profile(): React.JSX.Element {
                               profileImg: user.profileImg,
                               conversationId: convId,
                             });
-                            navigate(`/chat/${id}`);
+                            navigate(`/chat`);
                           }}
                         >
                           Message

@@ -33,7 +33,7 @@ export default function SuggestedUser(): React.JSX.Element {
       <div className="bg-white rounded-t-xl p-4 pb-3">
         <div className="flex items-center justify-between">
           <label className="text-sm text-gray-600 font-bold">
-            Friend Request
+            New Users
           </label>
           <a href="#" className="text-sm text-blue-600">
             See all
@@ -82,10 +82,10 @@ export default function SuggestedUser(): React.JSX.Element {
             </div>
             <div className="flex items-center justify-center mt-4">
               <button className="rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-sm font-bold px-7 py-2 mr-3 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
-                Confirm
+                Follow
               </button>
               <button className="rounded-lg border-2 border-gray-300 border-solid text-sm text-gray-400 font-bold px-7 py-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
-                Delete
+                Ignore
               </button>
             </div>
           </div>
