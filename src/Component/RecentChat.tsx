@@ -7,14 +7,8 @@ import SearchIcon from "./icons/SearchIcon";
 import useApi from "../hooks/useApi";
 import { useSnack } from "../hooks/store/useSnack";
 import { APIS } from "../api/apiList";
+import { useAuth } from "../hooks/store/useAuth";
 
-interface peoples {
-  id: number;
-  name: string;
-  avatar: string;
-  location: string;
-}
-[];
 interface user {
   _id: string;
   name: string;
@@ -23,50 +17,16 @@ interface user {
   conversationId: string;
 }
 
-const peoples = [
-  {
-    id: 1,
-    name: "Wade Cooper",
-    avatar:
-      "https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    location: "Surat,India",
-  },
-  {
-    id: 2,
-    name: "Arlene Mccoy",
-    avatar:
-      "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    location: "Mumbai,India",
-  },
-  {
-    id: 3,
-    name: "Devon Webb",
-    avatar:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80",
-    location: "Kolkata,India",
-  },
-  {
-    id: 4,
-    name: "Tom Cook",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    location: "Chennai,India",
-  },
-  {
-    id: 5,
-    name: "Tanya Fox",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    location: "Delhi,India",
-  },
-  {
-    id: 6,
-    name: "Hellen Schmidt",
-    avatar:
-      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    location: "Jammu,India",
-  },
-];
+interface story {
+  loginUser: boolean;
+  story: { url: string; type: string }[];
+  follow_friend: {
+    _id: string;
+    username: string;
+    name: string;
+    profileImg: string;
+  };
+}
 
 export default function RecentChat(): React.JSX.Element {
   const [openChat, setOpenChat] = useState(false);
@@ -75,8 +35,61 @@ export default function RecentChat(): React.JSX.Element {
   const [activeSlide, setActiveSlide] = useState<number>(0);
   const [search, setSearch] = useState<string>("");
   const [users, setUsers] = useState<user[]>([]);
+  const [storyList, setStoryList] = useState<story[]>([]);
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
+  const { user } = useAuth();
+
+  // console.log(storyList);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const createStory = useCallback(
+    async (story: File) => {
+      const formData = new FormData();
+      if (story) {
+        formData.append("story", story);
+      }
+      try {
+        const res = await apiCall({
+          url: APIS.STORY.POST,
+          method: "post",
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          data: formData,
+        });
+        if (res.status === 201) {
+          console.log(res.data.data);
+          setSnack(res.data.message);
+        }
+      } catch (error) {
+        if (checkAxiosError(error)) {
+          const errorMessage = error?.response?.data.message;
+          setSnack(errorMessage, "warning");
+        }
+      }
+    },
+    [apiCall, checkAxiosError, setSnack]
+  );
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const getStoryList = useCallback(async () => {
+    try {
+      const res = await apiCall({
+        url: APIS.STORY.GET,
+        method: "get",
+      });
+      if (res.status === 200) {
+        setStoryList(res.data.data);
+        setSnack(res.data.message);
+      }
+    } catch (error) {
+      if (checkAxiosError(error)) {
+        const errorMessage = error?.response?.data.message;
+        setSnack(errorMessage, "warning");
+      }
+    }
+  }, [apiCall, checkAxiosError, setSnack]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const recentChatList = useCallback(async () => {
@@ -122,7 +135,8 @@ export default function RecentChat(): React.JSX.Element {
 
   useEffect(() => {
     recentChatList();
-  }, [recentChatList]);
+    getStoryList();
+  }, [getStoryList, recentChatList]);
 
   useEffect(() => {
     if (!search) recentChatList(); // Exit early if search is falsy
@@ -140,13 +154,26 @@ export default function RecentChat(): React.JSX.Element {
             <SwiperSlide className="relative flex items-center justify-center flex-col pt-1">
               <button>
                 <img
-                  className="w-14 h-14 rounded-full ring-2 ring-primary"
-                  src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  className={`w-14 h-14 rounded-full ${
+                    storyList[0]?.loginUser && "ring-2"
+                  } ring-primary object-cover`}
+                  src={user.profileImg}
                   alt="Bordered avatar"
                 />
               </button>
               <label htmlFor="story-add">
-                <input id="story-add" type="file" className="hidden" />
+                <input
+                  id="story-add"
+                  type="file"
+                  className="hidden"
+                  accept=".jpg,.jpeg,.png,.mp4,.mkv"
+                  onChange={(e) => {
+                    const file = e.currentTarget.files[0];
+                    if (file) {
+                      createStory(file);
+                    }
+                  }}
+                />
                 <img
                   className="border-2 rounded-full bg-white absolute bottom-5 left-6 cursor-pointer"
                   width={18}
@@ -156,21 +183,30 @@ export default function RecentChat(): React.JSX.Element {
               </label>
               <span className="text-sm mt-2">Add</span>
             </SwiperSlide>
-            {peoples.map((item) => (
-              <SwiperSlide
-                className="flex items-center justify-center flex-col pt-1"
-                key={item.id}
-              >
-                <button onClick={() => setOpenStory(true)}>
-                  <img
-                    className="w-14 h-14 rounded-full ring-2 ring-primary"
-                    src={item.avatar}
-                    alt="Bordered avatar"
-                  />
-                </button>
-                <span className="text-sm mt-2">{item.name.split(" ")[0]}</span>
-              </SwiperSlide>
-            ))}
+            {storyList.map((item, index) => {
+              if (index === 0 && item.loginUser) {
+                return;
+              }
+              return (
+                <SwiperSlide
+                  className="flex items-center justify-center flex-col pt-1"
+                  key={item.follow_friend._id}
+                >
+                  <button onClick={() => setOpenStory(true)}>
+                    <img
+                      className="w-14 h-14 rounded-full ring-2 ring-primary object-cover"
+                      src={item.follow_friend.profileImg}
+                      alt="Bordered avatar"
+                    />
+                  </button>
+                  <span className="text-xs mt-2">
+                    {item.follow_friend.username.length > 8
+                      ? item.follow_friend.username.slice(0, 8) + "..."
+                      : item.follow_friend.username}
+                  </span>
+                </SwiperSlide>
+              );
+            })}
           </Swiper>
           <ul className="space-y-2 font-medium">
             <li>
@@ -244,6 +280,7 @@ export default function RecentChat(): React.JSX.Element {
             setActiveSlide={setActiveSlide}
             setOpenStory={setOpenStory}
             openStory={openStory}
+            storyList={storyList}
           />
         </div>
       )}

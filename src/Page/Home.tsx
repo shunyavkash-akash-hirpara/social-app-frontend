@@ -10,7 +10,7 @@ export default function Home(): React.JSX.Element {
         <div className="feed-scroll w-[580px] mr-6 overflow-y-auto">
           <Feed />
         </div>
-        <div className="w-[300px]">
+        <div className="w-[300px] overflow-y-auto feed-scroll">
           <RecentLikeUser />
           <SuggestedUser />
         </div>
