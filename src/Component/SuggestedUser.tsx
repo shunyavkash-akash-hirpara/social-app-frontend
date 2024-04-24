@@ -81,10 +81,10 @@ export default function SuggestedUser(): React.JSX.Element {
               </div>
             </div>
             <div className="flex items-center justify-center mt-4">
-              <button className="rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-sm font-bold px-7 py-2 mr-3 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
+              <button className="rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold px-7 py-2 mr-3 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
                 Follow
               </button>
-              <button className="rounded-lg border-2 border-gray-300 border-solid text-sm text-gray-400 font-bold px-7 py-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
+              <button className="rounded-lg border-2 border-gray-300 border-solid text-xs text-gray-400 font-bold px-7 py-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
                 Ignore
               </button>
             </div>

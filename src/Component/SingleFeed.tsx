@@ -205,23 +205,33 @@ export default function SingleFeed({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const getLike = useCallback(
     async (id: string) => {
-      try {
-        const res = await apiCall({
-          url: APIS.LIKE.GETLIKE(id),
-          method: "get",
-        });
-        if (res.status === 200) {
-          setLikeList(res.data.data);
-          setSnack(res.data.message);
-        }
-      } catch (error) {
-        if (checkAxiosError(error)) {
-          const errorMessage = error?.response?.data.message;
-          setSnack(errorMessage, "warning");
+      if (nextPage || currPage === 0) {
+        try {
+          const res = await apiCall({
+            url: APIS.LIKE.GETLIKE(id),
+            method: "get",
+          });
+          if (res.status === 200) {
+            if (currPage === 0) {
+              setLikeList(res.data.data.getLike);
+            } else {
+              setLikeList((prevComments) => [
+                ...prevComments,
+                ...res.data.data.getLike,
+              ]);
+            }
+            setNextPage(res.data.data.hasNextPage);
+            setSnack(res.data.message);
+          }
+        } catch (error) {
+          if (checkAxiosError(error)) {
+            const errorMessage = error?.response?.data.message;
+            setSnack(errorMessage, "warning");
+          }
         }
       }
     },
-    [apiCall, checkAxiosError, setSnack]
+    [apiCall, checkAxiosError, currPage, nextPage, setSnack]
   );
 
   const handleKeyPress = (

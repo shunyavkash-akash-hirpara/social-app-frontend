@@ -221,7 +221,7 @@ export default function Feed(): React.JSX.Element {
         onSubmit={formik.handleSubmit}
         className="w-full bg-white rounded-xl mb-6 p-4"
       >
-        <div className="flex items-center pb-3">
+        <div className="flex items-center pb-3 relative">
           <img
             className="w-10 h-10 rounded-full mr-3 object-cover"
             src={
@@ -237,6 +237,14 @@ export default function Feed(): React.JSX.Element {
             formik={formik}
             inputStyle="w-[494px] bg-input-primary border-none my-0 text-sm"
           />
+          <div className="absolute right-1">
+            <InputEmoji
+              value={formik.values.description}
+              onChange={handleOnEnter}
+              cleanOnEnter
+              keepOpened
+            ></InputEmoji>
+          </div>
         </div>
         {formik.values.file.length > 0 && (
           <div className="relative grid grid-cols-4">
@@ -337,7 +345,7 @@ export default function Feed(): React.JSX.Element {
             <PictureIcon className="text-[#80838a] w-[30px] h-full" />
             <span className="text-gray-500 ml-1 text-sm">Photos</span>
           </label>
-          <div className="flex items-center">
+          {/* <div className="flex items-center">
             <InputEmoji
               value={formik.values.description}
               onChange={handleOnEnter}
@@ -346,13 +354,8 @@ export default function Feed(): React.JSX.Element {
             ></InputEmoji>
             <button className="flex flex-row items-center">
               <span className="text-gray-500 ml-1 text-sm">Feeling</span>
-              {/* <img
-                width={25}
-                src="/public/icons/emoji-smile-svgrepo-com.svg"
-                alt="photos"
-              /> */}
             </button>
-          </div>
+          </div> */}
           <div className="flex items-center">
             <button
               className="flex flex-row items-center"
