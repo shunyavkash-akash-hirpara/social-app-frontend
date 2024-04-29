@@ -152,14 +152,32 @@ export default function RecentChat(): React.JSX.Element {
         <div className="h-full px-4 py-4 overflow-y-auto bg-white">
           <Swiper className="swiper" spaceBetween={3} slidesPerView={4}>
             <SwiperSlide className="relative flex items-center justify-center flex-col pt-1">
-              <button>
+              <button onClick={() => setOpenStory(true)}>
                 <img
-                  className={`w-14 h-14 rounded-full ${
-                    storyList[0]?.loginUser && "ring-2"
-                  } ring-primary object-cover`}
+                  className="w-14 h-14 rounded-full object-cover"
                   src={user.profileImg}
                   alt="Bordered avatar"
                 />
+                {storyList[0]?.loginUser && (
+                  <svg
+                    viewBox="0 0 100 100"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="absolute -top-[3px] left-0"
+                  >
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="45"
+                      fill="transparent"
+                      stroke="#DE2C70"
+                      stroke-width="3"
+                      stroke-dasharray={`${
+                        (((2 * 22) / 7) * 45 - 4 * storyList[0]?.story.length) /
+                        storyList[0]?.story.length
+                      } ${storyList[0]?.story.length === 1 ? "0" : "4"}`}
+                    />
+                  </svg>
+                )}
               </button>
               <label htmlFor="story-add">
                 <input
@@ -175,7 +193,7 @@ export default function RecentChat(): React.JSX.Element {
                   }}
                 />
                 <img
-                  className="border-2 rounded-full bg-white absolute bottom-5 left-6 cursor-pointer"
+                  className="border-2 rounded-full bg-white absolute bottom-5 left-7 cursor-pointer"
                   width={18}
                   src="/public/icons/plus-large-svgrepo-com.svg"
                   alt="plus-icon"
@@ -189,15 +207,33 @@ export default function RecentChat(): React.JSX.Element {
               }
               return (
                 <SwiperSlide
-                  className="flex items-center justify-center flex-col pt-1"
+                  className="relative flex items-center justify-center flex-col pt-1"
                   key={item.follow_friend._id}
                 >
                   <button onClick={() => setOpenStory(true)}>
                     <img
-                      className="w-14 h-14 rounded-full ring-2 ring-primary object-cover"
+                      className="w-14 h-14 rounded-full object-cover"
                       src={item.follow_friend.profileImg}
                       alt="Bordered avatar"
                     />
+                    <svg
+                      viewBox="0 0 100 100"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="absolute -top-[3px] left-0"
+                    >
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="45"
+                        fill="transparent"
+                        stroke="#DE2C70"
+                        stroke-width="3"
+                        stroke-dasharray={`${
+                          (((2 * 22) / 7) * 45 - 4 * item.story.length) /
+                          item.story.length
+                        } ${item.story.length === 1 ? "0" : "4"}`}
+                      />
+                    </svg>
                   </button>
                   <span className="text-xs mt-2">
                     {item.follow_friend.username.length > 8

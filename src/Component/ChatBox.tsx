@@ -224,7 +224,7 @@ export default function ChatBox({
     <div className="w-[320px] bg-white p-0 shadow-lg rounded-xl">
       <div className="w-full border-b-2 border-gray-100 flex items-center p-3 text-gray-900">
         <img
-          className="w-10 h-10 rounded-full"
+          className="w-10 h-10 rounded-full object-cover"
           src={
             chatUser?.profileImg ||
             "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"

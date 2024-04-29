@@ -1,5 +1,7 @@
 import React, {
+  Dispatch,
   LegacyRef,
+  SetStateAction,
   useCallback,
   useEffect,
   useRef,
@@ -15,6 +17,7 @@ import { useSnack } from "../hooks/store/useSnack";
 import { APIS } from "../api/apiList";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
+import "swiper/css/pagination";
 import { Pagination } from "swiper/modules";
 import ShareIcon from "./icons/ShareIcon";
 import {
@@ -33,6 +36,7 @@ import {
   TwitterIcon,
   WhatsappIcon,
 } from "react-share";
+import VideoPlayer from "./VideoPlayer";
 
 interface comment {
   _id: string;
@@ -55,6 +59,9 @@ interface like {
 
 export default function SingleFeed({
   post,
+  activeFeed,
+  setMute,
+  mute,
 }: {
   post: {
     _id: string;
@@ -77,6 +84,9 @@ export default function SingleFeed({
     comment: number;
     isLike: boolean;
   };
+  activeFeed: number;
+  setMute: Dispatch<SetStateAction<boolean>>;
+  mute: boolean;
 }): React.JSX.Element {
   const [openLike, setOpenLike] = useState<boolean>(false);
   const [openComment, setOpenComment] = useState<boolean>(false);
@@ -87,6 +97,9 @@ export default function SingleFeed({
   const [currPage, setCurrPage] = useState<number>(0);
   const [nextPage, setNextPage] = useState<boolean>(false);
   const [openShare, setOpenShare] = useState<boolean>(false);
+  const [activeVideoId, setActiveVideoId] = useState<string>(
+    post.photos[0]._id
+  );
   const { user } = useAuth();
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
@@ -188,7 +201,7 @@ export default function SingleFeed({
   const onScroll = () => {
     if (listInnerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = listInnerRef.current;
-      if (-scrollTop + clientHeight === scrollHeight && nextPage) {
+      if (scrollTop + clientHeight === scrollHeight && nextPage) {
         setCurrPage(currPage + 1);
       }
     }
@@ -292,6 +305,9 @@ export default function SingleFeed({
               pagination={{ clickable: true }}
               modules={[Pagination]}
               className="swiper"
+              onSlideChange={(swiper) =>
+                setActiveVideoId(post.photos[swiper.activeIndex]._id)
+              }
             >
               {post.photos.map((media) => (
                 <SwiperSlide
@@ -305,12 +321,15 @@ export default function SingleFeed({
                       alt="photo"
                     />
                   ) : (
-                    <video
-                      className="my-3 mx-[auto] rounded-xl h-[409px] object-cover"
-                      src={media.url}
-                      controls
-                      autoPlay
-                    ></video>
+                    <>
+                      <VideoPlayer
+                        src={media}
+                        activeVideoId={activeVideoId}
+                        activeFeed={activeFeed.toString() === post._id}
+                        setMute={setMute}
+                        mute={mute}
+                      />
+                    </>
                   )}
                 </SwiperSlide>
               ))}

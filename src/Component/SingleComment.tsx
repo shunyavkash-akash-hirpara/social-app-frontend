@@ -86,7 +86,7 @@ export default function SingleComment({
   const onScroll = () => {
     if (listInnerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = listInnerRef.current;
-      if (-scrollTop + clientHeight === scrollHeight && nextPage) {
+      if (scrollTop + clientHeight === scrollHeight && nextPage) {
         setCurrPage(currPage + 1);
       }
     }

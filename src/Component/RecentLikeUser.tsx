@@ -10,6 +10,7 @@ interface suggest {
   profileImg: string;
   followBack: boolean;
   mutual: { _id: string; username: string; profileImg: string }[];
+  mutual_count: number;
 }
 
 export default function RecentLikeUser(): React.JSX.Element {
@@ -64,7 +65,7 @@ export default function RecentLikeUser(): React.JSX.Element {
               <div className="flex">
                 <Link to={`/profile/${friend._id}`}>
                   <img
-                    className="w-11 h-11 rounded-full"
+                    className="w-11 h-11 rounded-full object-cover"
                     src={friend.profileImg}
                     alt="Rounded avatar"
                   />
@@ -80,7 +81,7 @@ export default function RecentLikeUser(): React.JSX.Element {
                     <div className="flex -space-x-3 rtl:space-x-reverse">
                       {friend.mutual?.slice(0, 3).map((people) => (
                         <img
-                          className="w-7 h-7 border-2 border-white rounded-full"
+                          className="w-7 h-7 border-2 border-white rounded-full object-cover"
                           src={people.profileImg}
                           alt="avtar"
                           key={people._id}
@@ -88,7 +89,7 @@ export default function RecentLikeUser(): React.JSX.Element {
                       ))}
                     </div>
                     <span className="text-gray-400 text-xs mr-6 cursor-pointer">
-                      13 Mutuals
+                      {friend.mutual_count} Mutuals
                     </span>
                   </div>
                 </div>

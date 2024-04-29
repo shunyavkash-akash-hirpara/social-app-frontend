@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, {
+  LegacyRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useAuth } from "../hooks/store/useAuth";
 import Header from "../Component/Header";
 import Sidebar from "../Component/Sidebar";
@@ -46,12 +52,15 @@ interface post {
 export default function Profile(): React.JSX.Element {
   const [user, setUser] = useState<user>();
   const [posts, setPosts] = useState<post[]>([]);
+  const [currPage, setCurrPage] = useState<number>(0);
+  const [nextPage, setNextPage] = useState<boolean>(false);
   const { setNewChatUser } = useChatUser();
   const { accessToken, userId } = useAuth();
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
   const id: string = useParams().id as string;
   const navigate = useNavigate();
+  const listInnerRef: LegacyRef<HTMLDivElement> = useRef(null);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const getProfileDetail = useCallback(async () => {
@@ -74,22 +83,39 @@ export default function Profile(): React.JSX.Element {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const getPosts = useCallback(async () => {
-    try {
-      const res = await apiCall({
-        url: APIS.POST.POSTBYUSER(id),
-        method: "get",
-      });
-      if (res.status === 200) {
-        setPosts(res.data.data);
-        setSnack(res.data.message);
-      }
-    } catch (error) {
-      if (checkAxiosError(error)) {
-        const errorMessage = error?.response?.data.message;
-        setSnack(errorMessage, "warning");
+    if (nextPage || currPage === 0) {
+      try {
+        const res = await apiCall({
+          url: APIS.POST.POSTBYUSER(id),
+          method: "get",
+          params: { limit: 20, page: currPage },
+        });
+        if (res.status === 200) {
+          if (currPage === 0) {
+            setPosts(res.data.data.post);
+          } else {
+            setPosts((prevPosts) => [...prevPosts, ...res.data.data.post]);
+          }
+          setNextPage(res.data.data.hasNextPage);
+          setSnack(res.data.message);
+        }
+      } catch (error) {
+        if (checkAxiosError(error)) {
+          const errorMessage = error?.response?.data.message;
+          setSnack(errorMessage, "warning");
+        }
       }
     }
-  }, [apiCall, checkAxiosError, id, setSnack]);
+  }, [apiCall, checkAxiosError, currPage, id, nextPage, setSnack]);
+
+  const onScroll = () => {
+    if (listInnerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = listInnerRef.current;
+      if (scrollTop + clientHeight === scrollHeight && nextPage) {
+        setCurrPage(currPage + 1);
+      }
+    }
+  };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleFollow = useCallback(async () => {
@@ -123,7 +149,11 @@ export default function Profile(): React.JSX.Element {
       <Sidebar />
 
       <main className="fixed w-[848px] top-[80px] left-[280px] right-[344px] mx-[auto] rounded-xl flex h-calc-screen-minus-nav">
-        <div className="feed-scroll w-full mx-[auto] overflow-y-auto p-6 pt-0">
+        <div
+          onScroll={onScroll}
+          ref={listInnerRef}
+          className="feed-scroll w-full mx-[auto] overflow-y-auto p-6 pt-0"
+        >
           <div className="bg-white rounded-xl p-6">
             {user && (
               <div className="flex items-center w-full">

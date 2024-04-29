@@ -51,7 +51,7 @@ export default function SuggestedUser(): React.JSX.Element {
             <div className="flex">
               <Link to={`/profile/${people.id}`}>
                 <img
-                  className="w-11 h-11 rounded-full"
+                  className="w-11 h-11 rounded-full object-cover"
                   src={people.avatar}
                   alt="Rounded avatar"
                 />
@@ -67,7 +67,7 @@ export default function SuggestedUser(): React.JSX.Element {
                   <div className="flex -space-x-3 rtl:space-x-reverse">
                     {peoples.slice(0, 3).map((people) => (
                       <img
-                        className="w-7 h-7 border-2 border-white rounded-full"
+                        className="w-7 h-7 border-2 border-white rounded-full object-cover"
                         src={people.avatar}
                         alt=""
                         key={people.id}

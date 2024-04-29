@@ -92,7 +92,7 @@ export default function FriendList(): React.JSX.Element {
   const onScroll = () => {
     if (listInnerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = listInnerRef.current;
-      if (-scrollTop + clientHeight === scrollHeight && nextPage) {
+      if (scrollTop + clientHeight === scrollHeight && nextPage) {
         setCurrPage(currPage + 1);
       }
     }
