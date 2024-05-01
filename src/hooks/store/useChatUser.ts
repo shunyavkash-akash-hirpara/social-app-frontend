@@ -6,6 +6,8 @@ interface user {
   username: string;
   profileImg: string;
   conversationId: string;
+  delete24View: boolean;
+  deleteAfterView: boolean;
 }
 
 interface useChatUser {

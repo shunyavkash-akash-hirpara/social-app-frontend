@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import BackIcon from "../Component/icons/BackIcon";
+import MoreIcon from "../Component/icons/MoreIcon";
 
 const peoples = [
   {
@@ -155,12 +156,8 @@ export default function Notifications(): React.JSX.Element {
                     <h4 className="text-sm text-gray-700">{item.desc}</h4>
                     <h5 className="text-xs text-gray-400">{item.date}</h5>
                   </div>
-                  <button className="absolute right-0 w-9 h-9">
-                    <img
-                      className="w-9"
-                      src="/public/icons/more-horizontal-svgrepo-com.svg"
-                      alt="more"
-                    />
+                  <button className="absolute right-0 w-9">
+                    <MoreIcon className="w-9 text-gray-500" radius={1.5} />
                   </button>
                 </div>
               ))}

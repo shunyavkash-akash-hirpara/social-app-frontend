@@ -93,7 +93,6 @@ export default function VideoPlayer({
   const videoPlayToggle = () => {
     if (videoRefs.current.paused) {
       videoRefs.current.play().then(() => {
-        console.log("play");
         setPause(false);
       });
     } else {

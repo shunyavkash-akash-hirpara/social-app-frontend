@@ -24,6 +24,8 @@ import PictureIcon from "../Component/icons/PictureIcon";
 import VideoIcon from "../Component/icons/VideoIcon";
 import { useOnCall } from "../hooks/store/useOnCall";
 import { useChatUser } from "../hooks/store/useChatUser";
+import ChatListItem from "../Component/ChatListItem";
+import MoreIcon from "../Component/icons/MoreIcon";
 dayjs.extend(duration);
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -34,6 +36,9 @@ interface user {
   username: string;
   profileImg: string;
   conversationId: string;
+  unread_msg?: number;
+  delete24View: boolean;
+  deleteAfterView: boolean;
 }
 
 interface chat {
@@ -56,6 +61,7 @@ export default function ChatList(): React.JSX.Element {
   const [typing, setTyping] = useState<boolean>(false);
   const [currPage, setCurrPage] = useState<number>(0);
   const [nextPage, setNextPage] = useState<boolean>(false);
+  const [openMorePopup, setOpenMorePopup] = useState<boolean>(false);
   const { newChatUser } = useChatUser();
   const { setOpenCallModel } = useOnCall();
   const navigate = useNavigate();
@@ -72,6 +78,31 @@ export default function ChatList(): React.JSX.Element {
       setChatUser(newChatUser);
     }
   }, [newChatUser]);
+
+  const handleDeleteChat = (e, type: string) => {
+    if (type === "delete24View") {
+      setChatUser((prev) => ({
+        ...prev,
+        delete24View: e.target.checked,
+        deleteAfterView: false,
+      }));
+      deleteChats(3);
+    }
+    if (type === "deleteAfterView") {
+      setChatUser((prev) => ({
+        ...prev,
+        delete24View: false,
+        deleteAfterView: e.target.checked,
+      }));
+      deleteChats(2);
+    }
+    if (type === "deleteChat") {
+      deleteChats(1);
+      setUsers((prev) => prev.filter((user) => user._id !== chatUser._id));
+      setChatUser(undefined);
+    }
+    setOpenMorePopup(false);
+  };
 
   const handleSendMessage = () => {
     if (!message) {
@@ -96,6 +127,15 @@ export default function ChatList(): React.JSX.Element {
     setChats((prevChats) => [newChat, ...prevChats]);
     setMessage("");
   };
+
+  useEffect(() => {
+    socket.on("newChatUser", (data) => {
+      setUsers((prev) => [data, ...prev]);
+    });
+    return () => {
+      socket.off("newChatUser");
+    };
+  }, []);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -216,9 +256,9 @@ export default function ChatList(): React.JSX.Element {
         });
         if (res.status === 200) {
           if (currPage === 0) {
-            setChats(res.data.data.chatData);
+            setChats(res.data.data.data);
           } else {
-            setChats((prevChats) => [...prevChats, ...res.data.data.chatData]);
+            setChats((prevChats) => [...prevChats, ...res.data.data.data]);
           }
           setNextPage(res.data.data.hasNextPage);
           setSnack(res.data.message);
@@ -239,6 +279,30 @@ export default function ChatList(): React.JSX.Element {
     setSnack,
   ]);
 
+  const deleteChats = useCallback(
+    async (deleteType: number) => {
+      try {
+        const res = await apiCall({
+          url: APIS.CHAT.DELETE,
+          method: "delete",
+          params: {
+            conversationId: chatUser?.conversationId,
+            deleteType: deleteType,
+          },
+        });
+        if (res.status === 200) {
+          setSnack(res.data.message);
+        }
+      } catch (error) {
+        if (checkAxiosError(error)) {
+          const errorMessage = error?.response?.data.message;
+          setSnack(errorMessage, "warning");
+        }
+      }
+    },
+    [apiCall, chatUser?.conversationId, checkAxiosError, setSnack]
+  );
+
   const onScroll = () => {
     if (listInnerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = listInnerRef.current;
@@ -249,7 +313,10 @@ export default function ChatList(): React.JSX.Element {
   };
 
   useEffect(() => {
-    if (!chatUser) return;
+    if (!chatUser) {
+      socket.emit("back", { userId: userId });
+      return;
+    }
     getUserChats();
     socket.emit("onScreen", { userId: userId, screenId: chatUser._id });
   }, [chatUser, getUserChats, userId]);
@@ -262,27 +329,6 @@ export default function ChatList(): React.JSX.Element {
   if (messageRef.current) {
     messageRef.current?.focus();
   }
-
-  useEffect(() => {
-    socket.on("sendMessage", (data) => {
-      const newChat: chat = {
-        sender: data.sender,
-        receiver: data.receiver,
-        conversationId: data.conversationId,
-        msg: data.msg,
-        type: data.type,
-        read: data.read,
-        createdAt: dayjs().toISOString(), // Use current time
-      };
-      setChats((prevChats) => [newChat, ...prevChats]);
-    });
-    socket.on("typing", (data) => {
-      setTyping(data.typing);
-    });
-    return () => {
-      socket.off("sendMessage");
-    };
-  }, []);
 
   return (
     <>
@@ -315,28 +361,14 @@ export default function ChatList(): React.JSX.Element {
             </div>
             <div className="overflow-y-auto feed-scroll rounded-b-xl m-y">
               {users.map((people) => (
-                <button
-                  className="w-full flex items-center p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group"
-                  onClick={() => setChatUser(people)}
+                <ChatListItem
+                  setChatUser={setChatUser}
+                  chatUser={chatUser}
+                  people={people}
+                  setChats={setChats}
+                  setTyping={setTyping}
                   key={people._id}
-                >
-                  <img
-                    className="w-11 h-11 rounded-full object-cover"
-                    src={
-                      people.profileImg ||
-                      "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
-                    }
-                    alt="Rounded avatar"
-                  />
-                  <div className="flex flex-col text-justify">
-                    <span className="ms-3 text-sm text-gray-700 font-bold">
-                      {people.username || "socialapp_user"}
-                    </span>
-                    <span className="ms-3 text-[12px] text-gray-400">
-                      {people.name}
-                    </span>
-                  </div>
-                </button>
+                />
               ))}
             </div>
           </div>
@@ -410,6 +442,96 @@ export default function ChatList(): React.JSX.Element {
                   >
                     <VideoIcon className="w-8 h-full text-white" />
                   </button>
+                  <button
+                    id="dropdownRadioButton"
+                    data-dropdown-toggle="dropdownDefaultRadio"
+                    type="button"
+                    className="w-8 h-8 p-1 rounded-lg ml-2"
+                    disabled={!chatUser.username}
+                    onClick={() => {
+                      setOpenMorePopup(true);
+                    }}
+                  >
+                    <MoreIcon
+                      className="w-8 h-full stroke-2 text-white"
+                      radius={2}
+                    />
+                    {/* <!-- Dropdown menu --> */}
+                  </button>
+                  <div>
+                    <div
+                      id="dropdownDefaultRadio"
+                      className={`absolute z-10 ${
+                        !openMorePopup && "hidden"
+                      } w-48 bg-white divide-y divide-gray-100 rounded-lg shadow`}
+                    >
+                      <div
+                        className="fixed inset-0 -z-10"
+                        onClick={() => {
+                          setOpenMorePopup(false);
+                        }}
+                      ></div>
+                      <ul
+                        className="p-3 space-y-3 text-sm text-gray-700 cursor-default"
+                        aria-labelledby="dropdownRadioButton"
+                      >
+                        <li>
+                          <div className="flex items-center">
+                            <button
+                              className="ms-2 text-sm font-medium text-gray-700"
+                              onClick={(e) => handleDeleteChat(e, "deleteChat")}
+                            >
+                              Delete chat
+                            </button>
+                          </div>
+                        </li>
+                        <li>
+                          <div className="flex items-center">
+                            <input
+                              checked={chatUser.deleteAfterView}
+                              id="default-radio-2"
+                              type="checkbox"
+                              name="default-radio"
+                              className={`appearance-none w-4 h-4 rounded-full ${
+                                chatUser.deleteAfterView && "bg-blue-600"
+                              } border-2 cursor-pointer`}
+                              onChange={(e) =>
+                                handleDeleteChat(e, "deleteAfterView")
+                              }
+                            />
+                            <label
+                              htmlFor="default-radio-2"
+                              className="ms-2 text-sm font-medium text-gray-700"
+                            >
+                              After viewing
+                            </label>
+                          </div>
+                        </li>
+                        <li>
+                          <div className="flex items-center">
+                            <input
+                              checked={chatUser.delete24View}
+                              id="default-radio-3"
+                              type="checkbox"
+                              name="default-radio"
+                              className={`appearance-none w-4 h-4 rounded-full ${
+                                chatUser.delete24View && "bg-blue-600"
+                              } border-2 cursor-pointer`}
+                              onChange={(e) =>
+                                handleDeleteChat(e, "delete24View")
+                              }
+                            />
+                            <label
+                              htmlFor="default-radio-3"
+                              className="ms-2 text-sm font-medium text-gray-700"
+                            >
+                              24hr after viewing
+                            </label>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div
@@ -448,7 +570,7 @@ export default function ChatList(): React.JSX.Element {
                     </div>
                   ))}
               </div>
-              {/* {chatUser.username && ()} */}
+
               <div className="absolute bottom-0 w-full">
                 <div className="relative w-full border-t-2 border-gray-100 p-3">
                   <input

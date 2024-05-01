@@ -158,9 +158,9 @@ export default function ChatBox({
         });
         if (res.status === 200) {
           if (currPage === 0) {
-            setChats(res.data.data.chatData);
+            setChats(res.data.data.data);
           } else {
-            setChats((prevChats) => [...prevChats, ...res.data.data.chatData]);
+            setChats((prevChats) => [...prevChats, ...res.data.data.data]);
           }
           setNextPage(res.data.data.hasNextPage);
           setSnack(res.data.message);
@@ -250,7 +250,14 @@ export default function ChatBox({
               : "offline"}
           </h4>
         </div>
-        <button className="block ml-[auto]" onClick={() => setOpenChat(false)}>
+        <button
+          className="block ml-[auto]"
+          onClick={() => {
+            setOpenChat(false);
+            socket.emit("back", { userId: userId });
+            socket.emit("typing", { userId: userId, typing: false });
+          }}
+        >
           <img
             width={20}
             src="/public/icons/close-svgrepo-com.svg"

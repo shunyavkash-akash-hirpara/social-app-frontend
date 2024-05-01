@@ -208,8 +208,6 @@ export default function SingleFeed({
   };
 
   useEffect(() => {
-    // console.log("run hook");
-
     if (openComment) {
       getComment(post._id);
     }

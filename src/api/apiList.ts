@@ -39,6 +39,7 @@ export const APIS = {
   CHAT: {
     CHATLIST: "/chat",
     CHAT: "/chat/chatMessage",
+    DELETE: "/chat",
   },
   STORY: {
     GET: "/story",

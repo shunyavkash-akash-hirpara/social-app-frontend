@@ -8,6 +8,8 @@ import useApi from "../hooks/useApi";
 import { useSnack } from "../hooks/store/useSnack";
 import { APIS } from "../api/apiList";
 import { useAuth } from "../hooks/store/useAuth";
+import ChatListItem from "./ChatListItem";
+import { socket } from "../socket";
 
 interface user {
   _id: string;
@@ -15,6 +17,7 @@ interface user {
   username: string;
   profileImg: string;
   conversationId: string;
+  unread_msg?: number;
 }
 
 interface story {
@@ -39,8 +42,6 @@ export default function RecentChat(): React.JSX.Element {
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
   const { user } = useAuth();
-
-  // console.log(storyList);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const createStory = useCallback(
@@ -90,6 +91,15 @@ export default function RecentChat(): React.JSX.Element {
       }
     }
   }, [apiCall, checkAxiosError, setSnack]);
+
+  useEffect(() => {
+    socket.on("newChatUser", (data) => {
+      setUsers((prev) => [data, ...prev]);
+    });
+    return () => {
+      socket.off("newChatUser");
+    };
+  }, []);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const recentChatList = useCallback(async () => {
@@ -264,40 +274,14 @@ export default function RecentChat(): React.JSX.Element {
               </div>
             </li>
             {users.map((people) => (
-              <li
+              <ChatListItem
+                setChatUser={setChatUser}
+                chatUser={chatUser}
+                people={people}
                 key={people._id}
-                className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group"
-              >
-                <img
-                  className="w-10 h-10 rounded-full object-cover"
-                  src={
-                    people.profileImg ||
-                    "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
-                  }
-                  alt="Rounded avatar"
-                />
-                <div className="flex flex-col text-justify">
-                  <span className="ms-3 text-sm text-gray-700">
-                    {people.username || "socialapp_user"}
-                  </span>
-                  <span className="ms-3 text-[13px] text-gray-400">
-                    {people.name}
-                  </span>
-                </div>
-                <button
-                  className="block ml-[auto]"
-                  onClick={() => {
-                    setOpenChat(true);
-                    setChatUser(people);
-                  }}
-                >
-                  <img
-                    width={25}
-                    src="/public/icons/chat-svgrepo-com.svg"
-                    alt="chat-icon"
-                  />
-                </button>
-              </li>
+                chatBox={true}
+                setOpenChat={setOpenChat}
+              />
             ))}
             {chatUser && (
               <div
