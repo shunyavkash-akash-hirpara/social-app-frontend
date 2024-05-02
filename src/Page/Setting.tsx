@@ -2,6 +2,7 @@ import React from "react";
 import { useAuth } from "../hooks/store/useAuth";
 import { Link } from "react-router-dom";
 import { socket } from "../socket";
+import NotificationIcon from "../Component/icons/NotificationIcon";
 
 export default function Setting(): React.JSX.Element {
   const { logout } = useAuth();
@@ -115,11 +116,7 @@ export default function Setting(): React.JSX.Element {
                   className="pt-2 pb-2 flex items-center"
                 >
                   <div className="bg-[#F29F4A] w-10 h-10 rounded-full flex items-center justify-center mr-2">
-                    <img
-                      className="w-7 rounded-full"
-                      src="/public/icons/notification-svgrepo-com.svg"
-                      alt="home"
-                    />
+                    <NotificationIcon className="w-7 h-7 text-white fill-[#F29F4A]" />
                   </div>
                   <h4 className="font-bold text-base text-gray-600 mb-0 mt-0">
                     Notification

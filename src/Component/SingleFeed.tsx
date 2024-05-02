@@ -37,6 +37,7 @@ import {
   WhatsappIcon,
 } from "react-share";
 import VideoPlayer from "./VideoPlayer";
+import LikeUserItem from "./LikeUserItem";
 
 interface comment {
   _id: string;
@@ -307,14 +308,14 @@ export default function SingleFeed({
                 setActiveVideoId(post.photos[swiper.activeIndex]._id)
               }
             >
-              {post.photos.map((media) => (
+              {post.photos.map((media, index) => (
                 <SwiperSlide
-                  key={media._id}
+                  key={media._id + index}
                   className="relative flex items-center justify-center flex-col"
                 >
                   {media.type === "image" ? (
                     <img
-                      className="my-3 mx-[auto] rounded-xl h-[409px] object-contain"
+                      className="my-3 mx-[auto] h-[409px] object-contain"
                       src={media.url}
                       alt="photo"
                     />
@@ -335,27 +336,55 @@ export default function SingleFeed({
           </div>
         )}
 
-        <div className="flex items-center justify-between">
-          <div className="">
+        <div className="relative flex items-center justify-between">
+          <div>
             {post.mentionedUsers?.length > 0 && (
-              <div className="flex -space-x-3 rtl:space-x-reverse">
-                {post.mentionedUsers.slice(0, 3).map((people) => (
-                  <img
-                    className="w-8 h-8 border-2 border-white rounded-full object-cover"
-                    src={people.profileImg}
-                    alt=""
-                    key={people._id}
-                  />
-                ))}
-                {post.mentionedUsers.length > 3 && (
-                  <a
-                    className="flex items-center justify-center w-8 h-8 text-xs font-medium text-white bg-primary border-2 border-white rounded-full hover:bg-pink-600"
-                    href="#"
-                  >
-                    +{post.mentionedUsers.length - 3}
-                  </a>
-                )}
-              </div>
+              <>
+                <div className="flex -space-x-3 rtl:space-x-reverse mention-avatar">
+                  {post.mentionedUsers.slice(0, 3).map((people) => (
+                    <img
+                      className="w-8 h-8 border-2 border-white rounded-full object-cover"
+                      src={people.profileImg}
+                      alt="avatar"
+                      key={people._id}
+                    />
+                  ))}
+                  {post.mentionedUsers.length > 3 && (
+                    <a
+                      className="flex items-center justify-center w-8 h-8 text-xs font-medium text-white bg-primary border-2 border-white rounded-full hover:bg-pink-600"
+                      href="#"
+                    >
+                      +{post.mentionedUsers.length - 3}
+                    </a>
+                  )}
+                  <div className="absolute bg-white border p-2 shadow-lg rounded-lg mention-user">
+                    <div className="flex flex-col">
+                      {post.mentionedUsers.map((people) => (
+                        <div key={people?._id}>
+                          <div className="flex items-center m-1">
+                            <img
+                              className="w-8 h-8 rounded-full object-cover"
+                              src={
+                                people.profileImg ||
+                                "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
+                              }
+                              alt="Rounded avatar"
+                            />
+                            <div className="flex flex-col text-justify">
+                              <span className="ms-3 text-sm text-gray-700 font-bold">
+                                {people.username || "socialapp_user"}
+                              </span>
+                              <span className="ms-3 text-[12px] text-gray-400">
+                                {people.name}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </>
             )}
           </div>
           <div>
@@ -455,32 +484,11 @@ export default function SingleFeed({
             </div>
             <div className="feed-scroll max-h-[70%] overflow-y-auto bg-white rounded-b-xl p-6 pt-2 border-t-2 border-gray-200">
               {likeList.map((likeData) => (
-                <div
+                <LikeUserItem
+                  likeData={likeData}
+                  setLikeList={setLikeList}
                   key={likeData._id}
-                  className="flex items-center justify-between p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group"
-                >
-                  <Link
-                    to={`/profile/${likeData._id}`}
-                    className="flex items-center"
-                  >
-                    <img
-                      className="w-12 h-12 rounded-full object-cover"
-                      src={likeData.user.profileImg}
-                      alt="Rounded avatar"
-                    />
-                    <div className="flex flex-col text-justify">
-                      <span className="ms-3 text-sm text-gray-700 font-bold">
-                        {likeData.user.username}
-                      </span>
-                      <span className="ms-3 text-[12px] text-gray-400">
-                        {likeData.user.name}
-                      </span>
-                    </div>
-                  </Link>
-                  <button className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold px-7 py-2 mr-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
-                    Following
-                  </button>
-                </div>
+                />
               ))}
             </div>
           </div>

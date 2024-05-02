@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSearch } from "../hooks/store/useSearch";
 import { useAuth } from "../hooks/store/useAuth";
 import SearchIcon from "./icons/SearchIcon";
+import NotificationIcon from "./icons/NotificationIcon";
 
 export default function Header({
   accessToken,
@@ -62,6 +63,12 @@ export default function Header({
           </form>
 
           <div className="md:w-auto flex items-center" id="navbar-default">
+            <Link
+              to={"/notification"}
+              className="bg-[#F29F4A] w-9 h-9 rounded-full flex items-center justify-center mr-10"
+            >
+              <NotificationIcon className="w-7 h-7 text-white fill-[#F29F4A]" />
+            </Link>
             <label className="mr-2 text-sm text-gray-700 font-bold">
               {user.username}
             </label>

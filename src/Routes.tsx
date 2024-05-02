@@ -16,6 +16,7 @@ import UserPostList from "./Page/UserPostList";
 import FriendList from "./Page/FriendList";
 import ChatList from "./Page/ChatList";
 import Layout from "./Component/Layout";
+import UnProtectedRoute from "./Component/ProtectedRoute/UnProtectedRoute";
 
 const routes = createBrowserRouter([
   {
@@ -36,7 +37,10 @@ const routes = createBrowserRouter([
       { path: "/chat", Component: ChatList },
     ],
   },
-  { path: "/auth", Component: Auth },
+  {
+    Component: UnProtectedRoute,
+    children: [{ path: "/auth", Component: Auth }],
+  },
 ]);
 
 export default function Routes(): React.JSX.Element {

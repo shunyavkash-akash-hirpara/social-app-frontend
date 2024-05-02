@@ -10,7 +10,7 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 import RecentChat from "./RecentChat";
 import { useAuth } from "../hooks/store/useAuth";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useCallRequest } from "../hooks/store/useCallRequest";
 import Draggable from "react-draggable";
 import CloseIcon from "./icons/CloseIcon";
@@ -24,7 +24,7 @@ import VideoIcon from "./icons/VideoIcon";
 import { socket } from "../socket";
 
 export default function Layout(): React.JSX.Element {
-  const { accessToken } = useAuth();
+  const { accessToken, isLoggedIn } = useAuth();
   const [currentRotate, setCurrentRotate] = useState(0);
   const [mic, setMic] = useState<boolean>(false);
   const [video, setVideo] = useState<boolean>(false);
@@ -36,7 +36,10 @@ export default function Layout(): React.JSX.Element {
   const isDraggingRef = useRef(false);
   const myMedia: LegacyRef<HTMLVideoElement> = useRef(null);
   const userMedia: LegacyRef<HTMLVideoElement> = useRef(null);
+  const navigate = useNavigate();
   // const connectionRef: LegacyRef<any> = useRef(null);
+
+  !isLoggedIn && navigate("/auth");
 
   // dragger model
   const onDrag = () => {

@@ -180,8 +180,8 @@ export default function RecentChat(): React.JSX.Element {
                       r="45"
                       fill="transparent"
                       stroke="#DE2C70"
-                      stroke-width="3"
-                      stroke-dasharray={`${
+                      strokeWidth="3"
+                      strokeDasharray={`${
                         (((2 * 22) / 7) * 45 - 4 * storyList[0]?.story.length) /
                         storyList[0]?.story.length
                       } ${storyList[0]?.story.length === 1 ? "0" : "4"}`}
@@ -237,8 +237,8 @@ export default function RecentChat(): React.JSX.Element {
                         r="45"
                         fill="transparent"
                         stroke="#DE2C70"
-                        stroke-width="3"
-                        stroke-dasharray={`${
+                        strokeWidth="3"
+                        strokeDasharray={`${
                           (((2 * 22) / 7) * 45 - 4 * item.story.length) /
                           item.story.length
                         } ${item.story.length === 1 ? "0" : "4"}`}

@@ -19,6 +19,7 @@ import SearchIcon from "./icons/SearchIcon";
 import { useAuth } from "../hooks/store/useAuth";
 import PictureIcon from "./icons/PictureIcon";
 import VideoIcon from "./icons/VideoIcon";
+import Loader from "./icons/Loader";
 
 interface FileType {
   element: Blob;
@@ -75,7 +76,7 @@ export default function Feed(): React.JSX.Element {
   const [currPage, setCurrPage] = useState<number>(0);
   const [nextPage, setNextPage] = useState<boolean>(false);
   const [mute, setMute] = useState<boolean>(true);
-  const { apiCall, checkAxiosError } = useApi();
+  const { apiCall, checkAxiosError, isLoading } = useApi();
   const { user } = useAuth();
   const { setSnack } = useSnack();
   const navigate = useNavigate();
@@ -107,6 +108,7 @@ export default function Feed(): React.JSX.Element {
     validationSchema: schema,
     initialValues: { description: "", file: [], mention: [] },
     onSubmit: async (values) => {
+      console.log(values);
       const formData = new FormData();
       Object.entries(values).forEach(([key, value]) => {
         if (value) {
@@ -243,7 +245,7 @@ export default function Feed(): React.JSX.Element {
               formik={formik}
               inputStyle="w-[494px] bg-input-primary border-none my-0 text-sm"
             />
-            <div className="absolute right-1">
+            <div className="absolute right-1 top-2">
               <InputEmoji
                 value={formik.values.description}
                 onChange={handleOnEnter}
@@ -306,9 +308,10 @@ export default function Feed(): React.JSX.Element {
                         setMention(
                           mention.filter((item) => item._id !== tag._id)
                         );
-                        formik.setFieldValue("mention", [
-                          formik.values.mention.filter((id) => id !== tag._id),
-                        ]);
+                        formik.setFieldValue(
+                          "mention",
+                          formik.values.mention.filter((id) => id !== tag._id)
+                        );
                       }}
                       className="p-1 rounded-full border-2 border-gray-700 text-gray-700"
                     >
@@ -334,7 +337,7 @@ export default function Feed(): React.JSX.Element {
                 id="post-input-file"
                 name="photos"
                 className="hidden"
-                accept=".jpg,.jpeg,.png,.mp4,.mkv"
+                accept=".jpg,.jpeg,.png,.webp,.mp4,.mkv"
                 multiple
                 onChange={(e) => {
                   const file = e.currentTarget.files;
@@ -353,17 +356,6 @@ export default function Feed(): React.JSX.Element {
               <PictureIcon className="text-[#80838a] w-[30px] h-full" />
               <span className="text-gray-500 ml-1 text-sm">Photos</span>
             </label>
-            {/* <div className="flex items-center">
-            <InputEmoji
-              value={formik.values.description}
-              onChange={handleOnEnter}
-              cleanOnEnter
-              keepOpened
-            ></InputEmoji>
-            <button className="flex flex-row items-center">
-              <span className="text-gray-500 ml-1 text-sm">Feeling</span>
-            </button>
-          </div> */}
             <div className="flex items-center">
               <button
                 className="flex flex-row items-center"
@@ -451,9 +443,10 @@ export default function Feed(): React.JSX.Element {
             )}
             <button
               type="submit"
+              disabled={isLoading}
               className="rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-sm font-bold px-7 py-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none"
             >
-              Post
+              {isLoading ? <Loader className="w-6 h-6" /> : "Post"}
             </button>
           </div>
         </form>

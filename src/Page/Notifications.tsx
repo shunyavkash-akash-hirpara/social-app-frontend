@@ -1,6 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import BackIcon from "../Component/icons/BackIcon";
 import MoreIcon from "../Component/icons/MoreIcon";
 
 const peoples = [
@@ -103,8 +101,6 @@ const peoples = [
 ];
 
 export default function Notifications(): React.JSX.Element {
-  const navigate = useNavigate();
-
   return (
     <>
       <main className="fixed w-[848px] top-[80px] left-[280px] right-[344px] mx-[auto] rounded-xl flex h-calc-screen-minus-nav">
@@ -113,13 +109,13 @@ export default function Notifications(): React.JSX.Element {
             <div className="w-full h-14 p-3 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center">
               <div className="h-full flex items-center justify-between">
                 <div className="flex flex-row items-center">
-                  <button
+                  {/* <button
                     className="w-8 mr-3 h-full place-content-center rotate-[180deg]"
                     onClick={() => navigate("/setting")}
                   >
                     <BackIcon />
-                  </button>
-                  <span className="text-lg font-bold text-white">
+                  </button> */}
+                  <span className="text-lg font-bold text-white ml-2">
                     Notification
                   </span>
                   <span className="p-2 bg-orange-400 text-sm text-white font-bold rounded-lg ml-2">

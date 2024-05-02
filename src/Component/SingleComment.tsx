@@ -148,7 +148,7 @@ export default function SingleComment({
         </div>
         <div className="flex flex-col text-justify w-[85%]">
           <Link
-            to={commentData.user && `/profile/${commentData.user._id}`}
+            to={commentData.user ? `/profile/${commentData.user._id}` : "#"}
             className="flex flex-col text-justify"
           >
             <span className="ms-3 text-sm text-gray-700 font-bold">
@@ -190,6 +190,7 @@ export default function SingleComment({
         </div>
         <div className="flex flex-col ml-3 w-[5%]">
           <button
+            disabled={!commentData.user}
             onClick={() => {
               handleCommentLike(commentData._id);
               setCommentLike(!commentLike);

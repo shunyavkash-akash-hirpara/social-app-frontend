@@ -17,7 +17,7 @@ interface MyFormikValue {
 export default function SignUp(): React.JSX.Element {
   const [serverError, setServerError] = useState<boolean>(false);
   const [serverErrorMessage, setserverErrorMessage] = useState<string>("");
-  const { apiCall, checkAxiosError } = useApi();
+  const { apiCall, checkAxiosError, isLoading } = useApi();
   const { setSnack } = useSnack();
   const navigate = useNavigate();
   // schema for yup validation
@@ -146,7 +146,10 @@ export default function SignUp(): React.JSX.Element {
         <div className="flex relative mt-2">
           <button
             type="submit"
-            className="rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-12 py-3 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none"
+            disabled={isLoading}
+            className={`${
+              isLoading && "cursor-not-allowed"
+            } rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-12 py-3 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none`}
           >
             Sign Up
           </button>

@@ -16,7 +16,7 @@ interface MyFormikValues {
 }
 
 export default function SignIn(): React.JSX.Element {
-  const { apiCall, checkAxiosError } = useApi();
+  const { apiCall, checkAxiosError, isLoading } = useApi();
   const { setSnack } = useSnack();
   const navigate = useNavigate();
   const { login, isLoggedIn } = useAuth();
@@ -119,7 +119,10 @@ export default function SignIn(): React.JSX.Element {
         <div className="flex relative">
           <button
             type="submit"
-            className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-12 py-3 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none"
+            disabled={isLoading}
+            className={`${
+              isLoading && "cursor-not-allowed"
+            }flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase px-12 py-3 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none`}
           >
             Sign In
           </button>

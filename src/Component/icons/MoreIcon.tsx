@@ -16,7 +16,7 @@ export default function MoreIcon({
       xmlns="http://www.w3.org/2000/svg"
       className={className as string}
     >
-      <g id="SVGRepo_bgCarrier" stroke-width="0" />
+      <g id="SVGRepo_bgCarrier" strokeWidth="0" />
 
       <g
         id="SVGRepo_tracerCarrier"

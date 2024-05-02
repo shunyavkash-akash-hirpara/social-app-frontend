@@ -190,6 +190,8 @@ export default function Profile(): React.JSX.Element {
                               username: user.username,
                               profileImg: user.profileImg,
                               conversationId: convId,
+                              delete24View: false,
+                              deleteAfterView: false,
                             });
                             navigate(`/chat`);
                           }}
