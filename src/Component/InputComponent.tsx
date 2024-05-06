@@ -64,15 +64,6 @@ export default function InputComponent<MyFormikValues>({
             }
           </div>
         )}
-        {/* {type === "date" && (
-          <button className="absolute top-4 right-14 flex items-center w-8 h-8">
-            <img
-              className="w-7"
-              src="/public/icons/calander-interface-icon-svgrepo-com.svg"
-              alt="calander"
-            />
-          </button>
-        )} */}
         {/* {currency && (
           <div className="absolute inset-y-0 right-0 flex items-center">
             <label htmlFor="currency" className="sr-only">

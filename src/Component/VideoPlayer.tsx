@@ -1,14 +1,8 @@
-import React, {
-  Dispatch,
-  LegacyRef,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { Dispatch, LegacyRef, SetStateAction, useEffect, useRef, useState } from "react";
 import PlayIcon from "./icons/PlayIcon";
 import MuteIcon from "./icons/MuteIcon";
 import VolumeIcon from "./icons/VolumeIcon";
+import Loader from "./icons/Loader";
 
 export default function VideoPlayer({
   src,
@@ -52,9 +46,7 @@ export default function VideoPlayer({
       const videoBounding = videoRefs.current.getBoundingClientRect();
 
       const viewHeight = e.target.clientHeight;
-      const isVisible = !(
-        videoBounding.bottom < 0 || videoBounding.top - viewHeight >= 0
-      );
+      const isVisible = !(videoBounding.bottom < 0 || videoBounding.top - viewHeight >= 0);
 
       if (isVisible && src._id === activeVideoId) {
         if (videoRefs.current.paused) {
@@ -107,43 +99,21 @@ export default function VideoPlayer({
   return (
     <div className="relative">
       {loading ? (
-        <>loading ...</>
+        <Loader className="h-[409px] text-primary" />
       ) : (
-        <video
-          ref={videoRefs}
-          onClick={videoPlayToggle}
-          className="my-3 mx-[auto] rounded-xl h-[409px] object-cover scrollArea"
-          src={src.url}
-          muted={mute}
-          autoPlay
-        ></video>
+        <video ref={videoRefs} onClick={videoPlayToggle} className="my-3 mx-[auto] rounded-xl h-[409px] object-cover scrollArea" src={src.url} muted={mute} autoPlay></video>
       )}
       {pause && (
-        <button
-          className="absolute z-10 top-[45%] left-[43%]"
-          onClick={videoPlayToggle}
-        >
-          <PlayIcon
-            className={
-              "h-10 w-10 border-transparent rounded-full bg-[#ffffffc7] p-2 text-gray-500 cursor-pointer"
-            }
-          />
+        <button className="absolute z-10 top-[45%] left-[43%]" onClick={videoPlayToggle}>
+          <PlayIcon className={"h-10 w-10 border-transparent rounded-full bg-[#ffffffc7] p-2 text-gray-500 cursor-pointer"} />
         </button>
       )}
 
       <button className="absolute top-4 right-1" onClick={videoMuteToggle}>
         {mute ? (
-          <MuteIcon
-            className={
-              "h-9 w-9 border-transparent rounded-full bg-[#ffffffc7] p-1 text-gray-500 cursor-pointer"
-            }
-          />
+          <MuteIcon className={"h-9 w-9 border-transparent rounded-full bg-[#ffffffc7] p-1 text-gray-500 cursor-pointer"} />
         ) : (
-          <VolumeIcon
-            className={
-              "h-9 w-9 border-transparent rounded-full bg-[#ffffffc7] p-1 text-gray-500 cursor-pointer"
-            }
-          />
+          <VolumeIcon className={"h-9 w-9 border-transparent rounded-full bg-[#ffffffc7] p-1 text-gray-500 cursor-pointer"} />
         )}
       </button>
     </div>

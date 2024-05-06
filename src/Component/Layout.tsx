@@ -1,10 +1,4 @@
-import React, {
-  LegacyRef,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { LegacyRef, useCallback, useEffect, useRef, useState } from "react";
 import Peer from "simple-peer";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
@@ -22,6 +16,7 @@ import ScreenIcon from "../Component/icons/ScreenIcon";
 import ShareIcon from "./icons/ShareIcon";
 import VideoIcon from "./icons/VideoIcon";
 import { socket } from "../socket";
+import HeadphoneIcon from "./icons/HeadphoneIcon";
 
 export default function Layout(): React.JSX.Element {
   const { accessToken, isLoggedIn } = useAuth();
@@ -101,14 +96,12 @@ export default function Layout(): React.JSX.Element {
   );
 
   useEffect(() => {
-    navigator.mediaDevices
-      .getUserMedia({ video: false, audio: true })
-      .then((stream) => {
-        setStream(stream);
-        if (myMedia.current) {
-          myMedia.current.srcObject = stream;
-        }
-      });
+    navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then((stream) => {
+      setStream(stream);
+      if (myMedia.current) {
+        myMedia.current.srcObject = stream;
+      }
+    });
     if (openCallModel) {
       handleCallUser(openCallModel);
     }
@@ -143,24 +136,12 @@ export default function Layout(): React.JSX.Element {
             style={{ transform: "rotate(" + currentRotate + "deg)" }}
           >
             <div className="flex items-center justify-center">
-              <img
-                className="h-8 w-8"
-                src="/public/icons/headphone-svgrepo-com.svg"
-                alt="headphone"
-              />
-              <span className="text-white text-sm font-bold ml-2">
-                invite to connect call
-              </span>
+              <HeadphoneIcon className="h-8 w-8 text-white" />
+              <span className="text-white text-sm font-bold ml-2">invite to connect call</span>
             </div>
             <div className="flex flex-col justify-center items-center mt-3">
-              <img
-                className="w-20 h-20 mb-2 rounded-lg object-cover"
-                src={callRequest.to.profileImg}
-                alt="Rounded avatar"
-              />
-              <div className="text-base text-white font-bold">
-                {callRequest.to.username}
-              </div>
+              <img className="w-20 h-20 mb-2 rounded-lg object-cover" src={callRequest.to.profileImg} alt="Rounded avatar" />
+              <div className="text-base text-white font-bold">{callRequest.to.username}</div>
             </div>
             <div className="flex items-center justify-center gap-5 mt-3">
               <div className="flex flex-col">
@@ -175,15 +156,8 @@ export default function Layout(): React.JSX.Element {
                 <span className="text-white">Decline</span>
               </div>
               <div className="flex flex-col">
-                <button
-                  className="p-3 h-13 w-12 rounded-full bg-[#f88989]"
-                  onClick={callAnswer}
-                >
-                  <img
-                    className="h-6 w-6"
-                    src="/public/icons/headphone-svgrepo-com.svg"
-                    alt="headphone"
-                  />
+                <button className="p-3 h-13 w-12 rounded-full bg-[#f88989]" onClick={callAnswer}>
+                  <HeadphoneIcon className="h-6 w-6 text-white" />
                 </button>
                 <span className="text-white">Join</span>
               </div>
@@ -202,44 +176,24 @@ export default function Layout(): React.JSX.Element {
             style={{ transform: "rotate(" + currentRotate + "deg)" }}
           >
             <div className="flex items-center justify-center">
-              <img
-                className="h-8 w-8"
-                src="/public/icons/headphone-svgrepo-com.svg"
-                alt="headphone"
-              />
-              <span className="text-white text-sm font-bold ml-2">
-                call with {openCallModel.from.username}
-              </span>
+              <HeadphoneIcon className="h-8 w-8 text-white" />
+              <span className="text-white text-sm font-bold ml-2">call with {openCallModel.from.username}</span>
             </div>
             <div className="flex justify-center items-center mt-3">
-              <img
-                className="w-20 h-20 mb-2 rounded-lg object-cover"
-                src={openCallModel.to.profileImg}
-                alt="Rounded avatar"
-              />
+              <img className="w-20 h-20 mb-2 rounded-lg object-cover" src={openCallModel.to.profileImg} alt="Rounded avatar" />
               <div className="relative ml-3">
-                <img
-                  className="w-20 h-20 mb-2 rounded-lg object-cover"
-                  src={openCallModel.from.profileImg}
-                  alt="Rounded avatar"
-                />
+                <img className="w-20 h-20 mb-2 rounded-lg object-cover" src={openCallModel.from.profileImg} alt="Rounded avatar" />
                 <ShareIcon className="text-white absolute h-7 w-7 p-[2px] top-0 left-0 bg-black rounded-lg" />
               </div>
             </div>
             <div className="flex items-center justify-center gap-5 mt-3">
               <div className="flex flex-col">
                 {mic ? (
-                  <button
-                    className="p-3 h-13 w-12 rounded-full bg-white"
-                    onClick={() => setMic(false)}
-                  >
+                  <button className="p-3 h-13 w-12 rounded-full bg-white" onClick={() => setMic(false)}>
                     <MicOnIcon className="w-6 h-6 text-gray-600" />
                   </button>
                 ) : (
-                  <button
-                    className="p-3 h-13 w-12 rounded-full bg-[#f88989]"
-                    onClick={() => setMic(true)}
-                  >
+                  <button className="p-3 h-13 w-12 rounded-full bg-[#f88989]" onClick={() => setMic(true)}>
                     <MicOffIcon className="w-6 h-6 text-white" />
                   </button>
                 )}
@@ -247,34 +201,19 @@ export default function Layout(): React.JSX.Element {
               </div>
               <div className="flex flex-col">
                 {video ? (
-                  <button
-                    className="p-3 h-13 w-12 rounded-full bg-white"
-                    onClick={() => setVideo(false)}
-                  >
+                  <button className="p-3 h-13 w-12 rounded-full bg-white" onClick={() => setVideo(false)}>
                     <VideoIcon className="w-6 h-6 text-gray-600" />
                   </button>
                 ) : (
-                  <button
-                    className="p-3 h-13 w-12 rounded-full bg-[#f88989]"
-                    onClick={() => setVideo(true)}
-                  >
+                  <button className="p-3 h-13 w-12 rounded-full bg-[#f88989]" onClick={() => setVideo(true)}>
                     <VideoOffIcon className="w-6 h-6 text-white" />
                   </button>
                 )}
                 <span className="text-white">video</span>
               </div>
               <div className="flex flex-col">
-                <button
-                  className={`p-3 h-13 w-12 rounded-full ${
-                    screen ? "bg-white" : "bg-[#f88989]"
-                  }`}
-                  onClick={() => setScreen(!screen)}
-                >
-                  <ScreenIcon
-                    className={`w-6 h-6 ${
-                      screen ? "text-gray-600" : "text-white"
-                    }`}
-                  />
+                <button className={`p-3 h-13 w-12 rounded-full ${screen ? "bg-white" : "bg-[#f88989]"}`} onClick={() => setScreen(!screen)}>
+                  <ScreenIcon className={`w-6 h-6 ${screen ? "text-gray-600" : "text-white"}`} />
                 </button>
                 <span className="text-white">Screen</span>
               </div>

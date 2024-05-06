@@ -1,10 +1,4 @@
-import React, {
-  LegacyRef,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { LegacyRef, useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "../hooks/store/useAuth";
 import Header from "../Component/Header";
 import Sidebar from "../Component/Sidebar";
@@ -14,6 +8,9 @@ import { APIS } from "../api/apiList";
 import useApi from "../hooks/useApi";
 import { useSnack } from "../hooks/store/useSnack";
 import { useChatUser } from "../hooks/store/useChatUser";
+import CameraIcon from "../Component/icons/CameraIcon";
+import MultipleAssetsIcon from "../Component/icons/MultipleAssetsIcon";
+import YoutubeIcon from "../Component/icons/YoutubeIcon";
 
 interface user {
   _id: string;
@@ -149,24 +146,14 @@ export default function Profile(): React.JSX.Element {
       <Sidebar />
 
       <main className="fixed w-[848px] top-[80px] left-[280px] right-[344px] mx-[auto] rounded-xl flex h-calc-screen-minus-nav">
-        <div
-          onScroll={onScroll}
-          ref={listInnerRef}
-          className="feed-scroll w-full mx-[auto] overflow-y-auto p-6 pt-0"
-        >
+        <div onScroll={onScroll} ref={listInnerRef} className="feed-scroll w-full mx-[auto] overflow-y-auto p-6 pt-0">
           <div className="bg-white rounded-xl p-6">
             {user && (
               <div className="flex items-center w-full">
-                <img
-                  className="w-40 h-40 mr-2 ml-12 rounded-full object-cover"
-                  src={user.profileImg}
-                  alt="Bordered avatar"
-                />
+                <img className="w-40 h-40 mr-2 ml-12 rounded-full object-cover" src={user.profileImg} alt="Bordered avatar" />
                 <div className="flex flex-col mx-auto items-start w-[55%]">
                   <div className="flex items-center justify-between w-full mb-3">
-                    <span className="text-lg font-bold text-gray-700">
-                      {user.username}
-                    </span>
+                    <span className="text-lg font-bold text-gray-700">{user.username}</span>
                     {id !== userId && (
                       <div className="flex">
                         <button
@@ -202,32 +189,19 @@ export default function Profile(): React.JSX.Element {
                     )}
                   </div>
                   <div className="w-full flex justify-between items-center mb-4">
-                    <Link
-                      to={`./posts`}
-                      className="text-sm font-bold text-gray-600 hover:text-gray-400"
-                    >
+                    <Link to={`./posts`} className="text-sm font-bold text-gray-600 hover:text-gray-400">
                       {user.post} posts
                     </Link>
-                    <Link
-                      to={`./friends`}
-                      className="text-sm font-bold text-gray-600 hover:text-gray-400"
-                    >
+                    <Link to={`./friends`} className="text-sm font-bold text-gray-600 hover:text-gray-400">
                       {user.followers} followers
                     </Link>
-                    <Link
-                      to={`friends`}
-                      className="text-sm font-bold text-gray-600 hover:text-gray-400"
-                    >
+                    <Link to={`friends`} className="text-sm font-bold text-gray-600 hover:text-gray-400">
                       {user.following} following
                     </Link>
                   </div>
                   <div className="flex flex-col items-start justify-center">
-                    <h3 className="text-gray-700 text-sm font-bold">
-                      {user?.name}
-                    </h3>
-                    <h4 className="text-gray-700 text-sm text-start">
-                      {user?.bio}
-                    </h4>
+                    <h3 className="text-gray-700 text-sm font-bold">{user?.name}</h3>
+                    <h4 className="text-gray-700 text-sm text-start">{user?.bio}</h4>
                   </div>
                 </div>
               </div>
@@ -237,30 +211,15 @@ export default function Profile(): React.JSX.Element {
                 {posts.map((item, index) => (
                   <Link key={index} to="./posts" className="relative">
                     {item.photos[0].type === "image" ? (
-                      <img
-                        className="h-full object-cover"
-                        src={item.photos[0].url}
-                        alt=""
-                      />
+                      <img className="h-[248px] w-[248px] object-cover" src={item.photos[0].url} alt="" />
                     ) : (
-                      <video
-                        className="h-full object-cover"
-                        src={item.photos[0].url}
-                      ></video>
+                      <video className="h-[248px] w-[248px] object-cover" src={item.photos[0].url}></video>
                     )}
 
                     {item.photos.length > 1 ? (
-                      <img
-                        className="w-5 h-5 absolute top-1 right-1"
-                        src="/public/icons/multiple-pages-empty-svgrepo-com.svg"
-                        alt=""
-                      />
+                      <MultipleAssetsIcon className="w-5 h-5 absolute top-1 right-1 text-white" />
                     ) : item.photos[0].type === "video" ? (
-                      <img
-                        className="w-5 h-5 absolute top-1 right-1"
-                        src="/public/icons/youtube-svgrepo-com.svg"
-                        alt=""
-                      />
+                      <YoutubeIcon className="w-5 h-5 absolute top-1 right-1 text-white" />
                     ) : (
                       ""
                     )}
@@ -270,15 +229,9 @@ export default function Profile(): React.JSX.Element {
             ) : (
               <div className="flex flex-col items-center justify-center border-t-2 border-gray-300 mt-10 pt-10">
                 <div className="h-18 w-18 p-3 border-2 border-gray-700 rounded-full mb-3">
-                  <img
-                    className="h-14"
-                    src="/public/icons/camera-svgrepo-com.svg"
-                    alt="post"
-                  />
+                  <CameraIcon className="h-14 w-14" />
                 </div>
-                <h2 className="text-lg font-bold text-gray-700">
-                  No Posts Yet
-                </h2>
+                <h2 className="text-lg font-bold text-gray-700">No Posts Yet</h2>
               </div>
             )}
           </div>

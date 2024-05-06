@@ -9,6 +9,7 @@ import { FormikProps, useFormik } from "formik";
 import { APIS } from "../api/apiList";
 import BackIcon from "../Component/icons/BackIcon";
 import dayjs from "dayjs";
+import CloudDownIcon from "../Component/icons/CloudDownIcon";
 
 interface MyFormikValues {
   name: string;
@@ -30,17 +31,9 @@ interface user {
 }
 
 export default function AccountDetail(): React.JSX.Element {
-  const [user, setUser] = useState<user>({
-    _id: "",
-    username: "",
-    name: "",
-    profileImg: "",
-    bio: "",
-    email: "",
-    dob: "",
-  });
+  const [user, setUser] = useState<user>();
   const [serverError, setServerError] = useState<boolean>(false);
-  const [serverErrorMessage, setserverErrorMessage] = useState<string>("");
+  const [serverErrorMessage, setserverErrorMessage] = useState<string>();
   const { userId, setUserDatail } = useAuth();
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
@@ -153,15 +146,10 @@ export default function AccountDetail(): React.JSX.Element {
           <div className="bg-white rounded-xl">
             <div className="w-full h-14 p-3 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center">
               <div className="h-full flex items-center justify-start">
-                <button
-                  className="w-8 mr-3 h-full place-content-center rotate-[180deg]"
-                  onClick={() => navigate("/setting")}
-                >
+                <button className="w-8 mr-3 h-full place-content-center rotate-[180deg]" onClick={() => navigate("/setting")}>
                   <BackIcon />
                 </button>
-                <span className="text-lg font-bold text-white">
-                  Account Details
-                </span>
+                <span className="text-lg font-bold text-white">Account Details</span>
               </div>
             </div>
             <div className="flex flex-col items-center justify-center mt-4">
@@ -178,14 +166,7 @@ export default function AccountDetail(): React.JSX.Element {
             </div>
             <form action="#" className="p-6" onSubmit={formik.handleSubmit}>
               <div className="grid grid-cols-2 gap-y-2">
-                <InputComponent<MyFormikValues>
-                  label="Name"
-                  name="name"
-                  type="text"
-                  placeholder="Name"
-                  formik={formik}
-                  inputStyle="bg-white my-2"
-                />
+                <InputComponent<MyFormikValues> label="Name" name="name" type="text" placeholder="Name" formik={formik} inputStyle="bg-white my-2" />
                 <InputComponent<MyFormikValues>
                   label="Username"
                   name="username"
@@ -196,23 +177,8 @@ export default function AccountDetail(): React.JSX.Element {
                   serverError={serverError}
                   serverErrorMessage={serverErrorMessage}
                 />
-                <InputComponent<MyFormikValues>
-                  label="Email"
-                  name="email"
-                  type="email"
-                  placeholder="Email"
-                  formik={formik}
-                  inputStyle="bg-white my-2"
-                  disabled={true}
-                />
-                <InputComponent<MyFormikValues>
-                  label="Date of Birth"
-                  name="dob"
-                  type="date"
-                  placeholder="Date of Birth"
-                  formik={formik}
-                  inputStyle="bg-white color-black my-2"
-                />
+                <InputComponent<MyFormikValues> label="Email" name="email" type="email" placeholder="Email" formik={formik} inputStyle="bg-white my-2" disabled={true} />
+                <InputComponent<MyFormikValues> label="Date of Birth" name="dob" type="date" placeholder="Date of Birth" formik={formik} inputStyle="bg-white color-black my-2" />
               </div>
               <div className="my-6 mx-12">
                 <input
@@ -222,37 +188,19 @@ export default function AccountDetail(): React.JSX.Element {
                   className="hidden"
                   accept=".jpg,.jpeg,.png"
                   onChange={(e) => {
-                    const file =
-                      e.currentTarget.files && e.currentTarget.files[0];
+                    const file = e.currentTarget.files && e.currentTarget.files[0];
                     if (file) {
                       formik.setFieldValue("profileImg", file);
                     }
                   }}
                 />
-                <label
-                  htmlFor="profile-upload"
-                  className="h-40 border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer"
-                >
-                  <img
-                    className="w-10 h-10 mb-3"
-                    src="/public/icons/cloud-down-svgrepo-com.svg"
-                    alt="upload"
-                  />
-                  <span className="text-gray-600 font-bold text-sm">
-                    Upload your profile image
-                  </span>
+                <label htmlFor="profile-upload" className="h-40 border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer">
+                  <CloudDownIcon className="w-10 h-10 mb-3 text-gray-600" />
+                  <span className="text-gray-600 font-bold text-sm">Upload your profile image</span>
                 </label>
               </div>
               <div className="mx-12 mb-6 place-content-start">
-                <InputComponent<MyFormikValues>
-                  label="Description"
-                  name="bio"
-                  type="text"
-                  placeholder="Description"
-                  formik={formik}
-                  inputStyle="bg-white my-2 w-full"
-                  labelStyle="w-full"
-                />
+                <InputComponent<MyFormikValues> label="Description" name="bio" type="text" placeholder="Description" formik={formik} inputStyle="bg-white my-2 w-full" labelStyle="w-full" />
               </div>
               <button
                 type="submit"

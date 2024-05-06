@@ -45,4 +45,12 @@ export const APIS = {
     GET: "/story",
     POST: "/story",
   },
+  NOTIFICATION: {
+    GET: "/notification",
+    COUNT: "/notification/count",
+  },
+  SETTING: {
+    GET: "/setting",
+    PATCH: "/setting",
+  },
 };

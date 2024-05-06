@@ -1,10 +1,4 @@
-import React, {
-  LegacyRef,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { LegacyRef, useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SearchIcon from "../Component/icons/SearchIcon";
 import BackIcon from "../Component/icons/BackIcon";
@@ -26,6 +20,7 @@ import { useOnCall } from "../hooks/store/useOnCall";
 import { useChatUser } from "../hooks/store/useChatUser";
 import ChatListItem from "../Component/ChatListItem";
 import MoreIcon from "../Component/icons/MoreIcon";
+import CallIcon from "../Component/icons/CallIcon";
 dayjs.extend(duration);
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -163,15 +158,7 @@ export default function ChatList(): React.JSX.Element {
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    const dayOfWeek = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
+    const dayOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
     // If the date is within the last week, return the day of the week
     const modDate = new Date(date).getDate();
@@ -202,9 +189,7 @@ export default function ChatList(): React.JSX.Element {
         method: "get",
       });
       if (res.status === 200) {
-        const allReadyUser = res.data.data.find(
-          (x) => x._id === newChatUser?._id
-        );
+        const allReadyUser = res.data.data.find((x) => x._id === newChatUser?._id);
         if (newChatUser && !allReadyUser) {
           setUsers([newChatUser, ...res.data.data]);
         } else {
@@ -270,14 +255,7 @@ export default function ChatList(): React.JSX.Element {
         }
       }
     }
-  }, [
-    apiCall,
-    chatUser?.conversationId,
-    checkAxiosError,
-    currPage,
-    nextPage,
-    setSnack,
-  ]);
+  }, [apiCall, chatUser?.conversationId, checkAxiosError, currPage, nextPage, setSnack]);
 
   const deleteChats = useCallback(
     async (deleteType: number) => {
@@ -337,10 +315,7 @@ export default function ChatList(): React.JSX.Element {
           <div className="w-[35%] bg-white rounded-xl flex flex-col h-calc-for-chatList">
             <div className="w-full h-14 p-3 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center">
               <div className="h-full flex items-center justify-start">
-                <button
-                  className="w-8 mr-3 h-full place-content-center rotate-[180deg]"
-                  onClick={() => navigate("/")}
-                >
+                <button className="w-8 mr-3 h-full place-content-center rotate-[180deg]" onClick={() => navigate("/")}>
                   <BackIcon />
                 </button>
                 <span className="text-lg font-bold text-white">Chat</span>
@@ -361,14 +336,7 @@ export default function ChatList(): React.JSX.Element {
             </div>
             <div className="overflow-y-auto feed-scroll rounded-b-xl m-y">
               {users.map((people) => (
-                <ChatListItem
-                  setChatUser={setChatUser}
-                  chatUser={chatUser}
-                  people={people}
-                  setChats={setChats}
-                  setTyping={setTyping}
-                  key={people._id}
-                />
+                <ChatListItem setChatUser={setChatUser} chatUser={chatUser} people={people} setChats={setChats} setTyping={setTyping} key={people._id} />
               ))}
             </div>
           </div>
@@ -376,13 +344,7 @@ export default function ChatList(): React.JSX.Element {
             <div className="relative h-calc-for-chatList w-[62%] rounded-xl bg-white">
               <div className="w-full h-14 p-3 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center flex items-center justify-between">
                 <div className="h-full flex items-center justify-start">
-                  <Link
-                    to={
-                      !chatUser.username
-                        ? undefined
-                        : `/profile/${chatUser._id}`
-                    }
-                  >
+                  <Link to={!chatUser.username ? undefined : `/profile/${chatUser._id}`}>
                     <img
                       className="w-10 h-10 rounded-full object-cover"
                       src={
@@ -393,21 +355,10 @@ export default function ChatList(): React.JSX.Element {
                     />
                   </Link>
                   <div className="flex flex-col text-justify">
-                    <Link
-                      to={
-                        !chatUser.username
-                          ? undefined
-                          : `/profile/${chatUser._id}`
-                      }
-                      className="ms-3 text-sm text-white font-bold"
-                    >
+                    <Link to={!chatUser.username ? undefined : `/profile/${chatUser._id}`} className="ms-3 text-sm text-white font-bold">
                       {chatUser.username || "socialapp_user"}
                     </Link>
-                    {onlineUsers.includes(chatUser._id.toString()) && (
-                      <span className="ms-3 text-sm text-white">
-                        {typing ? "typing" : "online"}
-                      </span>
-                    )}
+                    {onlineUsers.includes(chatUser._id.toString()) && <span className="ms-3 text-sm text-white">{typing ? "typing" : "online"}</span>}
                   </div>
                 </div>
                 <div>
@@ -430,16 +381,9 @@ export default function ChatList(): React.JSX.Element {
                     className="w-8 h-8 p-1 rounded-lg"
                     disabled={!chatUser.username}
                   >
-                    <img
-                      className="w-8"
-                      src="/public/icons/phone-call-svgrepo-com.svg"
-                      alt="read"
-                    />
+                    <CallIcon className="w-6 h-6 text-white" />
                   </button>
-                  <button
-                    className="w-8 h-8 p-1 rounded-lg ml-2"
-                    disabled={!chatUser.username}
-                  >
+                  <button className="w-8 h-8 p-1 rounded-lg ml-2" disabled={!chatUser.username}>
                     <VideoIcon className="w-8 h-full text-white" />
                   </button>
                   <button
@@ -452,35 +396,21 @@ export default function ChatList(): React.JSX.Element {
                       setOpenMorePopup(true);
                     }}
                   >
-                    <MoreIcon
-                      className="w-8 h-full stroke-2 text-white"
-                      radius={2}
-                    />
+                    <MoreIcon className="w-8 h-full stroke-2 text-white" radius={2} />
                     {/* <!-- Dropdown menu --> */}
                   </button>
                   <div>
-                    <div
-                      id="dropdownDefaultRadio"
-                      className={`absolute z-10 ${
-                        !openMorePopup && "hidden"
-                      } w-48 bg-white divide-y divide-gray-100 rounded-lg shadow`}
-                    >
+                    <div id="dropdownDefaultRadio" className={`absolute z-10 ${!openMorePopup && "hidden"} w-48 bg-white divide-y divide-gray-100 rounded-lg shadow`}>
                       <div
                         className="fixed inset-0 -z-10"
                         onClick={() => {
                           setOpenMorePopup(false);
                         }}
                       ></div>
-                      <ul
-                        className="p-3 space-y-3 text-sm text-gray-700 cursor-default"
-                        aria-labelledby="dropdownRadioButton"
-                      >
+                      <ul className="p-3 space-y-3 text-sm text-gray-700 cursor-default" aria-labelledby="dropdownRadioButton">
                         <li>
                           <div className="flex items-center">
-                            <button
-                              className="ms-2 text-sm font-medium text-gray-700"
-                              onClick={(e) => handleDeleteChat(e, "deleteChat")}
-                            >
+                            <button className="ms-2 text-sm font-medium text-gray-700" onClick={(e) => handleDeleteChat(e, "deleteChat")}>
                               Delete chat
                             </button>
                           </div>
@@ -492,17 +422,10 @@ export default function ChatList(): React.JSX.Element {
                               id="default-radio-2"
                               type="checkbox"
                               name="default-radio"
-                              className={`appearance-none w-4 h-4 rounded-full ${
-                                chatUser.deleteAfterView && "bg-blue-600"
-                              } border-2 cursor-pointer`}
-                              onChange={(e) =>
-                                handleDeleteChat(e, "deleteAfterView")
-                              }
+                              className={`appearance-none w-4 h-4 rounded-full ${chatUser.deleteAfterView && "bg-blue-600"} border-2 cursor-pointer`}
+                              onChange={(e) => handleDeleteChat(e, "deleteAfterView")}
                             />
-                            <label
-                              htmlFor="default-radio-2"
-                              className="ms-2 text-sm font-medium text-gray-700"
-                            >
+                            <label htmlFor="default-radio-2" className="ms-2 text-sm font-medium text-gray-700">
                               After viewing
                             </label>
                           </div>
@@ -514,17 +437,10 @@ export default function ChatList(): React.JSX.Element {
                               id="default-radio-3"
                               type="checkbox"
                               name="default-radio"
-                              className={`appearance-none w-4 h-4 rounded-full ${
-                                chatUser.delete24View && "bg-blue-600"
-                              } border-2 cursor-pointer`}
-                              onChange={(e) =>
-                                handleDeleteChat(e, "delete24View")
-                              }
+                              className={`appearance-none w-4 h-4 rounded-full ${chatUser.delete24View && "bg-blue-600"} border-2 cursor-pointer`}
+                              onChange={(e) => handleDeleteChat(e, "delete24View")}
                             />
-                            <label
-                              htmlFor="default-radio-3"
-                              className="ms-2 text-sm font-medium text-gray-700"
-                            >
+                            <label htmlFor="default-radio-3" className="ms-2 text-sm font-medium text-gray-700">
                               24hr after viewing
                             </label>
                           </div>
@@ -534,37 +450,22 @@ export default function ChatList(): React.JSX.Element {
                   </div>
                 </div>
               </div>
-              <div
-                onScroll={onScroll}
-                ref={listInnerRef}
-                className="h-calc-for-chats w-full p-3 feed-scroll overflow-y-auto flex flex-col-reverse"
-              >
+              <div onScroll={onScroll} ref={listInnerRef} className="h-calc-for-chats w-full p-3 feed-scroll overflow-y-auto flex flex-col-reverse">
                 {chats.length > 0 &&
                   chats.map((chat, index, array) => (
                     <div key={index}>
-                      {getDayLabel(array[index + 1]?.createdAt) !==
-                        getDayLabel(chat.createdAt) && (
-                        <div className="rounded-xl border-transparent bg-gray-200 text-gray-600 py-1 px-2 text-xs w-fit mx-auto">
-                          {getDayLabel(chat.createdAt)}
-                        </div>
+                      {getDayLabel(array[index + 1]?.createdAt) !== getDayLabel(chat.createdAt) && (
+                        <div className="rounded-xl border-transparent bg-gray-200 text-gray-600 py-1 px-2 text-xs w-fit mx-auto">{getDayLabel(chat.createdAt)}</div>
                       )}
                       {chat.receiver === userId ? (
                         <div className="flex flex-col items-start">
-                          <p className="text-sm text-gray-700 bg-[#E2EFFF] px-5 py-[10px] rounded-t-2xl rounded-r-2xl max-w-[80%] text-start">
-                            {chat.msg}
-                          </p>
-                          <span className="text-xs text-gray-400 my-2">
-                            {formatTime(chat.createdAt)}
-                          </span>
+                          <p className="text-sm text-gray-700 bg-[#E2EFFF] px-5 py-[10px] rounded-t-2xl rounded-r-2xl max-w-[80%] text-start">{chat.msg}</p>
+                          <span className="text-xs text-gray-400 my-2">{formatTime(chat.createdAt)}</span>
                         </div>
                       ) : (
                         <div className="flex flex-col items-end">
-                          <p className="text-sm text-gray-700 bg-[#fcf1f5] px-5 py-[10px] rounded-t-2xl rounded-l-2xl max-w-[80%] text-start">
-                            {chat.msg}
-                          </p>
-                          <span className="text-xs text-gray-400 my-2">
-                            {formatTime(chat.createdAt)}
-                          </span>
+                          <p className="text-sm text-gray-700 bg-[#fcf1f5] px-5 py-[10px] rounded-t-2xl rounded-l-2xl max-w-[80%] text-start">{chat.msg}</p>
+                          <span className="text-xs text-gray-400 my-2">{formatTime(chat.createdAt)}</span>
                         </div>
                       )}
                     </div>
@@ -586,32 +487,12 @@ export default function ChatList(): React.JSX.Element {
                     disabled={!chatUser.username}
                   />
                   <div className="absolute right-5 bottom-[20px] flex">
-                    <input
-                      disabled={!chatUser.username}
-                      type="file"
-                      id="chat-media"
-                      className="hidden"
-                    />
-                    <label
-                      htmlFor="chat-media"
-                      className="mr-2 cursor-pointer h-[30px]"
-                    >
-                      <PictureIcon
-                        className={`text-gray-400 w-[30px] h-full hover:text-gray-500 ${
-                          !chatUser.username && "cursor-not-allowed"
-                        }`}
-                      />
+                    <input disabled={!chatUser.username} type="file" id="chat-media" className="hidden" />
+                    <label htmlFor="chat-media" className="mr-2 cursor-pointer h-[30px]">
+                      <PictureIcon className={`text-gray-400 w-[30px] h-full hover:text-gray-500 ${!chatUser.username && "cursor-not-allowed"}`} />
                     </label>
-                    <button
-                      className="h-[30px]"
-                      onClick={handleSendMessage}
-                      disabled={!chatUser.username}
-                    >
-                      <ShareIcon
-                        className={`text-gray-400 w-[30px] h-full hover:text-gray-500 ${
-                          !chatUser.username && "cursor-not-allowed"
-                        }`}
-                      />
+                    <button className="h-[30px]" onClick={handleSendMessage} disabled={!chatUser.username}>
+                      <ShareIcon className={`text-gray-400 w-[30px] h-full hover:text-gray-500 ${!chatUser.username && "cursor-not-allowed"}`} />
                     </button>
                   </div>
                 </div>

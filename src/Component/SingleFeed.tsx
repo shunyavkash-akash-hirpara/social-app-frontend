@@ -1,12 +1,4 @@
-import React, {
-  Dispatch,
-  LegacyRef,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { Dispatch, LegacyRef, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import LikeIcon from "./icons/LikeIcon";
 import CloseIcon from "./icons/CloseIcon";
@@ -38,6 +30,8 @@ import {
 } from "react-share";
 import VideoPlayer from "./VideoPlayer";
 import LikeUserItem from "./LikeUserItem";
+import CommentIcon from "./icons/CommentIcon";
+import ShareArrowIcon from "./icons/ShareArrowIcon";
 
 interface comment {
   _id: string;
@@ -98,9 +92,7 @@ export default function SingleFeed({
   const [currPage, setCurrPage] = useState<number>(0);
   const [nextPage, setNextPage] = useState<boolean>(false);
   const [openShare, setOpenShare] = useState<boolean>(false);
-  const [activeVideoId, setActiveVideoId] = useState<string>(
-    post.photos[0]._id
-  );
+  const [activeVideoId, setActiveVideoId] = useState<string>(post.photos[0]._id);
   const { user } = useAuth();
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
@@ -156,10 +148,7 @@ export default function SingleFeed({
             if (currPage === 0) {
               setCommentList(res.data.data.comment);
             } else {
-              setCommentList((prevComments) => [
-                ...prevComments,
-                ...res.data.data.comment,
-              ]);
+              setCommentList((prevComments) => [...prevComments, ...res.data.data.comment]);
             }
             setNextPage(res.data.data.hasNextPage);
             setSnack(res.data.message);
@@ -227,10 +216,7 @@ export default function SingleFeed({
             if (currPage === 0) {
               setLikeList(res.data.data.getLike);
             } else {
-              setLikeList((prevComments) => [
-                ...prevComments,
-                ...res.data.data.getLike,
-              ]);
+              setLikeList((prevComments) => [...prevComments, ...res.data.data.getLike]);
             }
             setNextPage(res.data.data.hasNextPage);
             setSnack(res.data.message);
@@ -246,11 +232,7 @@ export default function SingleFeed({
     [apiCall, checkAxiosError, currPage, nextPage, setSnack]
   );
 
-  const handleKeyPress = (
-    e: React.KeyboardEvent<HTMLInputElement>,
-    postId: string,
-    commentId?: string
-  ) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>, postId: string, commentId?: string) => {
     if (e.key === "Enter") {
       handleComment(postId, commentId);
     }
@@ -277,57 +259,28 @@ export default function SingleFeed({
             />
           </Link>
           <div className="flex flex-col text-justify">
-            <Link
-              to={`/profile/${post.user._id}`}
-              className="ms-3 text-sm text-gray-600 font-bold"
-            >
+            <Link to={`/profile/${post.user._id}`} className="ms-3 text-sm text-gray-600 font-bold">
               {post.user.username || "social_user"}
             </Link>
-            <span className="ms-3 text-sm text-gray-400">
-              {post.user.city && post.user.country
-                ? post.user.city + ", " + post.user.country
-                : "India"}
-            </span>
+            <span className="ms-3 text-sm text-gray-400">{post.user.city && post.user.country ? post.user.city + ", " + post.user.country : "India"}</span>
           </div>
         </div>
         {post.description && (
           <div className="mt-2 w-full">
-            <p className="text-start text-sm text-gray-700">
-              {post.description}
-            </p>
+            <p className="text-start text-sm text-gray-700">{post.description}</p>
           </div>
         )}
 
         {post.photos.length > 0 && (
           <div className="feed-scroll w-full h-full overflow-y-auto">
-            <Swiper
-              pagination={{ clickable: true }}
-              modules={[Pagination]}
-              className="swiper"
-              onSlideChange={(swiper) =>
-                setActiveVideoId(post.photos[swiper.activeIndex]._id)
-              }
-            >
+            <Swiper pagination={{ clickable: true }} modules={[Pagination]} className="swiper" onSlideChange={(swiper) => setActiveVideoId(post.photos[swiper.activeIndex]._id)}>
               {post.photos.map((media, index) => (
-                <SwiperSlide
-                  key={media._id + index}
-                  className="relative flex items-center justify-center flex-col"
-                >
+                <SwiperSlide key={media._id + index} className="relative flex items-center justify-center flex-col">
                   {media.type === "image" ? (
-                    <img
-                      className="my-3 mx-[auto] h-[409px] object-contain"
-                      src={media.url}
-                      alt="photo"
-                    />
+                    <img className="my-3 mx-[auto] h-[409px] object-contain" src={media.url} alt="photo" />
                   ) : (
                     <>
-                      <VideoPlayer
-                        src={media}
-                        activeVideoId={activeVideoId}
-                        activeFeed={activeFeed.toString() === post._id}
-                        setMute={setMute}
-                        mute={mute}
-                      />
+                      <VideoPlayer src={media} activeVideoId={activeVideoId} activeFeed={activeFeed.toString() === post._id} setMute={setMute} mute={mute} />
                     </>
                   )}
                 </SwiperSlide>
@@ -342,18 +295,10 @@ export default function SingleFeed({
               <>
                 <div className="flex -space-x-3 rtl:space-x-reverse mention-avatar">
                   {post.mentionedUsers.slice(0, 3).map((people) => (
-                    <img
-                      className="w-8 h-8 border-2 border-white rounded-full object-cover"
-                      src={people.profileImg}
-                      alt="avatar"
-                      key={people._id}
-                    />
+                    <img className="w-8 h-8 border-2 border-white rounded-full object-cover" src={people.profileImg} alt="avatar" key={people._id} />
                   ))}
                   {post.mentionedUsers.length > 3 && (
-                    <a
-                      className="flex items-center justify-center w-8 h-8 text-xs font-medium text-white bg-primary border-2 border-white rounded-full hover:bg-pink-600"
-                      href="#"
-                    >
+                    <a className="flex items-center justify-center w-8 h-8 text-xs font-medium text-white bg-primary border-2 border-white rounded-full hover:bg-pink-600" href="#">
                       +{post.mentionedUsers.length - 3}
                     </a>
                   )}
@@ -371,12 +316,8 @@ export default function SingleFeed({
                               alt="Rounded avatar"
                             />
                             <div className="flex flex-col text-justify">
-                              <span className="ms-3 text-sm text-gray-700 font-bold">
-                                {people.username || "socialapp_user"}
-                              </span>
-                              <span className="ms-3 text-[12px] text-gray-400">
-                                {people.name}
-                              </span>
+                              <span className="ms-3 text-sm text-gray-700 font-bold">{people.username || "socialapp_user"}</span>
+                              <span className="ms-3 text-[12px] text-gray-400">{people.name}</span>
                             </div>
                           </div>
                         </div>
@@ -388,16 +329,10 @@ export default function SingleFeed({
             )}
           </div>
           <div>
-            <button
-              className="text-gray-500 text-sm mr-6 cursor-pointer"
-              onClick={() => post.comment > 0 && setOpenComment(true)}
-            >
+            <button className="text-gray-500 text-sm mr-6 cursor-pointer" onClick={() => post.comment > 0 && setOpenComment(true)}>
               {post.comment} Comments
             </button>
-            <button
-              className="text-gray-500 ml-1 text-sm cursor-pointer"
-              onClick={() => post.like > 0 && setOpenLike(true)}
-            >
+            <button className="text-gray-500 ml-1 text-sm cursor-pointer" onClick={() => post.like > 0 && setOpenLike(true)}>
               {post.like} Likes
             </button>
           </div>
@@ -419,22 +354,11 @@ export default function SingleFeed({
               document.getElementById(`${post._id}`).focus();
             }}
           >
-            <img
-              width={25}
-              src="/public/icons/comment-1-svgrepo-com.svg"
-              alt="comment"
-            />
+            <CommentIcon className="w-7 h-7 text-gray-500" />
             <span className="text-gray-500 ml-1 text-sm">Comments</span>
           </button>
-          <button
-            className="flex flex-row items-center"
-            onClick={() => setOpenShare(true)}
-          >
-            <img
-              width={25}
-              src="/public/icons/share-arrow-svgrepo-com.svg"
-              alt="share"
-            />
+          <button className="flex flex-row items-center" onClick={() => setOpenShare(true)}>
+            <ShareArrowIcon className="w-6 h-6 text-gray-500" />
             <span className="text-gray-500 ml-1 text-sm">Share</span>
           </button>
         </div>
@@ -474,21 +398,14 @@ export default function SingleFeed({
         <div className="w-full h-full relative flex justify-center">
           <div className="h-full absolute top-[100px] w-[580px]">
             <div className="relative w-full text-base font-bold text-gray-700 bg-white rounded-t-xl p-6 pb-2">
-              <button
-                className="p-1 rounded-xl border-2 border-grey text-gray-400 absolute right-2 top-3"
-                onClick={() => setOpenLike(false)}
-              >
+              <button className="p-1 rounded-xl border-2 border-grey text-gray-400 absolute right-2 top-3" onClick={() => setOpenLike(false)}>
                 <CloseIcon className="w-6 h-6"></CloseIcon>
               </button>
               <h2>Likes</h2>
             </div>
             <div className="feed-scroll max-h-[70%] overflow-y-auto bg-white rounded-b-xl p-6 pt-2 border-t-2 border-gray-200">
               {likeList.map((likeData) => (
-                <LikeUserItem
-                  likeData={likeData}
-                  setLikeList={setLikeList}
-                  key={likeData._id}
-                />
+                <LikeUserItem likeData={likeData} setLikeList={setLikeList} key={likeData._id} />
               ))}
             </div>
           </div>
@@ -500,26 +417,14 @@ export default function SingleFeed({
         <div className="w-full h-full relative flex justify-center">
           <div className="h-full absolute top-[100px] w-[580px]">
             <div className="relative w-full text-base font-bold text-gray-700 bg-white rounded-t-xl p-6 pb-2">
-              <button
-                className="p-1 rounded-xl border-2 border-grey text-gray-400 absolute right-2 top-3"
-                onClick={() => setOpenComment(false)}
-              >
+              <button className="p-1 rounded-xl border-2 border-grey text-gray-400 absolute right-2 top-3" onClick={() => setOpenComment(false)}>
                 <CloseIcon className="w-6 h-6"></CloseIcon>
               </button>
               <h2>Comments</h2>
             </div>
-            <div
-              onScroll={onScroll}
-              ref={listInnerRef}
-              className="feed-scroll max-h-[70%] overflow-y-auto bg-white p-6 pt-2 border-t-2 border-gray-200"
-            >
+            <div onScroll={onScroll} ref={listInnerRef} className="feed-scroll max-h-[70%] overflow-y-auto bg-white p-6 pt-2 border-t-2 border-gray-200">
               {commentList.map((commentData) => (
-                <SingleComment
-                  openComment={openComment}
-                  commentData={commentData}
-                  setComment={setComment}
-                  key={commentData._id}
-                />
+                <SingleComment openComment={openComment} commentData={commentData} setComment={setComment} key={commentData._id} />
               ))}
             </div>
             <div className="bg-white rounded-b-xl px-3 py-2 border-t-2 border-gray-200 flex justify-between">
@@ -531,10 +436,7 @@ export default function SingleFeed({
                 onKeyDown={(e) => handleKeyPress(e, post._id, comment.id)}
                 value={comment.text}
               />
-              <button
-                className="bg-[#f48bb34c] py-1 pl-1 pr-2 rounded-xl"
-                onClick={() => handleComment(post._id, comment.id)}
-              >
+              <button className="bg-[#f48bb34c] py-1 pl-1 pr-2 rounded-xl" onClick={() => handleComment(post._id, comment.id)}>
                 <ShareIcon className="text-[#DE2C70] w-[35px] h-full transform rotate-[30deg]" />
               </button>
             </div>
@@ -547,10 +449,7 @@ export default function SingleFeed({
         <div className="w-full h-full relative flex justify-center items-center">
           <div className="w-auto">
             <div className="relative w-full text-base font-bold text-gray-700 bg-white rounded-t-xl p-6 pb-2">
-              <button
-                className="p-1 rounded-xl border-2 border-grey text-gray-400 absolute right-2 top-3"
-                onClick={() => setOpenShare(false)}
-              >
+              <button className="p-1 rounded-xl border-2 border-grey text-gray-400 absolute right-2 top-3" onClick={() => setOpenShare(false)}>
                 <CloseIcon className="w-6 h-6"></CloseIcon>
               </button>
               <h2>Share</h2>

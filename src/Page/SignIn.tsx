@@ -9,6 +9,8 @@ import { APIS } from "../api/apiList";
 import { useAuth } from "../hooks/store/useAuth";
 import { socket } from "../socket";
 import { useSocket } from "../hooks/store/useSocket";
+import FacebookIcon from "../Component/icons/FacebookIcon";
+import GoogleIcon from "../Component/icons/GoogleIcon";
 
 interface MyFormikValues {
   email: string;
@@ -38,16 +40,7 @@ export default function SignIn(): React.JSX.Element {
           data: JSON.stringify(values, null, 2),
         });
         if (res.status === 200) {
-          const {
-            username,
-            name,
-            email,
-            role,
-            profileImg,
-            mobileNumber,
-            accessToken,
-            _id,
-          } = res.data.data;
+          const { username, name, email, role, profileImg, mobileNumber, accessToken, _id } = res.data.data;
           login({
             user: { username, name, email, role, mobileNumber, profileImg },
             accessToken: accessToken,
@@ -71,48 +64,19 @@ export default function SignIn(): React.JSX.Element {
   });
   return (
     <div className="absolute top-0 h-full transition-all duration-600 ease-in-out left-0 w-1/2 z-2">
-      <form
-        onSubmit={formik.handleSubmit}
-        className="bg-white flex items-center justify-center flex-col px-10 h-full text-center"
-      >
-        <h1 className="font-bold m-0">Sign in</h1>
+      <form onSubmit={formik.handleSubmit} className="bg-white flex items-center justify-center flex-col px-10 h-full text-center">
+        <h1 className="font-bold m-0 text-gray-700">Sign in</h1>
         <div className="my-5">
-          <a
-            href="#"
-            className="text-gray-700 text-base no-underline my-4 border border-gray-300 rounded-full inline-flex justify-center items-center m-1 h-10 w-10"
-          >
-            <img
-              height={20}
-              width={20}
-              src="/public/icons/facebook-svgrepo-com.svg"
-            />
+          <a href="#" className="text-gray-700 text-base no-underline my-4 border border-gray-300 rounded-full inline-flex justify-center items-center m-1 h-10 w-10">
+            <FacebookIcon className="w-5 h-5 text-gray-800" />
           </a>
-          <a
-            href="#"
-            className="text-gray-700 text-base no-underline my-4 border border-gray-300 rounded-full inline-flex justify-center items-center m-1 h-10 w-10"
-          >
-            <img
-              height={20}
-              width={20}
-              src="/public/icons/google-svgrepo-com.svg"
-            />
+          <a href="#" className="text-gray-700 text-base no-underline my-4 border border-gray-300 rounded-full inline-flex justify-center items-center m-1 h-10 w-10">
+            <GoogleIcon className="w-5 h-5 text-gray-800" />
           </a>
         </div>
         <span className="text-xs">or use your account</span>
-        <InputComponent<MyFormikValues>
-          name="email"
-          type="email"
-          placeholder="Email"
-          formik={formik}
-          inputStyle="bg-white my-2"
-        />
-        <InputComponent<MyFormikValues>
-          name="password"
-          type="password"
-          placeholder="Password"
-          formik={formik}
-          inputStyle="bg-white my-2"
-        />
+        <InputComponent<MyFormikValues> name="email" type="email" placeholder="Email" formik={formik} inputStyle="bg-white my-2" />
+        <InputComponent<MyFormikValues> name="password" type="password" placeholder="Password" formik={formik} inputStyle="bg-white my-2" />
         <a href="#" className="text-gray-700 text-base no-underline my-4">
           Forgot your password?
         </a>
@@ -126,15 +90,6 @@ export default function SignIn(): React.JSX.Element {
           >
             Sign In
           </button>
-          {/* <a href="#" className="flex p-2 absolute left-[115%]">
-            skip
-            <img
-              height={30}
-              width={30}
-              src="/public/icons/right-arrow-svgrepo-com.svg"
-              className="px-2"
-            />
-          </a> */}
         </div>
       </form>
     </div>

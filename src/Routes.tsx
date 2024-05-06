@@ -17,6 +17,7 @@ import FriendList from "./Page/FriendList";
 import ChatList from "./Page/ChatList";
 import Layout from "./Component/Layout";
 import UnProtectedRoute from "./Component/ProtectedRoute/UnProtectedRoute";
+import NotificationManage from "./Page/NotificationManage";
 
 const routes = createBrowserRouter([
   {
@@ -29,6 +30,7 @@ const routes = createBrowserRouter([
       { path: "/social", Component: SocialDetail },
       { path: "/change-password", Component: ChangePassword },
       { path: "/notification", Component: Notifications },
+      { path: "/manage-notification", Component: NotificationManage },
       { path: "/delete-my-account", Component: DeleteMyAccount },
       { path: "/profile/:id", Component: Profile },
       { path: "/search", Component: SearchPage },

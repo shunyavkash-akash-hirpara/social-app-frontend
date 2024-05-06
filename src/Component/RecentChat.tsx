@@ -10,6 +10,7 @@ import { APIS } from "../api/apiList";
 import { useAuth } from "../hooks/store/useAuth";
 import ChatListItem from "./ChatListItem";
 import { socket } from "../socket";
+import PlusIcon from "./icons/PlusIcon";
 
 interface user {
   _id: string;
@@ -154,26 +155,14 @@ export default function RecentChat(): React.JSX.Element {
   }, [recentChatList, search, searchUser]);
   return (
     <>
-      <aside
-        id="separator-sidebar"
-        className="fixed top-14 right-0 w-80 h-screen sm:translate-x-0 border-t-2 border-[#F6F5F7]"
-        aria-label="Sidebar"
-      >
+      <aside id="separator-sidebar" className="fixed top-14 right-0 w-80 h-screen sm:translate-x-0 border-t-2 border-[#F6F5F7]" aria-label="Sidebar">
         <div className="h-full px-4 py-4 overflow-y-auto bg-white">
           <Swiper className="swiper" spaceBetween={3} slidesPerView={4}>
             <SwiperSlide className="relative flex items-center justify-center flex-col pt-1">
               <button onClick={() => setOpenStory(true)}>
-                <img
-                  className="w-14 h-14 rounded-full object-cover"
-                  src={user.profileImg}
-                  alt="Bordered avatar"
-                />
+                <img className="w-14 h-14 rounded-full object-cover" src={user.profileImg} alt="Bordered avatar" />
                 {storyList[0]?.loginUser && (
-                  <svg
-                    viewBox="0 0 100 100"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="absolute -top-[3px] left-0"
-                  >
+                  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="absolute -top-[3px] left-0">
                     <circle
                       cx="50"
                       cy="50"
@@ -181,10 +170,7 @@ export default function RecentChat(): React.JSX.Element {
                       fill="transparent"
                       stroke="#DE2C70"
                       strokeWidth="3"
-                      strokeDasharray={`${
-                        (((2 * 22) / 7) * 45 - 4 * storyList[0]?.story.length) /
-                        storyList[0]?.story.length
-                      } ${storyList[0]?.story.length === 1 ? "0" : "4"}`}
+                      strokeDasharray={`${(((2 * 22) / 7) * 45 - 4 * storyList[0]?.story.length) / storyList[0]?.story.length} ${storyList[0]?.story.length === 1 ? "0" : "4"}`}
                     />
                   </svg>
                 )}
@@ -202,12 +188,7 @@ export default function RecentChat(): React.JSX.Element {
                     }
                   }}
                 />
-                <img
-                  className="border-2 rounded-full bg-white absolute bottom-5 left-7 cursor-pointer"
-                  width={18}
-                  src="/public/icons/plus-large-svgrepo-com.svg"
-                  alt="plus-icon"
-                />
+                <PlusIcon className="w-4 h-4 text-primary border-2 rounded-full bg-white absolute bottom-5 left-7 cursor-pointer" />
               </label>
               <span className="text-sm mt-2">Add</span>
             </SwiperSlide>
@@ -216,21 +197,10 @@ export default function RecentChat(): React.JSX.Element {
                 return;
               }
               return (
-                <SwiperSlide
-                  className="relative flex items-center justify-center flex-col pt-1"
-                  key={item.follow_friend._id}
-                >
+                <SwiperSlide className="relative flex items-center justify-center flex-col pt-1" key={item.follow_friend._id}>
                   <button onClick={() => setOpenStory(true)}>
-                    <img
-                      className="w-14 h-14 rounded-full object-cover"
-                      src={item.follow_friend.profileImg}
-                      alt="Bordered avatar"
-                    />
-                    <svg
-                      viewBox="0 0 100 100"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="absolute -top-[3px] left-0"
-                    >
+                    <img className="w-14 h-14 rounded-full object-cover" src={item.follow_friend.profileImg} alt="Bordered avatar" />
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="absolute -top-[3px] left-0">
                       <circle
                         cx="50"
                         cy="50"
@@ -238,27 +208,18 @@ export default function RecentChat(): React.JSX.Element {
                         fill="transparent"
                         stroke="#DE2C70"
                         strokeWidth="3"
-                        strokeDasharray={`${
-                          (((2 * 22) / 7) * 45 - 4 * item.story.length) /
-                          item.story.length
-                        } ${item.story.length === 1 ? "0" : "4"}`}
+                        strokeDasharray={`${(((2 * 22) / 7) * 45 - 4 * item.story.length) / item.story.length} ${item.story.length === 1 ? "0" : "4"}`}
                       />
                     </svg>
                   </button>
-                  <span className="text-xs mt-2">
-                    {item.follow_friend.username.length > 8
-                      ? item.follow_friend.username.slice(0, 8) + "..."
-                      : item.follow_friend.username}
-                  </span>
+                  <span className="text-xs mt-2">{item.follow_friend.username.length > 8 ? item.follow_friend.username.slice(0, 8) + "..." : item.follow_friend.username}</span>
                 </SwiperSlide>
               );
             })}
           </Swiper>
           <ul className="space-y-2 font-medium">
             <li>
-              <div className="text-gray-700 font-bold text-left ml-2 mt-5 mb-2">
-                Recent Chats
-              </div>
+              <div className="text-gray-700 font-bold text-left ml-2 mt-5 mb-2">Recent Chats</div>
               <div className="relative">
                 <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                   <SearchIcon />
@@ -274,19 +235,10 @@ export default function RecentChat(): React.JSX.Element {
               </div>
             </li>
             {users.map((people) => (
-              <ChatListItem
-                setChatUser={setChatUser}
-                chatUser={chatUser}
-                people={people}
-                key={people._id}
-                chatBox={true}
-                setOpenChat={setOpenChat}
-              />
+              <ChatListItem setChatUser={setChatUser} chatUser={chatUser} people={people} key={people._id} chatBox={true} setOpenChat={setOpenChat} />
             ))}
             {chatUser && (
-              <div
-                className={`modal-popup-chat ${openChat ? "block" : "hidden"}`}
-              >
+              <div className={`modal-popup-chat ${openChat ? "block" : "hidden"}`}>
                 <ChatBox setOpenChat={setOpenChat} chatUser={chatUser} />
               </div>
             )}
@@ -295,13 +247,7 @@ export default function RecentChat(): React.JSX.Element {
       </aside>
       {openStory && (
         <div className={`modal-popup-story ${openStory ? "block" : "hidden"}`}>
-          <StoryModel
-            activeSlide={activeSlide}
-            setActiveSlide={setActiveSlide}
-            setOpenStory={setOpenStory}
-            openStory={openStory}
-            storyList={storyList}
-          />
+          <StoryModel activeSlide={activeSlide} setActiveSlide={setActiveSlide} setOpenStory={setOpenStory} openStory={openStory} storyList={storyList} />
         </div>
       )}
     </>

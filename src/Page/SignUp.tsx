@@ -6,6 +6,8 @@ import useApi from "../hooks/useApi";
 import { APIS } from "../api/apiList";
 import { useSnack } from "../hooks/store/useSnack";
 import { useNavigate } from "react-router-dom";
+import FacebookIcon from "../Component/icons/FacebookIcon";
+import GoogleIcon from "../Component/icons/GoogleIcon";
 
 interface MyFormikValue {
   name: string;
@@ -85,41 +87,18 @@ export default function SignUp(): React.JSX.Element {
   }, [apiCall, formik.values.username]);
   return (
     <div className="absolute top-0 h-full transition-all duration-600 ease-in-out left-0 w-1/2 transform translate-x-full opacity-100 z-5 animate-show">
-      <form
-        onSubmit={formik.handleSubmit}
-        className="bg-white flex items-center justify-center flex-col px-10 h-full text-center"
-      >
+      <form onSubmit={formik.handleSubmit} className="bg-white flex items-center justify-center flex-col px-10 h-full text-center">
         <h1 className="font-bold m-0">Create Account</h1>
         <div className="social-container my-5">
-          <a
-            href="#"
-            className="text-gray-700 text-base no-underline my-4 border border-gray-300 rounded-full inline-flex justify-center items-center m-1 h-10 w-10"
-          >
-            <img
-              height={20}
-              width={20}
-              src="/public/icons/facebook-svgrepo-com.svg"
-            />
+          <a href="#" className="text-gray-700 text-base no-underline my-4 border border-gray-300 rounded-full inline-flex justify-center items-center m-1 h-10 w-10">
+            <FacebookIcon className="w-5 h-5 text-gray-800" />
           </a>
-          <a
-            href="#"
-            className="text-gray-700 text-base no-underline my-4 border border-gray-300 rounded-full inline-flex justify-center items-center m-1 h-10 w-10"
-          >
-            <img
-              height={20}
-              width={20}
-              src="/public/icons/google-svgrepo-com.svg"
-            />
+          <a href="#" className="text-gray-700 text-base no-underline my-4 border border-gray-300 rounded-full inline-flex justify-center items-center m-1 h-10 w-10">
+            <GoogleIcon className="w-5 h-5 text-gray-800" />
           </a>
         </div>
         <span className="text-xs">or use your email for registration</span>
-        <InputComponent<MyFormikValue>
-          name="name"
-          type="text"
-          placeholder="Name"
-          formik={formik}
-          inputStyle="bg-white my-2"
-        />
+        <InputComponent<MyFormikValue> name="name" type="text" placeholder="Name" formik={formik} inputStyle="bg-white my-2" />
         <InputComponent<MyFormikValue>
           name="username"
           type="text"
@@ -129,20 +108,8 @@ export default function SignUp(): React.JSX.Element {
           serverError={serverError}
           serverErrorMessage={serverErrorMessage}
         />
-        <InputComponent<MyFormikValue>
-          name="email"
-          type="email"
-          placeholder="Email"
-          formik={formik}
-          inputStyle="bg-white my-2"
-        />
-        <InputComponent<MyFormikValue>
-          name="password"
-          type="password"
-          placeholder="Password"
-          formik={formik}
-          inputStyle="bg-white my-2"
-        />
+        <InputComponent<MyFormikValue> name="email" type="email" placeholder="Email" formik={formik} inputStyle="bg-white my-2" />
+        <InputComponent<MyFormikValue> name="password" type="password" placeholder="Password" formik={formik} inputStyle="bg-white my-2" />
         <div className="flex relative mt-2">
           <button
             type="submit"
@@ -153,15 +120,6 @@ export default function SignUp(): React.JSX.Element {
           >
             Sign Up
           </button>
-          {/* <a href="#" className="flex p-2 absolute left-[115%]">
-            skip
-            <img
-              height={30}
-              width={30}
-              src="/public/icons/right-arrow-svgrepo-com.svg"
-              className="px-2"
-            />
-          </a> */}
         </div>
       </form>
     </div>

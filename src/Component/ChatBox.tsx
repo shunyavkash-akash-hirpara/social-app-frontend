@@ -1,12 +1,4 @@
-import React, {
-  Dispatch,
-  LegacyRef,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { Dispatch, LegacyRef, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import useApi from "../hooks/useApi";
 import { useSnack } from "../hooks/store/useSnack";
 import { APIS } from "../api/apiList";
@@ -20,6 +12,7 @@ import timezone from "dayjs/plugin/timezone";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import ShareIcon from "./icons/ShareIcon";
 import PictureIcon from "./icons/PictureIcon";
+import CloseIcon from "./icons/CloseIcon";
 dayjs.extend(duration);
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -44,13 +37,7 @@ interface chat {
   createdAt: string;
 }
 
-export default function ChatBox({
-  setOpenChat,
-  chatUser,
-}: {
-  setOpenChat: Dispatch<SetStateAction<boolean>>;
-  chatUser: user;
-}): React.JSX.Element {
+export default function ChatBox({ setOpenChat, chatUser }: { setOpenChat: Dispatch<SetStateAction<boolean>>; chatUser: user }): React.JSX.Element {
   const [message, setMessage] = useState<string>("");
   const [chats, setChats] = useState<chat[]>([]);
   const [typing, setTyping] = useState<boolean>(false);
@@ -113,15 +100,7 @@ export default function ChatBox({
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    const dayOfWeek = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
+    const dayOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
     // If the date is within the last week, return the day of the week
     const modDate = new Date(date).getDate();
@@ -172,14 +151,7 @@ export default function ChatBox({
         }
       }
     }
-  }, [
-    apiCall,
-    chatUser?.conversationId,
-    checkAxiosError,
-    currPage,
-    nextPage,
-    setSnack,
-  ]);
+  }, [apiCall, chatUser?.conversationId, checkAxiosError, currPage, nextPage, setSnack]);
 
   const onScroll = () => {
     if (listInnerRef.current) {
@@ -232,22 +204,10 @@ export default function ChatBox({
           alt="Rounded avatar"
         />
         <div className="flex flex-col text-justify">
-          <h3 className="ms-3 text-sm text-gray-700">
-            {chatUser?.username || "socialapp_user"}
-          </h3>
+          <h3 className="ms-3 text-sm text-gray-700">{chatUser?.username || "socialapp_user"}</h3>
           <h4 className="ms-3 text-[13px] text-gray-400">
-            <span
-              className={`inline-block ${
-                onlineUsers.includes(chatUser._id.toString())
-                  ? "bg-green-500"
-                  : "bg-red-500"
-              } p-1 mr-1 rounded-full`}
-            ></span>
-            {onlineUsers.includes(chatUser._id.toString())
-              ? typing
-                ? "typing"
-                : "online"
-              : "offline"}
+            <span className={`inline-block ${onlineUsers.includes(chatUser._id.toString()) ? "bg-green-500" : "bg-red-500"} p-1 mr-1 rounded-full`}></span>
+            {onlineUsers.includes(chatUser._id.toString()) ? (typing ? "typing" : "online") : "offline"}
           </h4>
         </div>
         <button
@@ -258,44 +218,25 @@ export default function ChatBox({
             socket.emit("typing", { userId: userId, typing: false });
           }}
         >
-          <img
-            width={20}
-            src="/public/icons/close-svgrepo-com.svg"
-            alt="chat-icon"
-          />
+          <CloseIcon className="w-5 h-5" />
         </button>
       </div>
-      <div
-        onScroll={onScroll}
-        ref={listInnerRef}
-        className="w-full p-3 h-[200px] feed-scroll overflow-y-auto flex flex-col-reverse"
-      >
+      <div onScroll={onScroll} ref={listInnerRef} className="w-full p-3 h-[200px] feed-scroll overflow-y-auto flex flex-col-reverse">
         {chats.length > 0 &&
           chats.map((chat, index, array) => (
             <div key={index}>
-              {getDayLabel(array[index + 1]?.createdAt) !==
-                getDayLabel(chat.createdAt) && (
-                <div className="rounded-xl border-transparent bg-gray-200 text-gray-600 py-1 px-2 text-xs w-fit mx-auto">
-                  {getDayLabel(chat.createdAt)}
-                </div>
+              {getDayLabel(array[index + 1]?.createdAt) !== getDayLabel(chat.createdAt) && (
+                <div className="rounded-xl border-transparent bg-gray-200 text-gray-600 py-1 px-2 text-xs w-fit mx-auto">{getDayLabel(chat.createdAt)}</div>
               )}
               {chat.receiver === userId ? (
                 <div className="flex flex-col items-start">
-                  <p className="text-sm text-gray-700 bg-[#E2EFFF] px-5 py-[10px] rounded-t-2xl rounded-r-2xl max-w-48 text-start">
-                    {chat.msg}
-                  </p>
-                  <span className="text-xs text-gray-400 my-2">
-                    {formatTime(chat.createdAt)}
-                  </span>
+                  <p className="text-sm text-gray-700 bg-[#E2EFFF] px-5 py-[10px] rounded-t-2xl rounded-r-2xl max-w-48 text-start">{chat.msg}</p>
+                  <span className="text-xs text-gray-400 my-2">{formatTime(chat.createdAt)}</span>
                 </div>
               ) : (
                 <div className="flex flex-col items-end">
-                  <p className="text-sm text-gray-700 bg-[#fcf1f5] px-5 py-[10px] rounded-t-2xl rounded-l-2xl max-w-48 text-start">
-                    {chat.msg}
-                  </p>
-                  <span className="text-xs text-gray-400 my-2">
-                    {formatTime(chat.createdAt)}
-                  </span>
+                  <p className="text-sm text-gray-700 bg-[#fcf1f5] px-5 py-[10px] rounded-t-2xl rounded-l-2xl max-w-48 text-start">{chat.msg}</p>
+                  <span className="text-xs text-gray-400 my-2">{formatTime(chat.createdAt)}</span>
                 </div>
               )}
             </div>
@@ -315,29 +256,12 @@ export default function ChatBox({
           disabled={!chatUser.username}
         />
         <div className="absolute right-5 bottom-[18px] flex">
-          <input
-            type="file"
-            id="chat-media"
-            className="hidden"
-            disabled={!chatUser.username}
-          />
+          <input type="file" id="chat-media" className="hidden" disabled={!chatUser.username} />
           <label htmlFor="chat-media" className="mr-2 cursor-pointer h-[30px]">
-            <PictureIcon
-              className={`text-gray-400 w-[30px] h-full hover:text-gray-500 ${
-                !chatUser.username && "cursor-not-allowed"
-              }`}
-            />
+            <PictureIcon className={`text-gray-400 w-[30px] h-full hover:text-gray-500 ${!chatUser.username && "cursor-not-allowed"}`} />
           </label>
-          <button
-            className="h-[30px]"
-            onClick={handleSendMessage}
-            disabled={!chatUser.username}
-          >
-            <ShareIcon
-              className={`text-gray-400 w-[30px] h-full hover:text-gray-500 ${
-                !chatUser.username && "cursor-not-allowed"
-              }`}
-            />
+          <button className="h-[30px]" onClick={handleSendMessage} disabled={!chatUser.username}>
+            <ShareIcon className={`text-gray-400 w-[30px] h-full hover:text-gray-500 ${!chatUser.username && "cursor-not-allowed"}`} />
           </button>
         </div>
       </div>
