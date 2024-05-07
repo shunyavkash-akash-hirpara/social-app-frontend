@@ -18,7 +18,7 @@ const siderbarItems = [
   },
   {
     name: "Messages",
-    href: "/chat/:id",
+    href: "/chat",
     svg: <MessageIcon />,
   },
   {
@@ -117,7 +117,7 @@ export default function Sidebar(): React.JSX.Element {
                   className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group"
                 >
                   <img
-                    className="w-10 h-10 rounded-full"
+                    className="w-10 h-10 rounded-full object-cover"
                     src={people.avatar}
                     alt="Rounded avatar"
                   />

@@ -33,7 +33,7 @@ export default function SuggestedUser(): React.JSX.Element {
       <div className="bg-white rounded-t-xl p-4 pb-3">
         <div className="flex items-center justify-between">
           <label className="text-sm text-gray-600 font-bold">
-            Friend Request
+            New Users
           </label>
           <a href="#" className="text-sm text-blue-600">
             See all
@@ -51,7 +51,7 @@ export default function SuggestedUser(): React.JSX.Element {
             <div className="flex">
               <Link to={`/profile/${people.id}`}>
                 <img
-                  className="w-11 h-11 rounded-full"
+                  className="w-11 h-11 rounded-full object-cover"
                   src={people.avatar}
                   alt="Rounded avatar"
                 />
@@ -67,7 +67,7 @@ export default function SuggestedUser(): React.JSX.Element {
                   <div className="flex -space-x-3 rtl:space-x-reverse">
                     {peoples.slice(0, 3).map((people) => (
                       <img
-                        className="w-7 h-7 border-2 border-white rounded-full"
+                        className="w-7 h-7 border-2 border-white rounded-full object-cover"
                         src={people.avatar}
                         alt=""
                         key={people.id}
@@ -81,11 +81,11 @@ export default function SuggestedUser(): React.JSX.Element {
               </div>
             </div>
             <div className="flex items-center justify-center mt-4">
-              <button className="rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-sm font-bold px-7 py-2 mr-3 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
-                Confirm
+              <button className="rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold px-7 py-2 mr-3 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
+                Follow
               </button>
-              <button className="rounded-lg border-2 border-gray-300 border-solid text-sm text-gray-400 font-bold px-7 py-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
-                Delete
+              <button className="rounded-lg border-2 border-gray-300 border-solid text-xs text-gray-400 font-bold px-7 py-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none">
+                Ignore
               </button>
             </div>
           </div>

@@ -10,6 +10,9 @@ export default function InputComponent<MyFormikValues>({
   inputStyle,
   labelStyle,
   formik,
+  disabled,
+  serverError,
+  serverErrorMessage,
 }: {
   name: keyof MyFormikValues;
   label?: string;
@@ -19,6 +22,9 @@ export default function InputComponent<MyFormikValues>({
   labelStyle?: string;
   currency?: boolean;
   formik: FormikProps<MyFormikValues>;
+  disabled?: boolean;
+  serverError?: boolean;
+  serverErrorMessage?: string;
 }): React.JSX.Element {
   return (
     <div>
@@ -37,6 +43,7 @@ export default function InputComponent<MyFormikValues>({
           <span className="text-gray-500 sm:text-sm">$</span>
         </div> */}
         <input
+          disabled={disabled}
           type={type}
           name={name as string}
           className={
@@ -48,20 +55,15 @@ export default function InputComponent<MyFormikValues>({
           onChange={formik.handleChange}
           value={formik.values[name] as string}
         />
-        {formik.touched[name] && Boolean(formik.errors[name]) && (
+        {((formik.touched[name] && Boolean(formik.errors[name])) ||
+          serverError) && (
           <div className="text-red-500">
-            {(formik.touched[name] && formik.errors[name]) as string}
+            {
+              ((formik.touched[name] && formik.errors[name]) ||
+                serverErrorMessage) as string
+            }
           </div>
         )}
-        {/* {type === "date" && (
-          <button className="absolute top-4 right-14 flex items-center w-8 h-8">
-            <img
-              className="w-7"
-              src="/public/icons/calander-interface-icon-svgrepo-com.svg"
-              alt="calander"
-            />
-          </button>
-        )} */}
         {/* {currency && (
           <div className="absolute inset-y-0 right-0 flex items-center">
             <label htmlFor="currency" className="sr-only">

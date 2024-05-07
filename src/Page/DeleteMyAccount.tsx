@@ -1,10 +1,15 @@
-import React, { useState } from "react";
-import { useAuth } from "../hooks/store/useAuth";
-import Header from "../Component/Header";
-import Sidebar from "../Component/Sidebar";
-import RecentChat from "../Component/RecentChat";
+import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BackIcon from "../Component/icons/BackIcon";
+import { APIS } from "../api/apiList";
+import useApi from "../hooks/useApi";
+import { useSnack } from "../hooks/store/useSnack";
+import { useAuth } from "../hooks/store/useAuth";
+
+interface reason {
+  id: number;
+  text: string;
+}
 
 const reasons = [
   { id: 1, text: "Privacy Concerns" },
@@ -18,19 +23,44 @@ const reasons = [
 ];
 
 export default function DeleteMyAccount(): React.JSX.Element {
-  const [selectReason, setSelectReason] = useState({ id: 0, text: "" });
-  const { accessToken } = useAuth();
+  const [selectReason, setSelectReason] = useState<reason | undefined>();
+  const [open, setOpen] = useState<boolean>(false);
   const navigate = useNavigate();
+  const { apiCall, checkAxiosError } = useApi();
+  const { setSnack } = useSnack();
+  const { userId, logout } = useAuth();
 
-  const handleDeleteAccount = () => {
-    console.log("delete account:", selectReason);
-  };
+  const handleDeleteAccount = useCallback(async () => {
+    if (selectReason) {
+      try {
+        const res = await apiCall({
+          url: APIS.USER.DELETE(userId),
+          method: "delete",
+        });
+        if (res.status === 200) {
+          logout();
+          navigate("/auth");
+          setSnack(res.data.message);
+        }
+      } catch (error) {
+        if (checkAxiosError(error)) {
+          const errorMessage = error?.response?.data.message;
+          setSnack(errorMessage, "warning");
+        }
+      }
+    }
+  }, [
+    apiCall,
+    checkAxiosError,
+    logout,
+    navigate,
+    selectReason,
+    setSnack,
+    userId,
+  ]);
 
   return (
     <>
-      <Header accessToken={accessToken} />
-      <Sidebar />
-
       <main className="fixed w-[848px] top-[80px] left-[280px] right-[344px] mx-[auto] rounded-xl flex h-calc-screen-minus-nav">
         <div className="feed-scroll w-full mx-[auto] overflow-y-auto p-6 pt-0">
           <div className="bg-white rounded-xl">
@@ -54,11 +84,12 @@ export default function DeleteMyAccount(): React.JSX.Element {
                 Tell us why you are delete your account
               </h3>
               {reasons.map((reason: { id: number; text: string }) => (
-                <div className="flex items-center ml-4 mb-2">
+                <div className="flex items-center ml-4 mb-2" key={reason.id}>
                   <input
                     checked={selectReason === reason}
                     id={`checked-checkbox-${reason.id}`}
                     type="checkbox"
+                    readOnly
                     className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
                     onClick={() => setSelectReason(reason)}
                   />
@@ -71,8 +102,8 @@ export default function DeleteMyAccount(): React.JSX.Element {
                 </div>
               ))}
               <button
-                type="submit"
-                onClick={() => handleDeleteAccount()}
+                disabled={selectReason ? false : true}
+                onClick={() => setOpen(true)}
                 className="flex rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-xs font-bold uppercase mt-4 px-12 py-3 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none"
               >
                 Delete My Account
@@ -81,7 +112,28 @@ export default function DeleteMyAccount(): React.JSX.Element {
           </div>
         </div>
       </main>
-      <RecentChat />
+      {open && (
+        <div className="absolute top-0 bottom-0 left-0 right-0 m-auto w-96 h-fit drop-shadow-2xl rounded-lg bg-white p-4">
+          <h2 className="text-red-600 font-bold border-b-2 pb-2">
+            Delete Account
+          </h2>
+          <p className="text-gray-600 my-6">
+            Are you sure permenent delete your account?
+          </p>
+          <button
+            className="rounded-lg border border-solid bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center text-white text-sm font-bold px-7 py-2 mr-3 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none"
+            onClick={handleDeleteAccount}
+          >
+            Yes
+          </button>
+          <button
+            className="rounded-lg border-2 border-gray-300 border-solid text-sm text-gray-400 font-bold px-7 py-2 tracking-wider transition-transform duration-80 ease-in active:scale-95 focus:outline-none"
+            onClick={() => setOpen(false)}
+          >
+            No
+          </button>
+        </div>
+      )}
     </>
   );
 }
