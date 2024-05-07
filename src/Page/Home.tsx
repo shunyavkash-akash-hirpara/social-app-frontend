@@ -18,7 +18,7 @@ export default function Home(): React.JSX.Element {
       {isLoading ? (
         <Loader className="text-[#DE2C70]" />
       ) : (
-        <main className="fixed w-[900px] top-[80px] left-[280px] right-[344px] mx-[auto] flex h-calc-screen-minus-nav">
+        <main className="mt-20 w-[900px] left-[280px] right-[344px] mx-[auto] flex h-calc-screen-minus-nav">
           <Feed />
           <div className="w-[300px] overflow-y-auto feed-scroll">
             <RecentLikeUser />

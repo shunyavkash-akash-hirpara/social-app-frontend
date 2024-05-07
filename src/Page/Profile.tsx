@@ -9,8 +9,8 @@ import useApi from "../hooks/useApi";
 import { useSnack } from "../hooks/store/useSnack";
 import { useChatUser } from "../hooks/store/useChatUser";
 import CameraIcon from "../Component/icons/CameraIcon";
-import MultipleAssetsIcon from "../Component/icons/MultipleAssetsIcon";
-import YoutubeIcon from "../Component/icons/YoutubeIcon";
+import PostProfileCard from "../Component/PostProfileCard";
+import PostDetail from "../Component/PostDetail";
 
 interface user {
   _id: string;
@@ -51,6 +51,8 @@ export default function Profile(): React.JSX.Element {
   const [posts, setPosts] = useState<post[]>([]);
   const [currPage, setCurrPage] = useState<number>(0);
   const [nextPage, setNextPage] = useState<boolean>(false);
+  const [viewPost, setViewPost] = useState<boolean>(false);
+  const [selectPost, setSelectPost] = useState<string>();
   const { setNewChatUser } = useChatUser();
   const { accessToken, userId } = useAuth();
   const { apiCall, checkAxiosError } = useApi();
@@ -145,7 +147,7 @@ export default function Profile(): React.JSX.Element {
       <Header accessToken={accessToken} />
       <Sidebar />
 
-      <main className="fixed w-[848px] top-[80px] left-[280px] right-[344px] mx-[auto] rounded-xl flex h-calc-screen-minus-nav">
+      <main className="mt-20 ml-[430px] mr-[494px] mx-[auto] rounded-xl flex h-calc-screen-minus-nav">
         <div onScroll={onScroll} ref={listInnerRef} className="feed-scroll w-full mx-[auto] overflow-y-auto p-6 pt-0">
           <div className="bg-white rounded-xl p-6">
             {user && (
@@ -209,21 +211,7 @@ export default function Profile(): React.JSX.Element {
             {posts.length > 0 ? (
               <div className="border-t-2 border-gray-300 mt-10 pt-10 grid grid-cols-3 gap-1">
                 {posts.map((item, index) => (
-                  <Link key={index} to="./posts" className="relative">
-                    {item.photos[0].type === "image" ? (
-                      <img className="h-[248px] w-[248px] object-cover" src={item.photos[0].url} alt="" />
-                    ) : (
-                      <video className="h-[248px] w-[248px] object-cover" src={item.photos[0].url}></video>
-                    )}
-
-                    {item.photos.length > 1 ? (
-                      <MultipleAssetsIcon className="w-5 h-5 absolute top-1 right-1 text-white" />
-                    ) : item.photos[0].type === "video" ? (
-                      <YoutubeIcon className="w-5 h-5 absolute top-1 right-1 text-white" />
-                    ) : (
-                      ""
-                    )}
-                  </Link>
+                  <PostProfileCard item={item} key={index} setViewPost={setViewPost} setSelectPost={setSelectPost} />
                 ))}
               </div>
             ) : (
@@ -234,6 +222,7 @@ export default function Profile(): React.JSX.Element {
                 <h2 className="text-lg font-bold text-gray-700">No Posts Yet</h2>
               </div>
             )}
+            <PostDetail setViewPost={setViewPost} viewPost={viewPost} postId={selectPost} />
           </div>
         </div>
       </main>

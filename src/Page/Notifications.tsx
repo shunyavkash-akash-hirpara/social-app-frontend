@@ -2,7 +2,8 @@ import React, { LegacyRef, useCallback, useEffect, useRef, useState } from "reac
 import useApi from "../hooks/useApi";
 import { useSnack } from "../hooks/store/useSnack";
 import { APIS } from "../api/apiList";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import PostDetail from "../Component/PostDetail";
 
 interface notification {
   _id: string;
@@ -20,8 +21,11 @@ export default function Notifications(): React.JSX.Element {
   const [notifications, setNotifications] = useState<notification[]>([]);
   const [currPage, setCurrPage] = useState<number>(0);
   const [nextPage, setNextPage] = useState<boolean>(false);
+  const [viewPost, setViewPost] = useState<boolean>(false);
+  const [selectPost, setSelectPost] = useState<string>();
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
+  const navigate = useNavigate();
   const listInnerRef: LegacyRef<HTMLDivElement> = useRef(null);
 
   function getTimeLapse(dateString: string) {
@@ -91,7 +95,7 @@ export default function Notifications(): React.JSX.Element {
 
   return (
     <>
-      <main className="fixed w-[848px] top-[80px] left-[280px] right-[344px] mx-[auto] rounded-xl flex h-calc-screen-minus-nav">
+      <main className="mt-20 ml-[430px] mr-[494px] mx-[auto] rounded-xl flex h-calc-screen-minus-nav">
         <div className="feed-scroll w-full mx-[auto] overflow-y-auto p-6 pt-0">
           <div className="bg-white rounded-xl">
             <div className="w-full h-14 p-3 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center">
@@ -104,7 +108,18 @@ export default function Notifications(): React.JSX.Element {
             {notifications.length > 0 && (
               <div onScroll={onScroll} ref={listInnerRef} className="py-5 px-3">
                 {notifications.map((item) => (
-                  <Link to={item.type === "follow" ? `/profile/${item.sender_info._id}` : "/"} key={item._id} className={`relative px-2 py-1 flex items-center rounded-lg hover:bg-slate-200`}>
+                  <div
+                    onClick={() => {
+                      if (item.type !== "follow") {
+                        setSelectPost(item.itemId);
+                        setViewPost(true);
+                      } else {
+                        navigate(`/profile/${item.sender_info._id}`);
+                      }
+                    }}
+                    key={item._id}
+                    className={`relative px-2 py-1 flex items-center rounded-lg hover:bg-slate-200 cursor-pointer`}
+                  >
                     <img className="w-11 h-11 mr-2 rounded-full object-cover" src={item.sender_info.profileImg} alt="Bordered avatar" />
                     <div className="flex flex-col items-start justify-center">
                       <h4 className="text-sm text-gray-700">
@@ -120,10 +135,11 @@ export default function Notifications(): React.JSX.Element {
                         <img className="w-9 h-9 object-cover rounded-md" src={item.post.photos[0].url} alt="" />
                       </Link>
                     )}
-                  </Link>
+                  </div>
                 ))}
               </div>
             )}
+            <PostDetail setViewPost={setViewPost} viewPost={viewPost} postId={selectPost} />
           </div>
         </div>
       </main>

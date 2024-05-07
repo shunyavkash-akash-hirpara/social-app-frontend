@@ -17,7 +17,6 @@ export default function ToggleButton({ className, label, value, name }: { classN
           data: { [name]: e.target.checked },
         });
         if (res.status === 200) {
-          console.log(res.data);
           setSnack(res.data.message);
         }
       } catch (error) {

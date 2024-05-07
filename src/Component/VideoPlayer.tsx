@@ -12,7 +12,7 @@ export default function VideoPlayer({
   mute,
 }: {
   src: { _id: string; url: string; type: string };
-  activeVideoId;
+  activeVideoId: string;
   activeFeed: boolean;
   setMute: Dispatch<SetStateAction<boolean>>;
   mute: boolean;
@@ -60,7 +60,7 @@ export default function VideoPlayer({
         }
       }
     };
-    feedScroll.addEventListener("scroll", scrollCallBack);
+    feedScroll?.addEventListener("scroll", scrollCallBack);
     return () => {
       feedScroll.removeEventListener("scroll", scrollCallBack);
     };

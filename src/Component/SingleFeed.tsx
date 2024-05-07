@@ -52,58 +52,63 @@ interface like {
   flag: string;
 }
 
+interface post {
+  _id: string;
+  user: {
+    _id: string;
+    username: string;
+    profileImg: string;
+    city?: string;
+    country?: string;
+  };
+  description?: string;
+  mentionedUsers: {
+    _id: string;
+    username: string;
+    name: string;
+    profileImg: string;
+  }[];
+  photos: { _id: string; url: string; type: string }[];
+  like: number;
+  comment: number;
+  isLike: boolean;
+}
+
 export default function SingleFeed({
   post,
   activeFeed,
   setMute,
   mute,
+  postId,
 }: {
-  post: {
-    _id: string;
-    user: {
-      _id: string;
-      username: string;
-      profileImg: string;
-      city?: string;
-      country?: string;
-    };
-    description?: string;
-    mentionedUsers: {
-      _id: string;
-      username: string;
-      name: string;
-      profileImg: string;
-    }[];
-    photos: { _id: string; url: string; type: string }[];
-    like: number;
-    comment: number;
-    isLike: boolean;
-  };
-  activeFeed: number;
-  setMute: Dispatch<SetStateAction<boolean>>;
-  mute: boolean;
+  post?: post;
+  activeFeed?: number;
+  setMute?: Dispatch<SetStateAction<boolean>>;
+  mute?: boolean;
+  postId?: string;
 }): React.JSX.Element {
+  const [postDetail, setPostDetail] = useState<post>(post);
   const [openLike, setOpenLike] = useState<boolean>(false);
   const [openComment, setOpenComment] = useState<boolean>(false);
-  const [like, setLike] = useState<boolean>(post.isLike);
+  const [like, setLike] = useState<boolean>(postDetail?.isLike);
   const [comment, setComment] = useState({ id: "", text: "" });
   const [commentList, setCommentList] = useState<comment[]>([]);
   const [likeList, setLikeList] = useState<like[]>([]);
   const [currPage, setCurrPage] = useState<number>(0);
   const [nextPage, setNextPage] = useState<boolean>(false);
   const [openShare, setOpenShare] = useState<boolean>(false);
-  const [activeVideoId, setActiveVideoId] = useState<string>(post.photos[0]._id);
+  const [activeVideoId, setActiveVideoId] = useState<string>(postDetail?.photos[0]._id);
   const { user } = useAuth();
   const { apiCall, checkAxiosError } = useApi();
   const { setSnack } = useSnack();
   const listInnerRef: LegacyRef<HTMLDivElement> = useRef(null);
 
   const handleLike = (id: string) => {
-    post.like = like ? post.like - 1 : post.like + 1;
+    postDetail.like = like ? postDetail.like - 1 : postDetail.like + 1;
     likeCreate(id);
   };
   const handleComment = (id: string, commentId?: string) => {
-    post.comment = post.comment + 1;
+    postDetail.comment = postDetail.comment + 1;
     commentCreate(id, commentId);
   };
 
@@ -111,6 +116,27 @@ export default function SingleFeed({
     const newText = e.target.value;
     setComment((prev) => ({ id: prev.id, text: newText }));
   };
+
+  const getPost = useCallback(
+    async (id: string) => {
+      try {
+        const res = await apiCall({
+          url: APIS.POST.GET(id),
+          method: "get",
+        });
+        if (res.status === 200) {
+          setPostDetail(res.data.data);
+          setSnack(res.data.message);
+        }
+      } catch (error) {
+        if (checkAxiosError(error)) {
+          const errorMessage = error?.response?.data.message;
+          setSnack(errorMessage, "warning");
+        }
+      }
+    },
+    [apiCall, checkAxiosError, setSnack]
+  );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const likeCreate = useCallback(
@@ -199,9 +225,15 @@ export default function SingleFeed({
 
   useEffect(() => {
     if (openComment) {
-      getComment(post._id);
+      getComment(postDetail?._id);
     }
-  }, [getComment, openComment, post._id]);
+  }, [getComment, openComment, postDetail?._id]);
+
+  useEffect(() => {
+    if (!post) {
+      getPost(postId);
+    }
+  }, [getPost, post, postId]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const getLike = useCallback(
@@ -239,159 +271,161 @@ export default function SingleFeed({
   };
 
   useEffect(() => {
-    if (openLike && post.like > 0) {
-      getLike(post._id);
+    if (openLike && postDetail?.like > 0) {
+      getLike(postDetail?._id);
     }
-  }, [getLike, openLike, post._id, post.like]);
+  }, [getLike, openLike, postDetail?._id, postDetail?.like]);
 
   return (
     <>
-      <div className="w-full bg-white rounded-xl mb-5 p-4">
-        <div className="flex items-center">
-          <Link to={`/profile/${post.user._id}`}>
+      {postDetail && (
+        <div className="w-full bg-white rounded-xl mb-5 p-4">
+          <div className="flex items-center">
+            <Link to={`/profile/${postDetail.user._id}`}>
+              <img
+                className="w-10 h-10 rounded-full object-cover"
+                src={
+                  postDetail.user.profileImg ||
+                  "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
+                }
+                alt="Rounded avatar"
+              />
+            </Link>
+            <div className="flex flex-col text-justify">
+              <Link to={`/profile/${postDetail.user._id}`} className="ms-3 text-sm text-gray-600 font-bold">
+                {postDetail.user.username || "social_user"}
+              </Link>
+              <span className="ms-3 text-sm text-gray-400">{postDetail.user.city && postDetail.user.country ? postDetail.user.city + ", " + postDetail.user.country : "India"}</span>
+            </div>
+          </div>
+          {postDetail.description && (
+            <div className="mt-2 w-full">
+              <p className="text-start text-sm text-gray-700">{postDetail.description}</p>
+            </div>
+          )}
+
+          {postDetail.photos.length > 0 && (
+            <div className="feed-scroll w-full h-full overflow-y-auto">
+              <Swiper pagination={{ clickable: true }} modules={[Pagination]} className="swiper" onSlideChange={(swiper) => setActiveVideoId(postDetail.photos[swiper.activeIndex]._id)}>
+                {postDetail.photos.map((media, index) => (
+                  <SwiperSlide key={media._id + index} className="relative flex items-center justify-center flex-col">
+                    {media.type === "image" ? (
+                      <img className="my-3 mx-[auto] h-[409px] object-contain" src={media.url} alt="photo" />
+                    ) : (
+                      <>
+                        <VideoPlayer src={media} activeVideoId={activeVideoId} activeFeed={activeFeed?.toString() === postDetail._id} setMute={setMute} mute={mute} />
+                      </>
+                    )}
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          )}
+
+          <div className="relative flex items-center justify-between">
+            <div>
+              {postDetail.mentionedUsers?.length > 0 && (
+                <>
+                  <div className="flex -space-x-3 rtl:space-x-reverse mention-avatar">
+                    {postDetail.mentionedUsers.slice(0, 3).map((people) => (
+                      <img className="w-8 h-8 border-2 border-white rounded-full object-cover" src={people.profileImg} alt="avatar" key={people._id} />
+                    ))}
+                    {postDetail.mentionedUsers.length > 3 && (
+                      <a className="flex items-center justify-center w-8 h-8 text-xs font-medium text-white bg-primary border-2 border-white rounded-full hover:bg-pink-600" href="#">
+                        +{postDetail.mentionedUsers.length - 3}
+                      </a>
+                    )}
+                    <div className="absolute bg-white border p-2 shadow-lg rounded-lg mention-user">
+                      <div className="flex flex-col">
+                        {postDetail.mentionedUsers.map((people) => (
+                          <div key={people?._id}>
+                            <div className="flex items-center m-1">
+                              <img
+                                className="w-8 h-8 rounded-full object-cover"
+                                src={
+                                  people.profileImg ||
+                                  "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
+                                }
+                                alt="Rounded avatar"
+                              />
+                              <div className="flex flex-col text-justify">
+                                <span className="ms-3 text-sm text-gray-700 font-bold">{people.username || "socialapp_user"}</span>
+                                <span className="ms-3 text-[12px] text-gray-400">{people.name}</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+            <div>
+              <button className="text-gray-500 text-sm mr-6 cursor-pointer" onClick={() => postDetail.comment > 0 && setOpenComment(true)}>
+                {postDetail.comment} Comments
+              </button>
+              <button className="text-gray-500 ml-1 text-sm cursor-pointer" onClick={() => postDetail.like > 0 && setOpenLike(true)}>
+                {postDetail.like} Likes
+              </button>
+            </div>
+          </div>
+          <div className="flex items-center justify-between border-t-2 border-gray-200 mt-3 pt-3">
+            <button
+              className={`flex flex-row items-center`}
+              onClick={() => {
+                handleLike(postDetail._id);
+                setLike(!like);
+              }}
+            >
+              <LikeIcon like={like} />
+              <span className="text-gray-500 ml-1 text-sm">Like</span>
+            </button>
+            <button
+              className="flex flex-row items-center"
+              onClick={() => {
+                document.getElementById(`${postDetail._id}`).focus();
+              }}
+            >
+              <CommentIcon className="w-7 h-7 text-gray-500" />
+              <span className="text-gray-500 ml-1 text-sm">Comments</span>
+            </button>
+            <button className="flex flex-row items-center" onClick={() => setOpenShare(true)}>
+              <ShareArrowIcon className="w-6 h-6 text-gray-500" />
+              <span className="text-gray-500 ml-1 text-sm">Share</span>
+            </button>
+          </div>
+          <div className="flex items-center justify-between border-t-2 border-gray-200 mt-3 pt-3">
             <img
-              className="w-10 h-10 rounded-full object-cover"
+              className="w-11 h-11 rounded-full object-cover shrink-0"
               src={
-                post.user.profileImg ||
+                user.profileImg ||
                 "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
               }
               alt="Rounded avatar"
             />
-          </Link>
-          <div className="flex flex-col text-justify">
-            <Link to={`/profile/${post.user._id}`} className="ms-3 text-sm text-gray-600 font-bold">
-              {post.user.username || "social_user"}
-            </Link>
-            <span className="ms-3 text-sm text-gray-400">{post.user.city && post.user.country ? post.user.city + ", " + post.user.country : "India"}</span>
-          </div>
-        </div>
-        {post.description && (
-          <div className="mt-2 w-full">
-            <p className="text-start text-sm text-gray-700">{post.description}</p>
-          </div>
-        )}
-
-        {post.photos.length > 0 && (
-          <div className="feed-scroll w-full h-full overflow-y-auto">
-            <Swiper pagination={{ clickable: true }} modules={[Pagination]} className="swiper" onSlideChange={(swiper) => setActiveVideoId(post.photos[swiper.activeIndex]._id)}>
-              {post.photos.map((media, index) => (
-                <SwiperSlide key={media._id + index} className="relative flex items-center justify-center flex-col">
-                  {media.type === "image" ? (
-                    <img className="my-3 mx-[auto] h-[409px] object-contain" src={media.url} alt="photo" />
-                  ) : (
-                    <>
-                      <VideoPlayer src={media} activeVideoId={activeVideoId} activeFeed={activeFeed.toString() === post._id} setMute={setMute} mute={mute} />
-                    </>
-                  )}
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </div>
-        )}
-
-        <div className="relative flex items-center justify-between">
-          <div>
-            {post.mentionedUsers?.length > 0 && (
-              <>
-                <div className="flex -space-x-3 rtl:space-x-reverse mention-avatar">
-                  {post.mentionedUsers.slice(0, 3).map((people) => (
-                    <img className="w-8 h-8 border-2 border-white rounded-full object-cover" src={people.profileImg} alt="avatar" key={people._id} />
-                  ))}
-                  {post.mentionedUsers.length > 3 && (
-                    <a className="flex items-center justify-center w-8 h-8 text-xs font-medium text-white bg-primary border-2 border-white rounded-full hover:bg-pink-600" href="#">
-                      +{post.mentionedUsers.length - 3}
-                    </a>
-                  )}
-                  <div className="absolute bg-white border p-2 shadow-lg rounded-lg mention-user">
-                    <div className="flex flex-col">
-                      {post.mentionedUsers.map((people) => (
-                        <div key={people?._id}>
-                          <div className="flex items-center m-1">
-                            <img
-                              className="w-8 h-8 rounded-full object-cover"
-                              src={
-                                people.profileImg ||
-                                "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
-                              }
-                              alt="Rounded avatar"
-                            />
-                            <div className="flex flex-col text-justify">
-                              <span className="ms-3 text-sm text-gray-700 font-bold">{people.username || "socialapp_user"}</span>
-                              <span className="ms-3 text-[12px] text-gray-400">{people.name}</span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-          <div>
-            <button className="text-gray-500 text-sm mr-6 cursor-pointer" onClick={() => post.comment > 0 && setOpenComment(true)}>
-              {post.comment} Comments
-            </button>
-            <button className="text-gray-500 ml-1 text-sm cursor-pointer" onClick={() => post.like > 0 && setOpenLike(true)}>
-              {post.like} Likes
+            <input
+              id={postDetail._id}
+              type="text"
+              placeholder="Write a comment..."
+              className="border-gray border rounded-xl py-3 px-4 pr-3 w-full bg-input-primary border-none my-0 mx-2 text-sm"
+              onChange={(e) => setComment({ id: postDetail._id, text: e.target.value })}
+              onKeyDown={(e) => handleKeyPress(e, postDetail._id)}
+              value={comment.id === postDetail._id ? comment.text : ""}
+            />
+            <button
+              className="bg-[#f48bb34c] py-1 pl-1 pr-2 rounded-xl h-[44px]"
+              onClick={() => {
+                if (comment.text) {
+                  handleComment(postDetail._id);
+                }
+              }}
+            >
+              <ShareIcon className="text-[#DE2C70] w-[35px] h-full transform rotate-[30deg]" />
             </button>
           </div>
         </div>
-        <div className="flex items-center justify-between border-t-2 border-gray-200 mt-3 pt-3">
-          <button
-            className={`flex flex-row items-center`}
-            onClick={() => {
-              handleLike(post._id);
-              setLike(!like);
-            }}
-          >
-            <LikeIcon like={like} />
-            <span className="text-gray-500 ml-1 text-sm">Like</span>
-          </button>
-          <button
-            className="flex flex-row items-center"
-            onClick={() => {
-              document.getElementById(`${post._id}`).focus();
-            }}
-          >
-            <CommentIcon className="w-7 h-7 text-gray-500" />
-            <span className="text-gray-500 ml-1 text-sm">Comments</span>
-          </button>
-          <button className="flex flex-row items-center" onClick={() => setOpenShare(true)}>
-            <ShareArrowIcon className="w-6 h-6 text-gray-500" />
-            <span className="text-gray-500 ml-1 text-sm">Share</span>
-          </button>
-        </div>
-        <div className="flex items-center justify-between border-t-2 border-gray-200 mt-3 pt-3">
-          <img
-            className="w-11 h-11 rounded-full object-cover shrink-0"
-            src={
-              user.profileImg ||
-              "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
-            }
-            alt="Rounded avatar"
-          />
-          <input
-            id={post._id}
-            type="text"
-            placeholder="Write a comment..."
-            className="border-gray border rounded-xl py-3 px-4 pr-3 w-full bg-input-primary border-none my-0 mx-2 text-sm"
-            onChange={(e) => setComment({ id: post._id, text: e.target.value })}
-            onKeyDown={(e) => handleKeyPress(e, post._id)}
-            value={comment.id === post._id ? comment.text : ""}
-          />
-          <button
-            className="bg-[#f48bb34c] py-1 pl-1 pr-2 rounded-xl h-[44px]"
-            onClick={() => {
-              if (comment.text) {
-                handleComment(post._id);
-              }
-            }}
-          >
-            <ShareIcon className="text-[#DE2C70] w-[35px] h-full transform rotate-[30deg]" />
-          </button>
-        </div>
-      </div>
+      )}
 
       {/* like model */}
       <div className={`modal-popup-story ${openLike ? "block" : "hidden"}`}>
@@ -433,10 +467,10 @@ export default function SingleFeed({
                 placeholder="Write a comment..."
                 className="border-gray border rounded-xl py-3 px-4 pr-3 w-[500px] bg-input-primary border-none my-0 text-sm"
                 onChange={handleChange}
-                onKeyDown={(e) => handleKeyPress(e, post._id, comment.id)}
+                onKeyDown={(e) => handleKeyPress(e, postDetail._id, comment.id)}
                 value={comment.text}
               />
-              <button className="bg-[#f48bb34c] py-1 pl-1 pr-2 rounded-xl" onClick={() => handleComment(post._id, comment.id)}>
+              <button className="bg-[#f48bb34c] py-1 pl-1 pr-2 rounded-xl" onClick={() => handleComment(postDetail._id, comment.id)}>
                 <ShareIcon className="text-[#DE2C70] w-[35px] h-full transform rotate-[30deg]" />
               </button>
             </div>

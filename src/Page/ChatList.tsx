@@ -391,7 +391,6 @@ export default function ChatList(): React.JSX.Element {
                     data-dropdown-toggle="dropdownDefaultRadio"
                     type="button"
                     className="w-8 h-8 p-1 rounded-lg ml-2"
-                    disabled={!chatUser.username}
                     onClick={() => {
                       setOpenMorePopup(true);
                     }}

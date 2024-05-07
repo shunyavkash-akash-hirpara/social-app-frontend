@@ -38,8 +38,8 @@ export default function SingleComment({
     subComment?: number;
     likeCount: number;
   };
-  setComment: Dispatch<SetStateAction<{ id: string; text: string }>>;
-  openComment: boolean;
+  setComment?: Dispatch<SetStateAction<{ id: string; text: string }>>;
+  openComment?: boolean;
 }): React.JSX.Element {
   const [commentLike, setCommentLike] = useState<boolean>(commentData.like);
   const [subCommentList, setSubCommentList] = useState<subcomment[]>([]);
