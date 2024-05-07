@@ -1,4 +1,4 @@
-import React, { LegacyRef, useCallback, useEffect, useRef, useState } from "react";
+import React, { Dispatch, LegacyRef, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SearchIcon from "../Component/icons/SearchIcon";
 import BackIcon from "../Component/icons/BackIcon";
@@ -50,7 +50,7 @@ interface chat {
 export default function ChatList(): React.JSX.Element {
   const [users, setUsers] = useState<user[]>([]);
   const [search, setSearch] = useState<string>("");
-  const [chatUser, setChatUser] = useState<user>();
+  const [chatUser, setChatUser] = useState<user | undefined>();
   const [message, setMessage] = useState<string>("");
   const [chats, setChats] = useState<chat[]>([]);
   const [typing, setTyping] = useState<boolean>(false);
@@ -76,24 +76,30 @@ export default function ChatList(): React.JSX.Element {
 
   const handleDeleteChat = (e, type: string) => {
     if (type === "delete24View") {
-      setChatUser((prev) => ({
-        ...prev,
-        delete24View: e.target.checked,
-        deleteAfterView: false,
-      }));
+      setChatUser(
+        (prev) =>
+          ({
+            ...prev,
+            delete24View: e.target.checked,
+            deleteAfterView: false,
+          } as user)
+      );
       deleteChats(3);
     }
     if (type === "deleteAfterView") {
-      setChatUser((prev) => ({
-        ...prev,
-        delete24View: false,
-        deleteAfterView: e.target.checked,
-      }));
+      setChatUser(
+        (prev) =>
+          ({
+            ...prev,
+            delete24View: false,
+            deleteAfterView: e.target.checked,
+          } as user)
+      );
       deleteChats(2);
     }
     if (type === "deleteChat") {
       deleteChats(1);
-      setUsers((prev) => prev.filter((user) => user._id !== chatUser._id));
+      setUsers((prev) => prev.filter((user) => user._id !== chatUser?._id));
       setChatUser(undefined);
     }
     setOpenMorePopup(false);
@@ -336,7 +342,7 @@ export default function ChatList(): React.JSX.Element {
             </div>
             <div className="overflow-y-auto feed-scroll rounded-b-xl m-y">
               {users.map((people) => (
-                <ChatListItem setChatUser={setChatUser} chatUser={chatUser} people={people} setChats={setChats} setTyping={setTyping} key={people._id} />
+                <ChatListItem setChatUser={setChatUser as Dispatch<SetStateAction<user>>} chatUser={chatUser as user} people={people} setChats={setChats} setTyping={setTyping} key={people._id} />
               ))}
             </div>
           </div>
@@ -344,7 +350,7 @@ export default function ChatList(): React.JSX.Element {
             <div className="relative h-calc-for-chatList w-[62%] rounded-xl bg-white">
               <div className="w-full h-14 p-3 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center flex items-center justify-between">
                 <div className="h-full flex items-center justify-start">
-                  <Link to={!chatUser.username ? undefined : `/profile/${chatUser._id}`}>
+                  <Link to={chatUser.username && `/profile/${chatUser._id}`}>
                     <img
                       className="w-10 h-10 rounded-full object-cover"
                       src={
@@ -355,7 +361,7 @@ export default function ChatList(): React.JSX.Element {
                     />
                   </Link>
                   <div className="flex flex-col text-justify">
-                    <Link to={!chatUser.username ? undefined : `/profile/${chatUser._id}`} className="ms-3 text-sm text-white font-bold">
+                    <Link to={chatUser.username && `/profile/${chatUser._id}`} className="ms-3 text-sm text-white font-bold">
                       {chatUser.username || "socialapp_user"}
                     </Link>
                     {onlineUsers.includes(chatUser._id.toString()) && <span className="ms-3 text-sm text-white">{typing ? "typing" : "online"}</span>}
@@ -373,7 +379,7 @@ export default function ChatList(): React.JSX.Element {
                         from: {
                           _id: userId,
                           username: user.username,
-                          profileImg: user.profileImg,
+                          profileImg: user.profileImg as string,
                         },
                       };
                       setOpenCallModel(data);

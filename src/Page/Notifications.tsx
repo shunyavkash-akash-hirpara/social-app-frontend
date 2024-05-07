@@ -139,7 +139,7 @@ export default function Notifications(): React.JSX.Element {
                 ))}
               </div>
             )}
-            <PostDetail setViewPost={setViewPost} viewPost={viewPost} postId={selectPost} />
+            <PostDetail setViewPost={setViewPost} viewPost={viewPost} postId={selectPost as string} />
           </div>
         </div>
       </main>

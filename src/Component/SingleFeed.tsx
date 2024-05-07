@@ -87,7 +87,7 @@ export default function SingleFeed({
   mute?: boolean;
   postId?: string;
 }): React.JSX.Element {
-  const [postDetail, setPostDetail] = useState<post>(post);
+  const [postDetail, setPostDetail] = useState<post>(post as post);
   const [openLike, setOpenLike] = useState<boolean>(false);
   const [openComment, setOpenComment] = useState<boolean>(false);
   const [like, setLike] = useState<boolean>(postDetail?.isLike);
@@ -231,7 +231,7 @@ export default function SingleFeed({
 
   useEffect(() => {
     if (!post) {
-      getPost(postId);
+      getPost(postId as string);
     }
   }, [getPost, post, postId]);
 
@@ -313,7 +313,13 @@ export default function SingleFeed({
                       <img className="my-3 mx-[auto] h-[409px] object-contain" src={media.url} alt="photo" />
                     ) : (
                       <>
-                        <VideoPlayer src={media} activeVideoId={activeVideoId} activeFeed={activeFeed?.toString() === postDetail._id} setMute={setMute} mute={mute} />
+                        <VideoPlayer
+                          src={media}
+                          activeVideoId={activeVideoId}
+                          activeFeed={activeFeed?.toString() === postDetail._id}
+                          setMute={setMute as Dispatch<SetStateAction<boolean>>}
+                          mute={mute as boolean}
+                        />
                       </>
                     )}
                   </SwiperSlide>

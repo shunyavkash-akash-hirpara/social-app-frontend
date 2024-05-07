@@ -3,6 +3,7 @@ import { socket } from "../socket";
 import dayjs from "dayjs";
 import { useAuth } from "../hooks/store/useAuth";
 import ChatIcon from "./icons/ChatIcon";
+import React from "react";
 
 interface user {
   _id: string;
@@ -11,6 +12,8 @@ interface user {
   profileImg: string;
   conversationId: string;
   unread_msg?: number;
+  delete24View: boolean;
+  deleteAfterView: boolean;
 }
 
 interface chat {
@@ -94,7 +97,7 @@ export default function ChatListItem({
         {count > 0 && chatUser?.conversationId !== people.conversationId && (
           <div className="h-6 w-6 ml-auto text-sm font-bold place-content-center rounded-full text-white bg-gradient-to-r from-red-500 to-pink-600 bg-no-repeat bg-cover bg-center">{count}</div>
         )}
-        {chatBox && (
+        {chatBox && setOpenChat && (
           <button
             onClick={() => {
               setOpenChat(true);
