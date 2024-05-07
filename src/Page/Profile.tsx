@@ -1,4 +1,4 @@
-import React, { LegacyRef, useCallback, useEffect, useRef, useState } from "react";
+import React, { Dispatch, LegacyRef, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "../hooks/store/useAuth";
 import Header from "../Component/Header";
 import Sidebar from "../Component/Sidebar";
@@ -211,7 +211,7 @@ export default function Profile(): React.JSX.Element {
             {posts.length > 0 ? (
               <div className="border-t-2 border-gray-300 mt-10 pt-10 grid grid-cols-3 gap-1">
                 {posts.map((item, index) => (
-                  <PostProfileCard item={item} key={index} setViewPost={setViewPost} setSelectPost={setSelectPost} />
+                  <PostProfileCard item={item} key={index} setViewPost={setViewPost} setSelectPost={setSelectPost as Dispatch<SetStateAction<string>>} />
                 ))}
               </div>
             ) : (
@@ -222,7 +222,7 @@ export default function Profile(): React.JSX.Element {
                 <h2 className="text-lg font-bold text-gray-700">No Posts Yet</h2>
               </div>
             )}
-            <PostDetail setViewPost={setViewPost} viewPost={viewPost} postId={selectPost} />
+            <PostDetail setViewPost={setViewPost} viewPost={viewPost} postId={selectPost as string} />
           </div>
         </div>
       </main>

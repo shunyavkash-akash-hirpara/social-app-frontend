@@ -41,34 +41,33 @@ export default function VideoPlayer({
     const feedScroll = document.getElementById("feedScroll");
 
     const scrollCallBack = (e) => {
-      // const parentBounding = e.target.getBoundingClientRect();
+      if (videoRefs.current) {
+        const videoBounding = videoRefs.current.getBoundingClientRect();
+        const viewHeight = e.target.clientHeight;
+        const isVisible = !(videoBounding.bottom < 0 || videoBounding.top - viewHeight >= 0);
 
-      const videoBounding = videoRefs.current.getBoundingClientRect();
-
-      const viewHeight = e.target.clientHeight;
-      const isVisible = !(videoBounding.bottom < 0 || videoBounding.top - viewHeight >= 0);
-
-      if (isVisible && src._id === activeVideoId) {
-        if (videoRefs.current.paused) {
-          videoRefs.current.play();
-          setPause(false);
-        }
-      } else {
-        if (videoRefs.current.played) {
-          videoRefs.current.pause();
-          setPause(true);
+        if (isVisible && src._id === activeVideoId) {
+          if (videoRefs.current.paused) {
+            videoRefs.current.play();
+            setPause(false);
+          }
+        } else {
+          if (videoRefs.current.played) {
+            videoRefs.current.pause();
+            setPause(true);
+          }
         }
       }
     };
     feedScroll?.addEventListener("scroll", scrollCallBack);
     return () => {
-      feedScroll.removeEventListener("scroll", scrollCallBack);
+      feedScroll?.removeEventListener("scroll", scrollCallBack);
     };
   }, [activeVideoId, src._id]);
 
   useEffect(() => {
     try {
-      if (src._id === activeVideoId && !activeFeed) {
+      if (src._id === activeVideoId && !activeFeed && videoRefs.current) {
         videoRefs?.current?.play();
         videoRefs.current.muted = mute;
         setPause(false);
@@ -83,18 +82,20 @@ export default function VideoPlayer({
   }, [activeFeed, activeVideoId, mute, src._id]);
 
   const videoPlayToggle = () => {
-    if (videoRefs.current.paused) {
+    if (videoRefs.current?.paused) {
       videoRefs.current.play().then(() => {
         setPause(false);
       });
     } else {
-      videoRefs.current.pause();
+      videoRefs.current?.pause();
       setPause(true);
     }
   };
   const videoMuteToggle = () => {
-    videoRefs.current.muted = !videoRefs.current.muted;
-    setMute(videoRefs.current.muted);
+    if (videoRefs.current) {
+      videoRefs.current.muted = !videoRefs.current.muted;
+      setMute(videoRefs.current.muted);
+    }
   };
   return (
     <div className="relative">
