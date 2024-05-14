@@ -1,11 +1,26 @@
 import React from "react";
 
-export default function TwitterIcon({ className }: { className?: React.SVGAttributes<SVGSVGElement> | string }): React.JSX.Element {
+export default function TwitterIcon({
+  className,
+}: {
+  className?: React.SVGAttributes<SVGSVGElement> | string;
+}): React.JSX.Element {
   return (
-    <svg width="800px" height="800px" viewBox="0 0 24 24" fill="#E65026" xmlns="http://www.w3.org/2000/svg" className={className as string}>
-      <g id="SVGRepo_bgCarrier" stroke-width="0" />
+    <svg
+      width="800px"
+      height="800px"
+      viewBox="0 0 24 24"
+      fill="#E65026"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className as string}
+    >
+      <g id="SVGRepo_bgCarrier" strokeWidth="0" />
 
-      <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
+      <g
+        id="SVGRepo_tracerCarrier"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
 
       <g id="SVGRepo_iconCarrier">
         {" "}

@@ -48,6 +48,7 @@ export const APIS = {
   NOTIFICATION: {
     GET: "/notification",
     COUNT: "/notification/count",
+    FCM_TOKEN: "/notification/add-fcm"
   },
   SETTING: {
     GET: "/setting",

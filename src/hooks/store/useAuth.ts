@@ -29,6 +29,9 @@ interface AuthState {
   }) => void;
   setAccessToken: (accessToken: string) => void;
   setUserDatail: (username: string, profileImg: string) => void;
+  notificationPermission: boolean;
+  fcmToken: string;
+  setNotification: (fcmToken: string, notificationPermission: boolean) => void;
 }
 
 export const useAuth = create(
@@ -46,6 +49,8 @@ export const useAuth = create(
       userId: "",
       setProfile: false,
       isLoggedIn: false,
+      notificationPermission: undefined,
+      fcmToken: undefined,
       login: ({
         user,
         accessToken,
@@ -79,6 +84,8 @@ export const useAuth = create(
           userId: "",
           setProfile: false,
           isLoggedIn: false,
+          notificationPermission: undefined,
+          fcmToken: undefined,
         })),
       setUserDatail: (username: string, profileImg: string) => {
         set((state) => ({
@@ -100,6 +107,8 @@ export const useAuth = create(
       },
       setAccessToken: (accessToken: string) =>
         set((state: object) => ({ ...state, accessToken })),
+      setNotification: (fcmToken: string, notificationPermission: boolean) =>
+        set(() => ({ fcmToken, notificationPermission })),
     }),
     { name: "auth" }
   )
